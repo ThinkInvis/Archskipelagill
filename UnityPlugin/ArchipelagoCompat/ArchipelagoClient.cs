@@ -169,12 +169,14 @@ public class ArchipelagoClient {
     }
 
     public void CheckLocationsByName(params string[] names) {
-        Plugin.BepinLogger.LogMessage($"Attempting checks: {string.Join(", ", names.Select(n => '"' + n + '"'))}");
+        var unsentNames = names.Except(ArchiSaver.instance.sentChecks).Distinct();
+        Plugin.BepinLogger.LogMessage($"Attempting checks: {string.Join(", ", unsentNames.Select(n => '"' + n + '"'))}");
         if(session == null) {
             Plugin.BepinLogger.LogWarning($"Offline, can't send; queueing");
-            ArchiSaver.instance.ReceiveUnsentChecks(names);
+            ArchiSaver.instance.ReceiveUnsentChecks([.. unsentNames]);
             return;
         }
-        session.Locations.CompleteLocationChecks([.. names.Select(n => session.Locations.GetLocationIdFromName("Skigill", n))]);
+        session.Locations.CompleteLocationChecks([.. unsentNames.Select(n => session.Locations.GetLocationIdFromName("Skigill", n))]);
+        ArchiSaver.instance.ReceiveSentChecks([.. unsentNames]);
     }
 }

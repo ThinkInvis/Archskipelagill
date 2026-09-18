@@ -16,6 +16,7 @@ public class ArchiSaver:JSONsaver {
 
     public readonly Dictionary<string, int> receivedItemCounts = [];
     public readonly List<string> unsentChecks = [];
+    public readonly List<string> sentChecks = [];
 
     public void Awake() {
         if(instance != null) {
@@ -33,8 +34,11 @@ public class ArchiSaver:JSONsaver {
                 receivedItemCounts[kv[0]] = int.Parse(kv[1]);
             }
         }
-        if(metaProg.TryGetValue("archi_unsentChecks", out var checksStr)) {
+        if(metaProg.TryGetValue("archi_unsentChecks", out var checksStr) && checksStr.Length > 0) {
             unsentChecks.AddRange(checksStr.Split("|"));
+        }
+        if(metaProg.TryGetValue("archi_sentChecks", out var checksStr2) && checksStr2.Length > 0) {
+            sentChecks.AddRange(checksStr2.Split("|"));
         }
     }
 
@@ -93,13 +97,19 @@ public class ArchiSaver:JSONsaver {
         metaProg["archi_unsentChecks"] = String.Join("|", unsentChecks);
         PostSave();
     }
+    public void ReceiveSentChecks(params string[] checkNames) {
+        sentChecks.AddRange(checkNames);
+        PreSave();
+        metaProg["archi_sentChecks"] = String.Join("|", sentChecks);
+        PostSave();
+    }
     public void ResendChecks() {
         if(unsentChecks.Count > 0) {
             Plugin.BepinLogger.LogMessage($"Retrying {unsentChecks.Count} unsent checks");
-            Plugin.ArchipelagoClient.CheckLocationsByName([.. unsentChecks]);
             PreSave();
             metaProg["archi_unsentChecks"] = "";
             PostSave();
+            Plugin.ArchipelagoClient.CheckLocationsByName([.. unsentChecks]);
         }
     }
 
