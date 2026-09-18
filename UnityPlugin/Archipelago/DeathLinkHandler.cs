@@ -2,10 +2,11 @@
 using BepInEx;
 using System;
 using System.Collections.Generic;
+using System.Xml.Linq;
 
 namespace Archskipelagill.Archipelago;
 
-public class DeathLinkHandler {
+public class DeathLinkHandler : IDisposable {
     private static bool deathLinkEnabled;
     private readonly string slotName;
     private readonly DeathLinkService service;
@@ -115,5 +116,11 @@ public class DeathLinkHandler {
         } catch(Exception e) {
             Plugin.BepinLogger.LogError(e);
         }
+    }
+
+    public void Dispose() {
+        service.OnDeathLinkReceived -= DeathLinkReceived;
+        On.CharaStats.Update -= CharaStats_Update;
+        On.mainCameraScript.playerDeath -= MainCameraScript_playerDeath;
     }
 }

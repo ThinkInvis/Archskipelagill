@@ -36,7 +36,7 @@ public class Plugin:BaseUnityPlugin {
     }
 
     private void OnApplicationQuit() {
-        ArchipelagoClient.Disconnect(true);
+        ArchipelagoClient.Disconnect();
     }
 
     private void OnGUI() {

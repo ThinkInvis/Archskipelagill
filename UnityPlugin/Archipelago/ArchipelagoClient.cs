@@ -45,7 +45,7 @@ public class ArchipelagoClient {
     /// add handlers for Archipelago events
     /// </summary>
     private void SetupSession() {
-        session.MessageLog.OnMessageReceived += message => ArchipelagoConsole.LogMessage(message.ToString());
+        session.MessageLog.OnMessageReceived += OnMessageReceived;
         session.Items.ItemReceived += OnItemReceived;
         session.Socket.ErrorReceived += OnSessionErrorReceived;
         session.Socket.SocketClosed += OnSessionSocketClosed;
@@ -106,21 +106,32 @@ public class ArchipelagoClient {
         attemptingConnection = false;
     }
 
+    bool disconnecting = false;
     /// <summary>
     /// something went wrong, or we need to properly disconnect from the server. cleanup and re null our session
     /// </summary>
-    /// <param name="blocking">if true, forces synchronous wait for the session to disconnect</param>
-    public void Disconnect(bool blocking = false) {
+    public void Disconnect() {
+        if(disconnecting) return;
+        disconnecting = true;
         Plugin.BepinLogger.LogDebug("disconnecting from server...");
         var task = session?.Socket.DisconnectAsync();
-        if(blocking) task.Wait();
+        session.Socket.SocketClosed -= OnSessionSocketClosed;
+        session.MessageLog.OnMessageReceived -= OnMessageReceived;
+        session.Items.ItemReceived -= OnItemReceived;
+        session.Socket.ErrorReceived -= OnSessionErrorReceived;
+        DeathLinkHandler?.Dispose();
         session = null;
         Authenticated = false;
+        disconnecting = false;
     }
 
 
     public void SendMessage(string message) {
         session.Socket.SendPacketAsync(new SayPacket { Text = message });
+    }
+
+    private void OnMessageReceived(LogMessage message) {
+        ArchipelagoConsole.LogMessage(message.ToString());
     }
 
     public readonly Dictionary<string, int> receivedItemCounts = [];
