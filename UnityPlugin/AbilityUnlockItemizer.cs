@@ -1,0 +1,82 @@
+﻿using MonoMod.Cil;
+using System;
+using System.Collections.Generic;
+using System.Text;
+using UnityEngine;
+
+namespace Archskipelagill;
+
+public class AbilityUnlockItemizer {
+    public AbilityUnlockItemizer() {
+        On.charaSelectScript.selected += CharaSelectScript_selected;
+        On.charaSelectScript.updateUnlockStatus += CharaSelectScript_updateUnlockStatus;
+        On.diffSelectScript.updateUnlockStatus += DiffSelectScript_updateUnlockStatus;
+        On.modeSelectScript.updateUnlockStatus += ModeSelectScript_updateUnlockStatus;
+        IL.chestLootScript.loote += ChestLootScript_loote;
+        On.chestLootScript.loote += ChestLootScript_loote1;
+    }
+
+    private int ChestLootScript_loote1(On.chestLootScript.orig_loote orig, chestLootScript self) {
+        var dict = GameObject.FindGameObjectWithTag("Dict").GetComponent<weaponDictionary>();
+        var origList = (Transform[])dict.WeaponList.Clone();
+        for(int i = 1; i <= origList.Length; i++) {
+            var wname = origList[i].gameObject.name.Replace("(Clone)", "");
+            if(!Plugin.ArchipelagoClient.receivedItemCounts.TryGetValue("Weapon: " + wname, out var wcount) || wcount == 0) {
+                Plugin.BepinLogger.LogMessage($"Blocked weapon {wname} from loot due to archilock");
+                dict.WeaponList[i] = null;
+            }
+        }
+        var retv = orig(self);
+        dict.WeaponList = origList;
+        return retv;
+    }
+
+    private void ChestLootScript_loote(ILContext il) {
+        ILCursor c = new(il);
+        c.GotoNext(MoveType.After,
+            x => x.MatchBrfalse(out _),
+            x => x.MatchLdloc(0),
+            x => x.MatchLdloc(5));
+        c.Index++;
+    }
+
+    private void ModeSelectScript_updateUnlockStatus(On.modeSelectScript.orig_updateUnlockStatus orig, modeSelectScript self) {
+        orig(self);
+        if(self.mode != "normal" && self.unlocked) {
+            self.unlocked = false;
+            self.cadenas.SetActive(true);
+            //TODO: replace lock icon with a custom asset, make sure to revert to original once unlocked from archi
+        }
+    }
+
+    private void DiffSelectScript_updateUnlockStatus(On.diffSelectScript.orig_updateUnlockStatus orig, diffSelectScript self) {
+        orig(self);
+        Plugin.ArchipelagoClient.receivedItemCounts.TryGetValue("Progressive Difficulty", out var tcc);
+        if(tcc < self.difficulty && self.unlocked) {
+            self.unlocked = false;
+            self.cadenas.SetActive(true);
+            //TODO: replace lock icon with a custom asset
+        }
+    }
+
+    private void CharaSelectScript_updateUnlockStatus(On.charaSelectScript.orig_updateUnlockStatus orig, charaSelectScript self) {
+        orig(self);
+        var targetChar = "Character: " + Enum.GetName(typeof(SkillTree.SkillNodeSpawnId), self.ID).ToTitleCase();
+        if(self.unlocked && (!Plugin.ArchipelagoClient.receivedItemCounts.TryGetValue(targetChar, out var tcc) || tcc == 0)) {
+            self.unlocked = false;
+            self.cadenas.SetActive(true);
+            //TODO: replace lock icon with a custom asset
+        }
+    }
+
+    private void CharaSelectScript_selected(On.charaSelectScript.orig_selected orig, charaSelectScript self) {
+        orig(self);
+        var targetChar = "Character: " + Enum.GetName(typeof(SkillTree.SkillNodeSpawnId), self.ID).ToTitleCase();
+        if(self.unlocked && (!Plugin.ArchipelagoClient.receivedItemCounts.TryGetValue(targetChar, out var tcc) || tcc == 0)) {
+            self.unlocked = false;
+            self.cadenas.SetActive(true);
+            self.ls.charaUnlocked = false;
+            //TODO: replace lock icon with a custom asset
+        }
+    }
+}
