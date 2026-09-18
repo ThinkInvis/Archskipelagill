@@ -92,6 +92,8 @@ public class ArchipelagoClient {
             outText = $"Successfully connected to {ServerData.Uri} as {ServerData.SlotName}!";
 
             ArchipelagoConsole.LogMessage(outText);
+
+            ArchiSaver.instance.ResendChecks();
         } else {
             var failure = (LoginFailure)result;
             outText = $"Failed to connect to {ServerData.Uri} as {ServerData.SlotName}.";
@@ -169,7 +171,8 @@ public class ArchipelagoClient {
     public void CheckLocationsByName(params string[] names) {
         Plugin.BepinLogger.LogMessage($"Attempting checks: {string.Join(", ", names.Select(n => '"' + n + '"'))}");
         if(session == null) {
-            Plugin.BepinLogger.LogWarning($"Offline, can't send");
+            Plugin.BepinLogger.LogWarning($"Offline, can't send; queueing");
+            ArchiSaver.instance.ReceiveUnsentChecks(names);
             return;
         }
         session.Locations.CompleteLocationChecks([.. names.Select(n => session.Locations.GetLocationIdFromName("Skigill", n))]);

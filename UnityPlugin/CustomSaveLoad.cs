@@ -14,6 +14,9 @@ public class ArchiSaver:JSONsaver {
     public int lastReceivedIndex = 0;
     public int lastSavedIndex = 0;
 
+    public readonly Dictionary<string, int> receivedItemCounts = [];
+    public readonly List<string> unsentChecks = [];
+
     public void Awake() {
         if(instance != null) {
             Plugin.BepinLogger.LogFatal("Multiple instances of intended-singleton ArchiSaver component created");
@@ -29,6 +32,9 @@ public class ArchiSaver:JSONsaver {
                 var kv = pair.Split(";");
                 receivedItemCounts[kv[0]] = int.Parse(kv[1]);
             }
+        }
+        if(metaProg.TryGetValue("archi_unsentChecks", out var checksStr)) {
+            unsentChecks.AddRange(checksStr.Split("|"));
         }
     }
 
@@ -48,21 +54,14 @@ public class ArchiSaver:JSONsaver {
         if(!receivedItemCounts.ContainsKey(itemName))
             receivedItemCounts[itemName] = 0;
         receivedItemCounts[itemName]++;
-        var mpo = GameObject.FindGameObjectWithTag("MetaProg");
-        JSONsaver stockSaver = null;
-        if(mpo != null)
-            mpo.TryGetComponent<JSONsaver>(out stockSaver);
-        if(stockSaver != null) {
-            metaProg = stockSaver.metaProg;
-        }
 
+        PreSave();
         var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
 
         switch(itemName) {
             case "Bonus Gill":
                 //todo: progressive amount based on region/difficulty unlocks
                 metaProg["totalMetaMoney"] = (int.Parse(metaProg.GetValueOrDefault("totalMetaMoney", "0")) + 50).ToString();
-                if(stockSaver != null) stockSaver.metaProg["totalMetaMoney"] = metaProg["totalMetaMoney"];
                 if(cs.metaMenu) {
                     cs.XP += 50;
                     cs.XPtoDisplay += 50;
@@ -83,14 +82,46 @@ public class ArchiSaver:JSONsaver {
         lastSavedIndex++;
         metaProg["archi_savedItems"] = string.Join("|", receivedItemCounts.ToList().Select(kvp => kvp.Key + ";" + kvp.Value.ToString()));
         metaProg["archi_lastIndex"] = (lastSavedIndex).ToString();
-        if(stockSaver != null)
-            stockSaver.metaProg = metaProg;
-        save();
+        PostSave();
 
         Plugin.BepinLogger.LogMessage($"Received item {itemName}, total count now {receivedItemCounts[itemName]}");
     }
 
-    public readonly Dictionary<string, int> receivedItemCounts = [];
+    public void ReceiveUnsentChecks(params string[] checkNames) {
+        unsentChecks.AddRange(checkNames);
+        PreSave();
+        metaProg["archi_unsentChecks"] = String.Join("|", unsentChecks);
+        PostSave();
+    }
+    public void ResendChecks() {
+        if(unsentChecks.Count > 0) {
+            Plugin.BepinLogger.LogMessage($"Retrying {unsentChecks.Count} unsent checks");
+            Plugin.ArchipelagoClient.CheckLocationsByName([.. unsentChecks]);
+            PreSave();
+            metaProg["archi_unsentChecks"] = "";
+            PostSave();
+        }
+    }
+
+    private void PreSave() {
+        var mpo = GameObject.FindGameObjectWithTag("MetaProg");
+        JSONsaver stockSaver = null;
+        if(mpo != null)
+            mpo.TryGetComponent<JSONsaver>(out stockSaver);
+        if(stockSaver != null) {
+            metaProg = stockSaver.metaProg;
+        }
+    }
+    private void PostSave() {
+        var mpo = GameObject.FindGameObjectWithTag("MetaProg");
+        JSONsaver stockSaver = null;
+        if(mpo != null)
+            mpo.TryGetComponent<JSONsaver>(out stockSaver);
+        if(stockSaver != null) {
+            stockSaver.metaProg = metaProg;
+        }
+        save();
+    }
 }
 
 public class CustomSaveLoad {
