@@ -10,6 +10,17 @@ public class CustomSaveLoad {
     public CustomSaveLoad() {
         IL.JSONsaver.save += JSONsaver_save;
         IL.JSONsaver.load += JSONsaver_load;
+        On.MoneyBagScript.addMoneyToBag += MoneyBagScript_addMoneyToBag;
+    }
+
+    private void MoneyBagScript_addMoneyToBag(On.MoneyBagScript.orig_addMoneyToBag orig, MoneyBagScript self) {
+        var mpo = GameObject.FindGameObjectWithTag("MetaProg");
+        if(mpo != null && mpo.TryGetComponent<JSONsaver>(out var saver)) {
+            if(!saver.metaProg.TryGetValue("archi_manualMetaMoney", out var manualMoneyStr))
+                manualMoneyStr = "0";
+            saver.metaProg["archi_manualMetaMoney"] = (int.Parse(manualMoneyStr) + self.amount).ToString(); //save this just in case we need to implement rebuilding total from manual collection + filler item count at some point
+        }
+        orig(self);
     }
 
     private void JSONsaver_load(ILContext il) {
