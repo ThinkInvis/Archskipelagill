@@ -9,14 +9,14 @@ namespace Archskipelagill.Utils;
 public static class ArchipelagoConsole {
     public static bool Hidden = true;
 
-    private static List<string> logLines = new();
+    private static readonly List<string> logLines = [];
     private static Vector2 scrollView;
     private static Rect window;
     private static Rect scroll;
     private static Rect text;
     private static Rect hideShowButton;
 
-    private static GUIStyle textStyle = new();
+    private static readonly GUIStyle textStyle = new();
     private static string scrollText = "";
     private static float lastUpdateTime = Time.time;
     private const int MaxLogLines = 80;
@@ -72,7 +72,7 @@ public static class ArchipelagoConsole {
 
         if(Hidden) {
             if(logLines.Count > 0) {
-                scrollText = logLines[logLines.Count - 1];
+                scrollText = logLines[^1];
             }
         } else {
             for(var i = 0; i < logLines.Count; i++) {

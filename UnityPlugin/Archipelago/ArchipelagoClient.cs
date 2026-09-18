@@ -87,7 +87,7 @@ public class ArchipelagoClient {
             Authenticated = true;
 
             DeathLinkHandler = new(session.CreateDeathLinkService(), ServerData.SlotName);
-            session.Locations.CompleteLocationChecksAsync(ServerData.CheckedLocations.ToArray());
+            session.Locations.CompleteLocationChecksAsync([.. ServerData.CheckedLocations]);
             outText = $"Successfully connected to {ServerData.Uri} as {ServerData.SlotName}!";
 
             ArchipelagoConsole.LogMessage(outText);

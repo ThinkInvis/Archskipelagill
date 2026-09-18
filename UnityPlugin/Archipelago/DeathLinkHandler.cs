@@ -7,7 +7,7 @@ namespace Archskipelagill.Archipelago;
 
 public class DeathLinkHandler {
     private static bool deathLinkEnabled;
-    private string slotName;
+    private readonly string slotName;
     private readonly DeathLinkService service;
     private readonly Queue<DeathLink> deathLinks = new();
 

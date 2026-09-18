@@ -24,14 +24,14 @@ public class ArchipelagoData {
     public ArchipelagoData() {
         Uri = "localhost";
         SlotName = "Player1";
-        CheckedLocations = new();
+        CheckedLocations = [];
     }
 
     public ArchipelagoData(string uri, string slotName, string password) {
         Uri = uri;
         SlotName = slotName;
         Password = password;
-        CheckedLocations = new();
+        CheckedLocations = [];
     }
 
     /// <summary>
