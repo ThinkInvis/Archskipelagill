@@ -9,7 +9,7 @@ namespace Archskipelagill;
 
 [BepInPlugin(PluginGUID, PluginName, PluginVersion)]
 public class Plugin:BaseUnityPlugin {
-    public const string PluginGUID = "com.yourName.projectName";
+    public const string PluginGUID = "com.ThinkInvisible.Archskipelagill";
     public const string PluginName = "Archskipelagill";
     public const string PluginVersion = "1.0.0";
 
