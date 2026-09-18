@@ -1,4 +1,4 @@
-﻿using Archskipelagill.Archipelago;
+﻿using Archskipelagill.ArchipelagoCompat;
 using BepInEx;
 using System.Collections.Generic;
 using System.Linq;

@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace Archskipelagill.Archipelago;
+namespace Archskipelagill.ArchipelagoCompat;
 
 public class DeathLinkHandler : IDisposable {
     private static bool deathLinkEnabled;

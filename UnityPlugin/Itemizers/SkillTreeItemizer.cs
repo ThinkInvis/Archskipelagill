@@ -31,7 +31,7 @@ public class SkillTreeItemizer {
             tkr.sortedIndex = i;
             tkr.node = SkillTree.skillTree[i];
 
-            if(Plugin.ArchipelagoClient.receivedItemCounts.TryGetValue($"Skigill Region: {ti.ToTitleCase(Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToLower())}", out var n) && n > 0)
+            if(ArchiSaver.instance.receivedItemCounts.TryGetValue($"Skigill Region: {ti.ToTitleCase(Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToLower())}", out var n) && n > 0)
                 tkr.Unlock();
             else
                 tkr.Lock();
@@ -53,7 +53,7 @@ public class SkillTreeItemizer {
 
     void EnsureSafeSpawn(CharaStats self) {
         var targetChar = "Skigill Region: " + Enum.GetName(typeof(SkillTree.SkillNodeSpawnId), self.chara).ToTitleCase();
-        if(!Plugin.ArchipelagoClient.receivedItemCounts.TryGetValue(targetChar, out var tcc) || tcc == 0) { //spawn region is locked, teleport to and activate mage region which for now is guaranteed unlocked
+        if(!ArchiSaver.instance.receivedItemCounts.TryGetValue(targetChar, out var tcc) || tcc == 0) { //spawn region is locked, teleport to and activate mage region which for now is guaranteed unlocked
             var mgo = GameObject.Find("gridHolder/grid/Perks/Mage");
             mgo.GetComponent<skigillNode>().autoActivate();
             self.transform.position = new(mgo.transform.position.x, mgo.transform.position.y, 0);

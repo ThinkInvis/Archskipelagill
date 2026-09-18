@@ -1,13 +1,12 @@
 ﻿using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Archskipelagill.Archipelago;
+namespace Archskipelagill.ArchipelagoCompat;
 
 public class ArchipelagoData {
     public string Uri;
     public string SlotName;
     public string Password;
-    public int Index;
 
     public List<long> CheckedLocations;
 

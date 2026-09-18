@@ -1,4 +1,4 @@
-﻿using Archskipelagill.Archipelago;
+﻿using Archskipelagill.ArchipelagoCompat;
 using Archskipelagill.Itemizers;
 using Archskipelagill.Utils;
 using BepInEx;

@@ -9,6 +9,8 @@ if TYPE_CHECKING:
 
 from .skilltree_data import WEAPON_NAMES, STARTER_WEAPON_NAMES, UNLOCK_WEAPON_NAMES
 
+# Note: do not use | or ; characters in item names, used as delimiters by client plugin save/load script
+
 ITEM_NAME_TO_ID = {
     "Bonus Gill": 1,
     "Skigill Region: Mage": 2,

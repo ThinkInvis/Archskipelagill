@@ -8,10 +8,11 @@ using Archskipelagill.Utils;
 using BepInEx.Logging;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
 
-namespace Archskipelagill.Archipelago;
+namespace Archskipelagill.ArchipelagoCompat;
 
 public class ArchipelagoClient {
     public const string APVersion = "0.6.7";
@@ -22,7 +23,7 @@ public class ArchipelagoClient {
 
     public static ArchipelagoData ServerData = new();
     private DeathLinkHandler DeathLinkHandler;
-    private ArchipelagoSession session;
+    internal ArchipelagoSession session;
 
     /// <summary>
     /// call to connect to an Archipelago session. Connection info should already be set up on ServerData
@@ -134,7 +135,6 @@ public class ArchipelagoClient {
         ArchipelagoConsole.LogMessage(message.ToString());
     }
 
-    public readonly Dictionary<string, int> receivedItemCounts = [];
     /// <summary>
     /// we received an item so reward it here
     /// </summary>
@@ -142,15 +142,9 @@ public class ArchipelagoClient {
     private void OnItemReceived(ReceivedItemsHelper helper) {
         var receivedItem = helper.DequeueItem();
 
-        if(helper.Index <= ServerData.Index) return;
+        if(helper.Index <= ArchiSaver.instance.lastReceivedIndex) return;
 
-        ServerData.Index++;
-
-        if(!receivedItemCounts.ContainsKey(receivedItem.ItemName))
-            receivedItemCounts[receivedItem.ItemName] = 0;
-        receivedItemCounts[receivedItem.ItemName]++;
-
-        Plugin.BepinLogger.LogMessage($"Received item {receivedItem.ItemName}, now {receivedItemCounts[receivedItem.ItemName]}");
+        ArchiSaver.instance.ReceiveArchiItem(receivedItem);
     }
 
     /// <summary>
