@@ -165,6 +165,10 @@ public class ArchipelagoClient {
 
     public void CheckLocationsByName(params string[] names) {
         Plugin.BepinLogger.LogMessage($"Attempting checks: {string.Join(", ", names.Select(n => '"' + n + '"'))}");
+        if(session == null) {
+            Plugin.BepinLogger.LogWarning($"Offline, can't send");
+            return;
+        }
         session.Locations.CompleteLocationChecks([.. names.Select(n => session.Locations.GetLocationIdFromName("Skigill", n))]);
     }
 }
