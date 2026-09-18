@@ -10,7 +10,7 @@ namespace Archskipelagill;
 public class Plugin:BaseUnityPlugin {
     public const string PluginGUID = "com.yourName.projectName";
     public const string PluginName = "Archskipelagill";
-    public const string PluginVersion = "1.0.0-alpha";
+    public const string PluginVersion = "1.0.0";
 
     public const string ModDisplayInfo = $"{PluginName} v{PluginVersion}";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";

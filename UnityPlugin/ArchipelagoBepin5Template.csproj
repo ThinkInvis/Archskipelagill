@@ -81,4 +81,12 @@
       <None Include="lib\Archipelago.MultiClient.Net.dll" />
     </ItemGroup>
 
+  <ItemGroup>
+    <ContentWithTargetPath Include="lib\MMHOOK_Assembly-CSharp.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>MMHOOK_Assembly-CSharp.dll</TargetPath>
+    </ContentWithTargetPath>
+    <None Include="lib\MMHOOK_Assembly-CSharp.dll" />
+  </ItemGroup>
+
 </Project>

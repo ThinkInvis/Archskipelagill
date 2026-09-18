@@ -12,14 +12,14 @@ public class AbilityUnlockItemizer {
         On.charaSelectScript.updateUnlockStatus += CharaSelectScript_updateUnlockStatus;
         On.diffSelectScript.updateUnlockStatus += DiffSelectScript_updateUnlockStatus;
         On.modeSelectScript.updateUnlockStatus += ModeSelectScript_updateUnlockStatus;
-        IL.chestLootScript.loote += ChestLootScript_loote;
-        On.chestLootScript.loote += ChestLootScript_loote1;
+        On.chestLootScript.loote += ChestLootScript_loote;
     }
 
-    private int ChestLootScript_loote1(On.chestLootScript.orig_loote orig, chestLootScript self) {
+    private int ChestLootScript_loote(On.chestLootScript.orig_loote orig, chestLootScript self) {
         var dict = GameObject.FindGameObjectWithTag("Dict").GetComponent<weaponDictionary>();
         var origList = (Transform[])dict.WeaponList.Clone();
-        for(int i = 1; i <= origList.Length; i++) {
+        for(int i = 0; i < origList.Length; i++) {
+            if(origList[i] == null) continue;
             var wname = origList[i].gameObject.name.Replace("(Clone)", "");
             if(!Plugin.ArchipelagoClient.receivedItemCounts.TryGetValue("Weapon: " + wname, out var wcount) || wcount == 0) {
                 Plugin.BepinLogger.LogMessage($"Blocked weapon {wname} from loot due to archilock");
@@ -29,15 +29,6 @@ public class AbilityUnlockItemizer {
         var retv = orig(self);
         dict.WeaponList = origList;
         return retv;
-    }
-
-    private void ChestLootScript_loote(ILContext il) {
-        ILCursor c = new(il);
-        c.GotoNext(MoveType.After,
-            x => x.MatchBrfalse(out _),
-            x => x.MatchLdloc(0),
-            x => x.MatchLdloc(5));
-        c.Index++;
     }
 
     private void ModeSelectScript_updateUnlockStatus(On.modeSelectScript.orig_updateUnlockStatus orig, modeSelectScript self) {
