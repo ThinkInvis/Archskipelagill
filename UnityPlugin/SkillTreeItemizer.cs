@@ -1,12 +1,7 @@
-﻿using Archskipelagill.Archipelago;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Globalization;
 using System.Linq;
-using System.Text;
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEngine.ParticleSystem.PlaybackState;
 
 namespace Archskipelagill;
 
