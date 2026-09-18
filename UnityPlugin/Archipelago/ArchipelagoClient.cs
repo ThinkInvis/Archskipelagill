@@ -109,12 +109,17 @@ public class ArchipelagoClient {
     /// <summary>
     /// something went wrong, or we need to properly disconnect from the server. cleanup and re null our session
     /// </summary>
+#if DEBUG
+    public void Disconnect() {
+#else
     private void Disconnect() {
+#endif
         Plugin.BepinLogger.LogDebug("disconnecting from server...");
         session?.Socket.DisconnectAsync();
         session = null;
         Authenticated = false;
     }
+
 
     public void SendMessage(string message) {
         session.Socket.SendPacketAsync(new SayPacket { Text = message });

@@ -71,6 +71,23 @@ public class Plugin:BaseUnityPlugin {
         if(GUI.Button(new Rect(16, 180, 200, 20), "DEBUG: Bake Skill Tree Map")) {
             SkillTree.BuildAndExportMaps();
         }
+        if(GUI.Button(new Rect(16, 210, 200, 20), "DEBUG: Interrupt Connection")) {
+            ArchipelagoClient.Disconnect();
+        }
+        if(GUI.Button(new Rect(16, 240, 200, 20), "DEBUG: Cheat: Lodsemone")) {
+            var cs = GameObject.Find("PlayerCharacter").GetComponent<CharaStats>();
+            cs.XP += 1000;
+            cs.XPtoDisplay += 1000;
+            cs.totalXP += 1000;
+        }
+        if(GUI.Button(new Rect(16, 270, 200, 20), "DEBUG: Cheat: Regen")) {
+            var cs = GameObject.Find("PlayerCharacter").GetComponent<CharaStats>();
+            cs.HPREGEN += 10000;
+        }
+        if(GUI.Button(new Rect(16, 270, 200, 20), "DEBUG: Cheat: Skip Time")) {
+            var ts = GameObject.Find("Main Camera/Canvas/timer").GetComponent<timerScript>();
+            ts.t = ts.endTime - 10f;
+        }
 #endif
         GUI.EndGroup();
     }
