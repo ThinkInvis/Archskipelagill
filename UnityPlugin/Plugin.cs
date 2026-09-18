@@ -84,7 +84,7 @@ public class Plugin:BaseUnityPlugin {
             var cs = GameObject.Find("PlayerCharacter").GetComponent<CharaStats>();
             cs.HPREGEN += 10000;
         }
-        if(GUI.Button(new Rect(16, 270, 200, 20), "DEBUG: Cheat: Skip Time")) {
+        if(GUI.Button(new Rect(16, 300, 200, 20), "DEBUG: Cheat: Skip Time")) {
             var ts = GameObject.Find("Main Camera/Canvas/timer").GetComponent<timerScript>();
             ts.t = ts.endTime - 10f;
         }
