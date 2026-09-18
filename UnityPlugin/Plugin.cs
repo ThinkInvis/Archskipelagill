@@ -21,6 +21,7 @@ public class Plugin:BaseUnityPlugin {
     public RoundEndItemizer roundEndItemizer;
     public AbilityUnlockItemizer abilityUnlockItemizer;
 
+#pragma warning disable IDE0051 //Used by Unity Engine
     private void Awake() {
         // Plugin startup logic
         BepinLogger = Logger;
@@ -91,4 +92,5 @@ public class Plugin:BaseUnityPlugin {
 #endif
         GUI.EndGroup();
     }
+#pragma warning restore IDE0051
 }
