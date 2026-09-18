@@ -25,13 +25,12 @@ public class SkillTreeItemizer {
             tkr.unsortedIndex = i;
         }
         var allValidNodes = avnUnsorted.OrderBy(n => n.transform.position.y).ThenBy(n => n.transform.position.x).ToList();
-        TextInfo ti = new CultureInfo("en-US", false).TextInfo;
         for(var i = 0; i < allValidNodes.Count; i++) {
             var tkr = allValidNodes[i].gameObject.GetComponent<SkillTreeIndexTracker>(); //guaranteed to exist from previous loop
             tkr.sortedIndex = i;
             tkr.node = SkillTree.skillTree[i];
 
-            if(ArchiSaver.instance.receivedItemCounts.TryGetValue($"Skigill Region: {ti.ToTitleCase(Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToLower())}", out var n) && n > 0)
+            if(ArchiSaver.instance.receivedItemCounts.TryGetValue($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToTitleCase()}", out var n) && n > 0)
                 tkr.Unlock();
             else
                 tkr.Lock();
@@ -73,6 +72,18 @@ public class SkillTreeItemizer {
         var isPerk = tkr.node.type == SkillTree.SkillNodeType.PERK;
         if(!isChest && !isPerk) return;
         Plugin.ArchipelagoClient.CheckLocationsByName($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? tkr.node.chestIndex : tkr.node.perkIndex) + 1} ({Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region)})");
+    }
+
+    public void RescanRegions() {
+        foreach(var tkr in GameObject.FindObjectsByType<SkillTreeIndexTracker>(FindObjectsSortMode.InstanceID)) {
+            if(!tkr.isActiveAndEnabled) continue;
+
+            if(ArchiSaver.instance.receivedItemCounts.TryGetValue($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToTitleCase()}", out var n) && n > 0)
+                tkr.Unlock();
+            else
+                tkr.Lock();
+
+        }
     }
 }
 

@@ -1,4 +1,5 @@
-﻿using MonoMod.Cil;
+﻿using Archskipelagill.Itemizers;
+using MonoMod.Cil;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -67,6 +68,15 @@ public class ArchiSaver:JSONsaver {
                     cs.XPtoDisplay += 50;
                     cs.updateXPtoDisplay();
                 }
+                break;
+            case "Skigill Region: Mage":
+            case "Skigill Region: Strongman":
+            case "Skigill Region: Fox":
+            case "Skigill Region: Prototype":
+            case "Skigill Region: Dragon":
+            case "Skigill Region: Dwarves":
+            case "Skigill Region: Bosses":
+                Plugin.instance.skillTreeItemizer.RescanRegions();
                 break;
         }
 
