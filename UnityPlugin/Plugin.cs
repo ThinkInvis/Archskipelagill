@@ -35,6 +35,10 @@ public class Plugin:BaseUnityPlugin {
         ArchipelagoConsole.LogMessage($"{ModDisplayInfo} loaded!");
     }
 
+    private void OnApplicationExit() {
+        ArchipelagoClient.Disconnect();
+    }
+
     private void OnGUI() {
         
         GUI.BeginGroup(new Rect(Screen.width - 332, 200, 332, Screen.height - 200));
