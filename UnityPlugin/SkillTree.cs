@@ -127,7 +127,7 @@ public static partial class SkillTree {
 
     public enum SkillNodeType { UNKNOWN, STAT, CHEST, PERK, BOSS, BOSS_FINAL };
     public enum SkillNodeSpawnId { NONE, MAGE, STRONGMAN, FOX, PROTOTYPE, DWARVES, DRAGON };
-    public enum SkillNodeRegion { MAGE, PROTOTYPE, DRAGON, STRONGMAN, FOX, DWARVES, BOSS };
+    public enum SkillNodeRegion { MAGE, PROTOTYPE, DRAGON, STRONGMAN, FOX, DWARVES, BOSSES };
 
     public struct SkillNode(SkillNodeType _type, int[] _neighbors, SkillNodeSpawnId _spawnId, SkillNodeRegion _region, int _originalIndex, int _chestIndex, int _perkIndex) {
         public SkillNodeType type = _type;

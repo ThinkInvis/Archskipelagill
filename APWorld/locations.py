@@ -70,7 +70,7 @@ def create_regular_locations(world: SkigillWorld) -> None:
         SkillNodeRegion.PROTOTYPE: world.get_region("Prototype"),
         SkillNodeRegion.DWARVES: world.get_region("Dwarves"),
         SkillNodeRegion.DRAGON: world.get_region("Dragon"),
-        SkillNodeRegion.BOSS: world.get_region("Bosses"),
+        SkillNodeRegion.BOSSES: world.get_region("Bosses"),
     }
     
     for node in [n for n in SKILL_TREE if n.type == SkillNodeType.CHEST]:
@@ -89,22 +89,22 @@ def create_regular_locations(world: SkigillWorld) -> None:
     regions[SkillNodeRegion.DRAGON].add_locations(get_location_names_with_ids(["Escaped with Dragon"]), SkigillLocation)
             
     lnidList = list(LOCATION_NAME_TO_ID.keys())
-    regions[SkillNodeRegion.BOSS].add_locations(get_location_names_with_ids(lnidList[0:6]), SkigillLocation)
+    regions[SkillNodeRegion.BOSSES].add_locations(get_location_names_with_ids(lnidList[0:6]), SkigillLocation)
 
     if world.options.goal_type > 0:
-        regions[SkillNodeRegion.BOSS].add_locations(get_location_names_with_ids(["Defeated Final Boss"]), SkigillLocation)
+        regions[SkillNodeRegion.BOSSES].add_locations(get_location_names_with_ids(["Defeated Final Boss"]), SkigillLocation)
 
     if world.options.goal_type > 1:
-        regions[SkillNodeRegion.BOSS].add_locations(get_location_names_with_ids(["I'm The Boss Now"]), SkigillLocation)
+        regions[SkillNodeRegion.BOSSES].add_locations(get_location_names_with_ids(["I'm The Boss Now"]), SkigillLocation)
 
     if world.options.goal_type > 2:
-        regions[SkillNodeRegion.BOSS].add_locations(get_location_names_with_ids(lnidList[9:16]), SkigillLocation)
+        regions[SkillNodeRegion.BOSSES].add_locations(get_location_names_with_ids(lnidList[9:16]), SkigillLocation)
 
     if world.options.goal_type > 3:
-        regions[SkillNodeRegion.BOSS].add_locations(get_location_names_with_ids(["Defeated Final Boss on Difficulty 7"]), SkigillLocation)
+        regions[SkillNodeRegion.BOSSES].add_locations(get_location_names_with_ids(["Defeated Final Boss on Difficulty 7"]), SkigillLocation)
 
     if world.options.goal_type > 4:
-        regions[SkillNodeRegion.BOSS].add_locations(get_location_names_with_ids(["I'm The Boss Now on Difficulty 7"]), SkigillLocation)
+        regions[SkillNodeRegion.BOSSES].add_locations(get_location_names_with_ids(["I'm The Boss Now on Difficulty 7"]), SkigillLocation)
 
 def create_events(world: SkigillWorld) -> None:
     boss_region = world.get_region("Bosses")

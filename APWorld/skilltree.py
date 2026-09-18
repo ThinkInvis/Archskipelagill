@@ -24,7 +24,7 @@ class SkillNodeRegion(Enum):
     DWARVES = 4
     PROTOTYPE = 5
     DRAGON = 6
-    BOSS = 7
+    BOSSES = 7
 
 class SkillNode:
     def __init__(self, type, neighbors, spawn_id, region, original_index, chest_index, perk_index):
