@@ -109,9 +109,11 @@ public class ArchipelagoClient {
     /// <summary>
     /// something went wrong, or we need to properly disconnect from the server. cleanup and re null our session
     /// </summary>
-    public void Disconnect() {
+    /// <param name="blocking">if true, forces synchronous wait for the session to disconnect</param>
+    public void Disconnect(bool blocking = false) {
         Plugin.BepinLogger.LogDebug("disconnecting from server...");
-        session?.Socket.DisconnectAsync();
+        var task = session?.Socket.DisconnectAsync();
+        if(blocking) task.Wait();
         session = null;
         Authenticated = false;
     }

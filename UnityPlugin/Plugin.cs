@@ -35,8 +35,8 @@ public class Plugin:BaseUnityPlugin {
         ArchipelagoConsole.LogMessage($"{ModDisplayInfo} loaded!");
     }
 
-    private void OnApplicationExit() {
-        ArchipelagoClient.Disconnect();
+    private void OnApplicationQuit() {
+        ArchipelagoClient.Disconnect(true);
     }
 
     private void OnGUI() {
