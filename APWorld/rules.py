@@ -100,5 +100,3 @@ def set_all_location_rules(world: SkigillWorld) -> None:
 
 def set_completion_condition(world: SkigillWorld) -> None:
     world.set_completion_rule(Has("Victory"))
-
-# TODO: test subclassing CachedRuleBuilderWorld instead of World for performance

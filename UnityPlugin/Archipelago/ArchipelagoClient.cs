@@ -137,8 +137,6 @@ public class ArchipelagoClient {
         receivedItemCounts[receivedItem.ItemName]++;
 
         Plugin.BepinLogger.LogMessage($"Received item {receivedItem.ItemName}, now {receivedItemCounts[receivedItem.ItemName]}");
-        // TODO handle immediate reward effects; namely character unlocks while on the relevant screen, weapon/region unlocks while mid-run
-        // TODO handle item persistence across game close/open/reconnect/etc. -- may be able to use session.Items.AllItemsReceived?
     }
 
     /// <summary>

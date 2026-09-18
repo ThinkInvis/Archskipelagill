@@ -36,7 +36,6 @@ public class AbilityUnlockItemizer {
         if(self.mode != "normal" && self.unlocked) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
-            //TODO: replace lock icon with a custom asset, make sure to revert to original once unlocked from archi
         }
     }
 
@@ -46,7 +45,6 @@ public class AbilityUnlockItemizer {
         if(tcc < self.difficulty && self.unlocked) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
-            //TODO: replace lock icon with a custom asset
         }
     }
 
@@ -56,7 +54,6 @@ public class AbilityUnlockItemizer {
         if(self.unlocked && (!Plugin.ArchipelagoClient.receivedItemCounts.TryGetValue(targetChar, out var tcc) || tcc == 0)) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
-            //TODO: replace lock icon with a custom asset
         }
     }
 
@@ -67,7 +64,6 @@ public class AbilityUnlockItemizer {
             self.unlocked = false;
             self.cadenas.SetActive(true);
             self.ls.charaUnlocked = false;
-            //TODO: replace lock icon with a custom asset
         }
     }
 }
