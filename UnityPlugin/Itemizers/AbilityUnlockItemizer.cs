@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace Archskipelagill;
+namespace Archskipelagill.Itemizers;
 
 public class AbilityUnlockItemizer {
     public AbilityUnlockItemizer() {

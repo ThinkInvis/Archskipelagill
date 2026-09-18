@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
-namespace Archskipelagill;
+namespace Archskipelagill.Itemizers;
 
 public class SkillTreeItemizer {
     public SkillTreeItemizer() {
