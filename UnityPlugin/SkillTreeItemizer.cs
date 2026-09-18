@@ -14,12 +14,7 @@ public class SkillTreeItemizer {
     public SkillTreeItemizer() {
         On.skigillNode.activate += SkigillNode_activate;
         On.skigillNode.OnTriggerStay2D += SkigillNode_OnTriggerStay2D;
-        On.skigillNode.Update += SkigillNode_Update;
         On.CharaStats.Start += CharaStats_Start;
-    }
-
-    private void SkigillNode_Update(On.skigillNode.orig_Update orig, skigillNode self) {
-        orig(self);
     }
 
     private void CharaStats_Start(On.CharaStats.orig_Start orig, CharaStats self) {
