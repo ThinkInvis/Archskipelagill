@@ -22,12 +22,10 @@ public class SkillTreeItemizer {
         for(var i = 0; i < avnUnsorted.Count; i++) {
             if(!avnUnsorted[i].gameObject.TryGetComponent<SkillTreeIndexTracker>(out var tkr))
                 tkr = avnUnsorted[i].gameObject.AddComponent<SkillTreeIndexTracker>();
-            tkr.unsortedIndex = i;
         }
         var allValidNodes = avnUnsorted.OrderBy(n => n.transform.position.y).ThenBy(n => n.transform.position.x).ToList();
         for(var i = 0; i < allValidNodes.Count; i++) {
             var tkr = allValidNodes[i].gameObject.GetComponent<SkillTreeIndexTracker>(); //guaranteed to exist from previous loop
-            tkr.sortedIndex = i;
             tkr.node = SkillTree.skillTree[i];
 
             var hasRegion = ArchiSaver.instance.receivedItemCounts.TryGetValue($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToTitleCase()}", out var n) && n > 0;
@@ -79,8 +77,6 @@ public class SkillTreeItemizer {
 }
 
 public class SkillTreeIndexTracker:MonoBehaviour {
-    public int unsortedIndex;
-    public int sortedIndex;
     public SkillTree.SkillNode node;
     public bool isUnlocked { get; private set; } = false;
 
