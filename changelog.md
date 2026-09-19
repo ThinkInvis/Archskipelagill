@@ -1,5 +1,29 @@
 ## Changelog
 
+### 1.0.0-alpha3
+
+- Implemented client effects for Trap items:
+  - Damage
+  - Pull Enemies
+  - Weapon Jam
+  - Drain Ski
+  - Scramble Stats
+  - Flash Mob
+  - Stronger Enemies
+  - (Note: Some planned traps already implemented by name in the APWorld have been removed/replaced)
+- Implemented the Endless Mode item
+- Added APWorld options to en/disable each category of locations
+- Added an APWorld option to limit boss region access behind having every other region, enabled by default
+- Fixed access to final boss node not being blocked behind Final Boss Key item
+- Improved appearance of locked Skigill nodes and connections
+- Reduced/removed some unnecessary console logs
+- Backend:
+  - Made retrieving saved item counts much easier
+  - Removed a lot of redundant code in SkillTreeItemizer
+  - Vast improvements to game data scraper
+  - Suppressed an intermittent "Remove unnecessary suppression" message applying to private methods used by UnityEngine
+  - Added a primary readme to the repo
+
 ### 1.0.0-alpha2
 
 - Fixed goals not being sent
