@@ -113,6 +113,13 @@ public static partial class SkillTree {
             var regions = spawnDistances.Select((d, i) => (d, i)).Where(n => n.d == closestDist).Select(n => n.i);
             var highestRegion = regions.OrderBy(n => n).Last();
 
+            Color regionColor = (new Color[] { new(1f, 0f, 0f, 1f), new(1f, 1f, 0f, 1f), new(0f, 1f, 0f, 1f), new(0f, 1f, 1f, 1f), new(0f, 0f, 1f, 1f), new(1f, 0f, 1f, 1f), new(1f, 1f, 1f, 1f)})[highestRegion];
+
+            node.GetComponent<SpriteRenderer>().color = regionColor;
+            node.transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>().color = regionColor;
+            node.transform.Find("IconColor").GetComponent<SpriteRenderer>().color = regionColor;
+            node.transform.Find("nodeOcto").GetComponent<SpriteRenderer>().color = regionColor;
+
             outputPy.Add($"\tSkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
             outputCs.Add($"\t\tnew SkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
         }
