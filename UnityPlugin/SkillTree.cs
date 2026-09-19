@@ -120,23 +120,40 @@ public static partial class SkillTree {
             outputCs.Add($"\t\tnew SkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeSpawnId.{spawnId}, SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
         }
         var dir = Directory.GetCurrentDirectory();
+        string[] linesPy = [
+            "from .skilltree import SkillNodeType, SkillNodeSpawnId, SkillNodeRegion, SkillNode",
+            "from enum import Enum",
+            "",
+            "SKILL_TREE = {",
+            string.Join("," + System.Environment.NewLine, outputPy),
+            "}"
+            ];
+        string[] linesCs = [
+            "using System.Collections.Generic;",
+            "",
+            "namespace Archskipelagill;",
+            ];
         File.WriteAllText(Path.Join(dir, "skilltree_data.py"),
-            "from .skilltree import SkillNodeType, SkillNodeSpawnId, SkillNodeRegion, SkillNode" + System.Environment.NewLine +
-            "from enum import Enum" + System.Environment.NewLine +
-            System.Environment.NewLine +
-            "SKILL_TREE = {" + System.Environment.NewLine +
-            string.Join("," + System.Environment.NewLine, outputPy) + System.Environment.NewLine + 
-            "}");
+            $$"""
+            from .skilltree import SkillNodeType, SkillNodeSpawnId, SkillNodeRegion, SkillNode
+            from enum import Enum
+
+            SKILL_TREE = {
+            {{string.Join("," + System.Environment.NewLine, outputPy)}}
+            }
+            """);
         File.WriteAllText(Path.Join(dir, "SkillTreeData.cs"),
-            "using System.Collections.Generic;" + System.Environment.NewLine +
-            System.Environment.NewLine +
-            "namespace Archskipelagill;" + System.Environment.NewLine +
-            System.Environment.NewLine +
-            "public static partial class SkillTree {" + System.Environment.NewLine +
-            "\tpublic static List<SkillNode> skillTree = [" + System.Environment.NewLine +
-            string.Join("," + System.Environment.NewLine, outputCs) + System.Environment.NewLine +
-            "\t];" + System.Environment.NewLine +
-            "}");
+            $$"""
+            using System.Collections.Generic;
+
+            namespace Archskipelagill;
+
+            public static partial class SkillTree {
+                public static List<SkillNode> skillTree = [
+                {{string.Join("," + System.Environment.NewLine, outputCs)}}
+                ];
+            }
+            """);
     }
 }
 
