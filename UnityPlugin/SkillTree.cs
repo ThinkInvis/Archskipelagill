@@ -8,13 +8,11 @@ namespace Archskipelagill;
 
 public static partial class SkillTree {
     public enum SkillNodeType { UNKNOWN, STAT, CHEST, PERK, BOSS, BOSS_FINAL };
-    public enum SkillNodeSpawnId { NONE, MAGE, STRONGMAN, FOX, PROTOTYPE, DWARVES, DRAGON };
     public enum SkillNodeRegion { MAGE, PROTOTYPE, DRAGON, STRONGMAN, FOX, DWARVES, BOSSES };
 
-    public struct SkillNode(SkillNodeType _type, int[] _neighbors, SkillNodeSpawnId _spawnId, SkillNodeRegion _region, int _originalIndex, int _chestIndex, int _perkIndex) {
+    public struct SkillNode(SkillNodeType _type, int[] _neighbors, SkillNodeRegion _region, int _originalIndex, int _chestIndex, int _perkIndex) {
         public SkillNodeType type = _type;
         public int[] neighbors = _neighbors;
-        public SkillNodeSpawnId spawnId = _spawnId;
         public SkillNodeRegion region = _region;
         public int originalIndex = _originalIndex;
         public int chestIndex = _chestIndex;
@@ -61,17 +59,24 @@ public static partial class SkillTree {
     }
 
     public static void ScrapeSkillTree() {
-        var gridObj = UnityEngine.GameObject.Find("gridHolder/grid").transform;
-        var avnUnsorted = GameObject.FindObjectsByType<skigillNode>(FindObjectsSortMode.InstanceID).Where(n => n.isActiveAndEnabled && !n.metaProg && n.transform.IsChildOf(gridObj)).ToList();
+        //Setup
+        var gridObj = UnityEngine.GameObject.Find("gridHolder/grid");
+        if(gridObj == null) {
+            Plugin.BepinLogger.LogError("Can't run ScrapeSkillTree without the Skigill active, start a run first");
+            return;
+        }
+        var gridTsf = gridObj.transform;
+        var avnUnsorted = GameObject.FindObjectsByType<skigillNode>(FindObjectsSortMode.InstanceID).Where(n => n.isActiveAndEnabled && !n.metaProg && n.transform.IsChildOf(gridTsf)).ToList();
         var allValidNodes = avnUnsorted.OrderBy(n => n.transform.position.y).ThenBy(n => n.transform.position.x).ToList();
 
         List<string> outputPy = [];
         List<string> outputCs = [];
 
-        var finalBossNode = allValidNodes.Find(n => n.adjacent.Count == 0 && n.type == 22);
-
         int chestCount = 0;
         int perkCount = 0;
+
+        //Build node list
+        var finalBossNode = allValidNodes.Find(n => n.adjacent.Count == 0 && n.type == 22);
 
         for(var i = 0; i < allValidNodes.Count; i++) {
             var node = allValidNodes[i];
@@ -98,14 +103,15 @@ public static partial class SkillTree {
                 connexList.Add(allValidNodes.IndexOf(finalBossNode));
             }
             var spawnId = node.name switch {
-                "Mage" => "MAGE",
-                "Baldo" => "STRONGMAN",
-                "Fox" => "FOX",
-                "Dragon" => "DRAGON",
-                "Jugger" => "PROTOTYPE",
-                "Nain" => "DWARVES",
-                _ => "NONE"
+                "Mage" => 0,
+                "Baldo" => 1,
+                "Fox" => 2,
+                "Dragon" => 3,
+                "Jugger" => 4,
+                "Nain" => 5,
+                _ => -1
             };
+
             var spawnDistances = new List<int>();
             for(var j = 0; j < SPAWN_TARGET_NAMES.Length; j++) {
                 var targetNode = GameObject.Find("gridHolder/grid/Perks/" + SPAWN_TARGET_NAMES[j]).GetComponent<skigillNode>();
@@ -116,14 +122,27 @@ public static partial class SkillTree {
             var regions = spawnDistances.Select((d, i) => (d, i)).Where(n => n.d == closestDist).Select(n => n.i);
             var highestRegion = regions.OrderBy(n => n).Last();
 
-            outputPy.Add($"\tSkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeSpawnId.{spawnId}, SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
-            outputCs.Add($"\t\tnew SkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeSpawnId.{spawnId}, SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
+            outputPy.Add($"\tSkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
+            outputCs.Add($"\t\tnew SkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
         }
+
+        //Build weapon list
+        var wd = GameObject.Find("WeaponDict").GetComponent<weaponDictionary>();
+        var wpnUnlockable = wd.unlockablePrefabs.Select(p => '"' + p.name.Replace("(Clone)", "") + '"');
+        var wpnStarter = wd.WeaponList.Except(wd.unlockablePrefabs).Where(w => w != null).Select(p => '"' + p.name.Replace("(Clone)", "") + '"');
+
+        //Write final output to game directory
         var dir = Directory.GetCurrentDirectory();
         File.WriteAllText(Path.Join(dir, "skilltree_data.py"),
             $$"""
             from .skilltree import SkillNodeType, SkillNodeSpawnId, SkillNodeRegion, SkillNode
             from enum import Enum
+
+            import re
+
+            STARTER_WEAPON_NAMES = [{{string.Join(", ", wpnStarter)}}]
+            UNLOCK_WEAPON_NAMES = [{{string.Join(", ", wpnUnlockable)}}]
+            WEAPON_NAMES = sorted(STARTER_WEAPON_NAMES + UNLOCK_WEAPON_NAMES, key = lambda n : int(re.findall(r'\d+', n)[0]))
 
             SKILL_TREE = {
             {{string.Join("," + System.Environment.NewLine, outputPy)}}
@@ -137,10 +156,11 @@ public static partial class SkillTree {
 
             public static partial class SkillTree {
                 public static List<SkillNode> skillTree = [
-                {{string.Join("," + System.Environment.NewLine, outputCs)}}
+            {{string.Join("," + System.Environment.NewLine, outputCs)}}
                 ];
             }
             """);
+        Plugin.BepinLogger.LogMessage("Successfully saved scraped data to game root directory as skilltree_data.py, SkillTreeData.cs");
     }
 }
 

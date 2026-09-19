@@ -47,7 +47,7 @@ public class AbilityUnlockItemizer {
 
     private void CharaSelectScript_updateUnlockStatus(On.charaSelectScript.orig_updateUnlockStatus orig, charaSelectScript self) {
         orig(self);
-        var targetChar = "Character: " + Enum.GetName(typeof(SkillTree.SkillNodeSpawnId), self.ID).ToTitleCase();
+        var targetChar = "Character: " + Enum.GetName(typeof(SkillTree.SkillNodeRegion), self.ID - 1).ToTitleCase();
         if(self.unlocked && (!ArchiSaver.instance.receivedItemCounts.TryGetValue(targetChar, out var tcc) || tcc == 0)) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
@@ -56,7 +56,7 @@ public class AbilityUnlockItemizer {
 
     private void CharaSelectScript_selected(On.charaSelectScript.orig_selected orig, charaSelectScript self) {
         orig(self);
-        var targetChar = "Character: " + Enum.GetName(typeof(SkillTree.SkillNodeSpawnId), self.ID).ToTitleCase();
+        var targetChar = "Character: " + Enum.GetName(typeof(SkillTree.SkillNodeRegion), self.ID - 1).ToTitleCase();
         if(self.unlocked && (!ArchiSaver.instance.receivedItemCounts.TryGetValue(targetChar, out var tcc) || tcc == 0)) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
