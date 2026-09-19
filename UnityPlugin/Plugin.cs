@@ -144,7 +144,7 @@ public class Plugin:BaseUnityPlugin {
         // a bunch of debug buttons
 #if DEBUG
         if(GUI.Button(new Rect(16, 210, 200, 20), "DEBUG: Bake Skill Tree Map")) {
-            SkillTree.BuildAndExportMaps();
+            SkillTree.ScrapeSkillTree();
         }
         if(GUI.Button(new Rect(16, 240, 200, 20), "DEBUG: Interrupt Connection")) {
             ArchipelagoClient.Disconnect();

@@ -60,7 +60,7 @@ public static partial class SkillTree {
         return -1;
     }
 
-    public static void BuildAndExportMaps() {
+    public static void ScrapeSkillTree() {
         var gridObj = UnityEngine.GameObject.Find("gridHolder/grid").transform;
         var avnUnsorted = GameObject.FindObjectsByType<skigillNode>(FindObjectsSortMode.InstanceID).Where(n => n.isActiveAndEnabled && !n.metaProg && n.transform.IsChildOf(gridObj)).ToList();
         var allValidNodes = avnUnsorted.OrderBy(n => n.transform.position.y).ThenBy(n => n.transform.position.x).ToList();
