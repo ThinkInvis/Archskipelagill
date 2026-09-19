@@ -14,6 +14,7 @@
 - Implemented the Endless Mode item
 - Added APWorld options to en/disable each category of locations
 - Added an APWorld option to limit boss region access behind having every other region, enabled by default
+- Fixed Skigill nodes being assigned to incorrect regions (region index order was wrong)
 - Fixed access to final boss node not being blocked behind Final Boss Key item
 - Improved appearance of locked Skigill nodes and connections
 - Reduced/removed some unnecessary console logs
