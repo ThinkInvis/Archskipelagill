@@ -6,6 +6,7 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using System;
 using System.IO;
+using System.Reflection;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -18,6 +19,8 @@ public class Plugin:BaseUnityPlugin {
     public const string PluginVersion = "1.0.0";
     public static Plugin instance { get; private set; }
 
+    internal static AssetBundle resources;
+
     public ConfigFile config { get; private set; }
     public ConfigEntry<string> cfgRunSuffix;
     public ConfigEntry<float> cfgTrapInterval;
@@ -27,6 +30,7 @@ public class Plugin:BaseUnityPlugin {
     public ConfigEntry<float> cfgJamTrapDuration;
     public ConfigEntry<float> cfgMobTrapStrength;
     public ConfigEntry<float> cfgSpawnTimeTrapStrength;
+
     public const string ModDisplayInfo = $"{PluginName} v{PluginVersion}";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ManualLogSource BepinLogger;
@@ -46,6 +50,11 @@ public class Plugin:BaseUnityPlugin {
 
         // Plugin startup logic
         BepinLogger = Logger;
+
+        using(var stream = Assembly.GetExecutingAssembly().GetManifestResourceStream("Archskipelagill.archskipelagill-assets")) {
+            resources = AssetBundle.LoadFromStream(stream);
+        }
+
         config = new(Path.Combine(Paths.ConfigPath, PluginGUID + ".cfg"), true);
 
         cfgRunSuffix = config.Bind<string>(new ConfigDefinition("Save/Load", "Run Suffix"), "default", new ConfigDescription("A suffix added to the custom save file redirect used by the client plugin. Must be changed if you want to participate in multiple Archipelago runs including this game simultaneously."));

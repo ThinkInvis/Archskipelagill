@@ -1,4 +1,5 @@
 ﻿using Archipelago.MultiClient.Net;
+using Archskipelagill.EffectComponents;
 using Archskipelagill.Itemizers;
 using MonoMod.Cil;
 using System;
@@ -19,6 +20,7 @@ public class ArchiSaver:JSONsaver {
     public readonly List<string> unsentChecks = [];
     public readonly List<string> sentChecks = [];
     public readonly Queue<string> queuedTraps = [];
+    public readonly Queue<string> itemsToProcess = [];
 
     public void Awake() {
         if(instance != null) {
@@ -46,13 +48,20 @@ public class ArchiSaver:JSONsaver {
 
     public new void Start() {}
 
+    public new void Update() {
+        base.Update();
+        while(itemsToProcess.Count > 0)
+            ProcessItem(itemsToProcess.Dequeue());
+    }
+
     public void ReceiveArchiItem(Archipelago.MultiClient.Net.Models.ItemInfo receivedItem) {
         Plugin.BepinLogger.LogDebug($"Received item {receivedItem.ItemName} at index {lastReceivedIndex}/{lastSavedIndex}");
 
         lastReceivedIndex++;
 
         if(lastReceivedIndex > lastSavedIndex) {
-            ProcessItem(receivedItem.ItemName);
+            //ReceiveArchiItem is called from a thread, which can cause issues with BepInEx error handling; queue and check everything on the next main thread update instead
+            itemsToProcess.Enqueue(receivedItem.ItemName);
         }
     }
 
@@ -60,6 +69,8 @@ public class ArchiSaver:JSONsaver {
         if(!receivedItemCounts.ContainsKey(itemName))
             receivedItemCounts[itemName] = 0;
         receivedItemCounts[itemName]++;
+
+        ArchiDropController.CreateDrop(itemName);
 
         PreSave();
         var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
@@ -107,6 +118,11 @@ public class ArchiSaver:JSONsaver {
         PreSave();
         metaProg["archi_sentChecks"] = String.Join("|", sentChecks);
         PostSave();
+
+        foreach(var _ in checkNames) {
+            ArchiSendController.CreateSend();
+            Plugin.BepinLogger.LogMessage("Creating send notif");
+        }
     }
     public void ResendChecks() {
         if(unsentChecks.Count > 0) {

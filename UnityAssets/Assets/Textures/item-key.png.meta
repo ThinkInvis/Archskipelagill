@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: b1b55601beecd1f45bd229054a9a9b99
+guid: 92d76f2a50cd7b74394612382d40f480
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3365924265193957810
-    second: archi-button_0
+      213: -3486618509452183886
+    second: item-key_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +37,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -72,10 +72,10 @@ TextureImporter:
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform
-    maxTextureSize: 32
+    maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: archi-button_0
+      name: item-key_0
       rect:
         serializedVersion: 2
-        x: 9
-        y: 9
-        width: 14
-        height: 15
+        x: 1
+        y: 0
+        width: 30
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 2b9e0c7294a26be20800000000000000
-      internalID: 3365924265193957810
+      spriteID: 2b6fcc440fa0d9fc0800000000000000
+      internalID: -3486618509452183886
       vertices: []
       indices: 
       edges: []
@@ -125,7 +125,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 5e97eb03825dee720800000000000000
+    spriteID: 
     internalID: 0
     vertices: []
     indices: 
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      archi-button_0: 3365924265193957810
+      item-key_0: -3486618509452183886
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -1,0 +1,38 @@
+ManifestFileVersion: 0
+UnityVersion: 6000.2.7f2
+CRC: 1059987437
+Hashes:
+  AssetFileHash:
+    serializedVersion: 2
+    Hash: f2cb3acd6c5bb4a87d5f54ada49aeb55
+  TypeTreeHash:
+    serializedVersion: 2
+    Hash: 9805626a0a960da8f69a56443df5de53
+  IncrementalBuildHash:
+    serializedVersion: 2
+    Hash: 5df4b74f8482f5e22bb30c6185af5c53
+HashAppended: 0
+ClassTypes:
+- Class: 28
+  Script: {instanceID: 0}
+- Class: 83
+  Script: {instanceID: 0}
+- Class: 213
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers: []
+Assets:
+- Assets/Textures/archi-button-conn.png
+- Assets/Sounds/archi_trap_activate.wav
+- Assets/Sounds/archi_item_fall.wav
+- Assets/Sounds/archi_send.wav
+- Assets/Textures/archi-big-single.png
+- Assets/Textures/archi-button-selected.png
+- Assets/Textures/archi-big.png
+- Assets/Sounds/archi_trap_arrive.wav
+- Assets/Sounds/archi_item_arrive.wav
+- Assets/Textures/archi-button-dc.png
+- Assets/Textures/archi-button-conn-selected.png
+- Assets/Textures/archi-button.png
+- Assets/Textures/archi-button-dc-selected.png
+- Assets/Textures/item-key.png
+Dependencies: []

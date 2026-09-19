@@ -173,6 +173,7 @@ public class ArchipelagoClient {
 
     public void CheckLocationsByName(params string[] names) {
         var unsentNames = names.Except(ArchiSaver.instance.sentChecks).Distinct();
+        if(unsentNames.Count() == 0) return;
         Plugin.BepinLogger.LogMessage($"Attempting checks: {string.Join(", ", unsentNames.Select(n => '"' + n + '"'))}");
         if(session == null) {
             Plugin.BepinLogger.LogWarning($"Offline, can't send; queueing");

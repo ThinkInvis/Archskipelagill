@@ -35,6 +35,14 @@
     </Target>
 
     <ItemGroup>
+      <None Remove="archskipelagill-assets" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Include="archskipelagill-assets" />
+    </ItemGroup>
+  
+    <ItemGroup>
         <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
         <PackageReference Include="BepInEx.Core" Version="5.*" />
         <PackageReference Include="UnityEngine.Modules" Version="6000.2.7" IncludeAssets="compile" />
