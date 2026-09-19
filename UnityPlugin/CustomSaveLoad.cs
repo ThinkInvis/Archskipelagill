@@ -121,7 +121,6 @@ public class ArchiSaver:JSONsaver {
 
         foreach(var _ in checkNames) {
             ArchiSendController.CreateSend();
-            Plugin.BepinLogger.LogMessage("Creating send notif");
         }
     }
     public void ResendChecks() {
