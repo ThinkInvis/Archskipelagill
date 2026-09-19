@@ -172,7 +172,7 @@ public class ArchipelagoClient {
     }
 
     public void CheckLocationsByName(params string[] names) {
-        var unsentNames = names.Except(ArchiSaver.instance.sentChecks).Distinct();
+        var unsentNames = names.Except(ArchiSaver.instance.sentChecks).Distinct().ToList();
         if(unsentNames.Count() == 0) return;
         Plugin.BepinLogger.LogMessage($"Attempting checks: {string.Join(", ", unsentNames.Select(n => '"' + n + '"'))}");
         if(session == null) {
@@ -180,6 +180,7 @@ public class ArchipelagoClient {
             ArchiSaver.instance.ReceiveUnsentChecks([.. unsentNames]);
             return;
         }
+        unsentNames = [.. unsentNames.Where(n => session.Locations.AllMissingLocations.Contains(session.Locations.GetLocationIdFromName("Skigill", n)))];
         session.Locations.CompleteLocationChecks([.. unsentNames.Select(n => session.Locations.GetLocationIdFromName("Skigill", n))]);
         ArchiSaver.instance.ReceiveSentChecks([.. unsentNames]);
         var slotData = session.DataStorage.GetSlotData();
