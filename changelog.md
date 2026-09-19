@@ -1,5 +1,12 @@
 ## Changelog
 
+### 1.0.0-alpha2
+
+- Fixed goals not being sent
+- Fixed boss region not unlocking after obtaining the relevant region item
+- Added a tool to generate zipped apworld files automatically
+- Added some extra debug tools to the client panel
+
 ### 1.0.0-alpha1
 - The client can now remember received items while disconnected and closed, and remember checks to send next time connection is restored.
 - The client will no longer attempt to send checks multiple times if completed multiple times (unsure if this was having any effect, but better safe than sorry).
