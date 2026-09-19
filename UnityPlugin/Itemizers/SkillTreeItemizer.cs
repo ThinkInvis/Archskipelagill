@@ -18,14 +18,10 @@ public class SkillTreeItemizer {
         var gridObj = GameObject.Find("gridHolder/grid")?.transform;
         if(gridObj == null) return;
 
-        var avnUnsorted = GameObject.FindObjectsByType<skigillNode>(FindObjectsSortMode.InstanceID).Where(n => n.isActiveAndEnabled && !n.metaProg && n.transform.IsChildOf(gridObj)).ToList();
-        for(var i = 0; i < avnUnsorted.Count; i++) {
-            if(!avnUnsorted[i].gameObject.TryGetComponent<SkillTreeIndexTracker>(out var tkr))
-                tkr = avnUnsorted[i].gameObject.AddComponent<SkillTreeIndexTracker>();
-        }
-        var allValidNodes = avnUnsorted.OrderBy(n => n.transform.position.y).ThenBy(n => n.transform.position.x).ToList();
+        var allValidNodes = GameObject.FindObjectsByType<skigillNode>(FindObjectsSortMode.InstanceID).Where(n => n.isActiveAndEnabled && !n.metaProg && n.transform.IsChildOf(gridObj)).OrderBy(n => n.transform.position.y).ThenBy(n => n.transform.position.x).ToList();
         for(var i = 0; i < allValidNodes.Count; i++) {
-            var tkr = allValidNodes[i].gameObject.GetComponent<SkillTreeIndexTracker>(); //guaranteed to exist from previous loop
+            if(!allValidNodes[i].gameObject.TryGetComponent<SkillTreeIndexTracker>(out var tkr))
+                tkr = allValidNodes[i].gameObject.AddComponent<SkillTreeIndexTracker>();
             tkr.node = SkillTree.skillTree[i];
 
             var hasRegion = ArchiSaver.instance.receivedItemCounts.TryGetValue($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToTitleCase()}", out var n) && n > 0;
