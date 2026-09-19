@@ -98,9 +98,13 @@ def create_all_items(world: SkigillWorld) -> None:
         world.create_item("Skigill Region: Dwarves"),
         world.create_item("Skigill Region: Dragon"),
         world.create_item("Skigill Region: Bosses"),
-        world.create_item("Final Boss Key"),
-        world.create_item("Endless Mode")
+        world.create_item("Final Boss Key")
     ]
+    
+    if world.options.itemize_endless_mode:
+        itempool.extend([world.create_item("Endless Mode")])
+    else:
+        world.push_precollected(world.create_item("Endless Mode"))
         
     if world.options.itemize_difficulty:
         itempool.extend([

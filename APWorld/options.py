@@ -23,6 +23,13 @@ class ItemizeDifficulty(Toggle):
     
     display_name = "Itemize Difficulty"
 
+class ItemizeEndlessMode(Toggle):
+    """
+    If enabled, Endless Mode will be itemized through Archipelago; it can only be used once unlocked through Archipelago. If disabled, this item will be added to starting inventory.
+    """
+    
+    display_name = "Itemize Endless Mode"
+    
 class RegionChecksNeedCharacter(Toggle):
     """
     If enabled, checks within a given region will be out of logic until you have the character for that region. If disabled, checking locations in distant regions may be much more difficult; but if enabled, it may be easy to get some out-of-logic items.
@@ -62,6 +69,7 @@ class SkigillOptions(PerGameCommonOptions):
     itemize_characters: ItemizeCharacters
     itemize_weapons: ItemizeWeapons
     itemize_difficulty: ItemizeDifficulty
+    itemize_endless_mode: ItemizeEndlessMode
     region_checks_need_character: RegionChecksNeedCharacter
     trap_chance: TrapChance
     goal_type: GoalType
@@ -70,7 +78,7 @@ class SkigillOptions(PerGameCommonOptions):
 option_groups = [
     OptionGroup(
         "Item Distribution",
-        [ItemizeCharacters, ItemizeWeapons, ItemizeDifficulty, TrapChance],
+        [ItemizeCharacters, ItemizeWeapons, ItemizeDifficulty, ItemizeEndlessMode, TrapChance],
     ),
     OptionGroup(
         "Logic and Goals",
@@ -83,6 +91,7 @@ option_presets = {
         "itemize_characters": True,
         "itemize_weapons": True,
         "itemize_difficulty": False,
+        "itemize_endless_mode": False,
         "region_checks_need_character": False,
         "trap_chance": 0,
         "goal_type": GoalType.option_finalboss

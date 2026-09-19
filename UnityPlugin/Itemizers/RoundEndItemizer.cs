@@ -7,6 +7,12 @@ public class RoundEndItemizer {
     public RoundEndItemizer() {
         On.mainCameraScript.playerWin += MainCameraScript_playerWin;
         On.VieScript.dies += VieScript_dies;
+        On.mainCameraScript.cancelWinVortex += MainCameraScript_cancelWinVortex;
+    }
+
+    private void MainCameraScript_cancelWinVortex(On.mainCameraScript.orig_cancelWinVortex orig, mainCameraScript self) {
+        if(ArchiSaver.GetItemCount("Endless Mode") < 1) return;
+        orig(self);
     }
 
     private void VieScript_dies(On.VieScript.orig_dies orig, VieScript self) {
