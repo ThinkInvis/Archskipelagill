@@ -7,6 +7,20 @@ using System.IO;
 namespace Archskipelagill;
 
 public static partial class SkillTree {
+    public enum SkillNodeType { UNKNOWN, STAT, CHEST, PERK, BOSS, BOSS_FINAL };
+    public enum SkillNodeSpawnId { NONE, MAGE, STRONGMAN, FOX, PROTOTYPE, DWARVES, DRAGON };
+    public enum SkillNodeRegion { MAGE, PROTOTYPE, DRAGON, STRONGMAN, FOX, DWARVES, BOSSES };
+
+    public struct SkillNode(SkillNodeType _type, int[] _neighbors, SkillNodeSpawnId _spawnId, SkillNodeRegion _region, int _originalIndex, int _chestIndex, int _perkIndex) {
+        public SkillNodeType type = _type;
+        public int[] neighbors = _neighbors;
+        public SkillNodeSpawnId spawnId = _spawnId;
+        public SkillNodeRegion region = _region;
+        public int originalIndex = _originalIndex;
+        public int chestIndex = _chestIndex;
+        public int perkIndex = _perkIndex;
+    }
+
     static readonly string[] SPAWN_TARGET_NAMES = [
         "Mage",
         "Baldo",
@@ -123,20 +137,6 @@ public static partial class SkillTree {
             string.Join("," + System.Environment.NewLine, outputCs) + System.Environment.NewLine +
             "\t];" + System.Environment.NewLine +
             "}");
-    }
-
-    public enum SkillNodeType { UNKNOWN, STAT, CHEST, PERK, BOSS, BOSS_FINAL };
-    public enum SkillNodeSpawnId { NONE, MAGE, STRONGMAN, FOX, PROTOTYPE, DWARVES, DRAGON };
-    public enum SkillNodeRegion { MAGE, PROTOTYPE, DRAGON, STRONGMAN, FOX, DWARVES, BOSSES };
-
-    public struct SkillNode(SkillNodeType _type, int[] _neighbors, SkillNodeSpawnId _spawnId, SkillNodeRegion _region, int _originalIndex, int _chestIndex, int _perkIndex) {
-        public SkillNodeType type = _type;
-        public int[] neighbors = _neighbors;
-        public SkillNodeSpawnId spawnId = _spawnId;
-        public SkillNodeRegion region = _region;
-        public int originalIndex = _originalIndex;
-        public int chestIndex = _chestIndex;
-        public int perkIndex = _perkIndex;
     }
 }
 
