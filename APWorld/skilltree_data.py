@@ -1,4 +1,4 @@
-from .skilltree import SkillNodeType, SkillNodeSpawnId, SkillNodeRegion, SkillNode
+from .skilltree import SkillNodeType, SkillNodeRegion, SkillNode
 from enum import Enum
 
 import re
