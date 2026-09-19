@@ -34,18 +34,6 @@ public class SkillTreeItemizer {
                 tkr.Unlock();
             else
                 tkr.Lock();
-
-            if(!tkr.isUnlocked) {
-                tkr.GetComponent<UnityEngine.SpriteRenderer>().color = new(0.35f, 0f, 0f, 1f);
-                tkr.transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>().color = new(0.35f, 0f, 0f, 1f);
-                tkr.transform.Find("IconColor").GetComponent<UnityEngine.SpriteRenderer>().color = new(0.6f, 0.6f, 0.6f, 0.25f);
-                tkr.transform.Find("nodeOcto").GetComponent<UnityEngine.SpriteRenderer>().color = new(0.35f, 0f, 0f, 1f);
-                for(var j = 0; j < tkr.transform.childCount; j++) {
-                    var ch = tkr.transform.GetChild(j);
-                    if(ch.name != "connexion(Clone)") continue; 
-                    ch.Find("GameObject").localScale = new(0.15f, 0.15f, 1f);
-                }
-            }
         }
         EnsureSafeSpawn(self);
     }
