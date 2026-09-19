@@ -44,7 +44,7 @@
   
     <ItemGroup>
         <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all" />
-        <PackageReference Include="BepInEx.Core" Version="5.*" />
+        <PackageReference Include="BepInEx.Core" Version="5.4.21" />
         <PackageReference Include="UnityEngine.Modules" Version="6000.2.7" IncludeAssets="compile" />
     </ItemGroup>
 
