@@ -33,8 +33,8 @@ ITEM_NAME_TO_ID = {
     "Trap: Pull Enemies": 19,
     "Trap: Weapon Jam": 20,
     "Trap: Drain Ski": 21,
-    "Trap: Drain Gill": 22,
-    "Trap: Slow Movement": 23,
+    "Trap: Scramble Stats": 22,
+    "Trap: Flash Mob": 23,
     "Trap: Stronger Enemies": 24
 }
     

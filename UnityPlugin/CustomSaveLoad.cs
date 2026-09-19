@@ -17,6 +17,7 @@ public class ArchiSaver:JSONsaver {
     public readonly Dictionary<string, int> receivedItemCounts = [];
     public readonly List<string> unsentChecks = [];
     public readonly List<string> sentChecks = [];
+    public readonly Queue<string> queuedTraps = [];
 
     public void Awake() {
         if(instance != null) {
@@ -80,6 +81,9 @@ public class ArchiSaver:JSONsaver {
             case "Skigill Region: Dwarves":
             case "Skigill Region: Bosses":
                 Plugin.instance.skillTreeItemizer.RescanRegions();
+                break;
+            case string trapTest when trapTest.StartsWith("Trap: "):
+                queuedTraps.Enqueue(itemName[6..]);
                 break;
         }
 

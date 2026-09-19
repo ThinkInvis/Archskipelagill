@@ -20,7 +20,13 @@ public class Plugin:BaseUnityPlugin {
 
     public ConfigFile config { get; private set; }
     public ConfigEntry<string> cfgRunSuffix;
-
+    public ConfigEntry<float> cfgTrapInterval;
+    public ConfigEntry<float> cfgDamageTrapStrength;
+    public ConfigEntry<float> cfgSpeedTrapDuration;
+    public ConfigEntry<float> cfgSpeedTrapStrength;
+    public ConfigEntry<float> cfgJamTrapDuration;
+    public ConfigEntry<float> cfgMobTrapStrength;
+    public ConfigEntry<float> cfgSpawnTimeTrapStrength;
     public const string ModDisplayInfo = $"{PluginName} v{PluginVersion}";
     private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ManualLogSource BepinLogger;
@@ -29,6 +35,7 @@ public class Plugin:BaseUnityPlugin {
     public RoundEndItemizer roundEndItemizer;
     public AbilityUnlockItemizer abilityUnlockItemizer;
     public CustomSaveLoad customSaveLoad;
+    public TrapHandler trapHandler;
 
 #pragma warning disable IDE0051 //Used by Unity Engine
     private void Awake() {
@@ -42,6 +49,13 @@ public class Plugin:BaseUnityPlugin {
         config = new(Path.Combine(Paths.ConfigPath, PluginGUID + ".cfg"), true);
 
         cfgRunSuffix = config.Bind<string>(new ConfigDefinition("Save/Load", "Run Suffix"), "default", new ConfigDescription("A suffix added to the custom save file redirect used by the client plugin. Must be changed if you want to participate in multiple Archipelago runs including this game simultaneously."));
+        cfgTrapInterval = config.Bind<float>(new ConfigDefinition("Difficulty", "Trap Interval"), 15f, new ConfigDescription("How much mid-run time to wait between activating queued traps. Traps will not activate while the game is paused or on the menu.", new AcceptableValueRange<float>(0f, 300f)));
+        cfgDamageTrapStrength = config.Bind<float>(new ConfigDefinition("Difficulty", "Damage Trap Strength"), 0.5f, new ConfigDescription("Fraction of health in damage dealt by Trap: Damage.", new AcceptableValueRange<float>(0f, 1f)));
+        cfgSpeedTrapDuration = config.Bind<float>(new ConfigDefinition("Difficulty", "Pull Enemies Trap Duration"), 5f, new ConfigDescription("Duration of Trap: Pull Enemies in seconds.", new AcceptableValueRange<float>(0f, 300f)));
+        cfgSpeedTrapStrength = config.Bind<float>(new ConfigDefinition("Difficulty", "Pull Enemies Trap Strength"), 2f, new ConfigDescription("Strength of Trap: Pull Enemies as an added multiplier to base speed.", new AcceptableValueRange<float>(0f, 100f)));
+        cfgJamTrapDuration = config.Bind<float>(new ConfigDefinition("Difficulty", "Weapon Jam Trap Duration"), 10f, new ConfigDescription("Duration of Trap: Weapon Jam in seconds.", new AcceptableValueRange<float>(0f, 180f)));
+        cfgMobTrapStrength = config.Bind<float>(new ConfigDefinition("Difficulty", "Flash Mob Trap Strength"), 30f, new ConfigDescription("Additional enemies spawned by Trap: Flash Mob.", new AcceptableValueRange<float>(0f, 1000f)));
+        cfgSpawnTimeTrapStrength = config.Bind<float>(new ConfigDefinition("Difficulty", "Stronger Enemies Trap Strength"), 60f, new ConfigDescription("Time added to the monster wave strength timer by Trap: Stronger Enemies.", new AcceptableValueRange<float>(0f, 300f)));
 
         ArchipelagoClient = new ArchipelagoClient();
         ArchipelagoConsole.Awake();
@@ -50,6 +64,7 @@ public class Plugin:BaseUnityPlugin {
         roundEndItemizer = new();
         abilityUnlockItemizer = new();
         customSaveLoad = new();
+        trapHandler = new();
 
         ArchipelagoConsole.LogMessage($"{ModDisplayInfo} loaded!");
     }
