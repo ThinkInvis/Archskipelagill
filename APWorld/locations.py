@@ -73,20 +73,24 @@ def create_regular_locations(world: SkigillWorld) -> None:
         SkillNodeRegion.BOSSES: world.get_region("Bosses"),
     }
     
-    for node in [n for n in SKILL_TREE if n.type == SkillNodeType.CHEST]:
-        regions[node.region].add_locations(get_location_names_with_ids([f"Skigill Chest #{node.chest_index + 1} ({node.region.name})"]), SkigillLocation)
+    if world.options.check_chests:
+        for node in [n for n in SKILL_TREE if n.type == SkillNodeType.CHEST]:
+            regions[node.region].add_locations(get_location_names_with_ids([f"Skigill Chest #{node.chest_index + 1} ({node.region.name})"]), SkigillLocation)
         
-    for node in [n for n in SKILL_TREE if n.type == SkillNodeType.PERK]:
-        regions[node.region].add_locations(get_location_names_with_ids([f"Skigill Perk #{node.perk_index + 1} ({node.region.name})"]), SkigillLocation)
+    if world.options.check_perks:
+        for node in [n for n in SKILL_TREE if n.type == SkillNodeType.PERK]:
+            regions[node.region].add_locations(get_location_names_with_ids([f"Skigill Perk #{node.perk_index + 1} ({node.region.name})"]), SkigillLocation)
         
-    regions[SkillNodeRegion.MAGE].add_locations(get_location_names_with_ids([f"Escaped with Weapon {n}" for n in WEAPON_NAMES]), SkigillLocation)
+    if world.options.check_weapon_escapes:
+        regions[SkillNodeRegion.MAGE].add_locations(get_location_names_with_ids([f"Escaped with Weapon {n}" for n in WEAPON_NAMES]), SkigillLocation)
         
-    regions[SkillNodeRegion.MAGE].add_locations(get_location_names_with_ids(["Escaped with Mage"]), SkigillLocation)
-    regions[SkillNodeRegion.STRONGMAN].add_locations(get_location_names_with_ids(["Escaped with Strongman"]), SkigillLocation)
-    regions[SkillNodeRegion.FOX].add_locations(get_location_names_with_ids(["Escaped with Fox"]), SkigillLocation)
-    regions[SkillNodeRegion.PROTOTYPE].add_locations(get_location_names_with_ids(["Escaped with Prototype"]), SkigillLocation)
-    regions[SkillNodeRegion.DWARVES].add_locations(get_location_names_with_ids(["Escaped with Dwarves"]), SkigillLocation)
-    regions[SkillNodeRegion.DRAGON].add_locations(get_location_names_with_ids(["Escaped with Dragon"]), SkigillLocation)
+    if world.options.check_hero_escapes:
+        regions[SkillNodeRegion.MAGE].add_locations(get_location_names_with_ids(["Escaped with Mage"]), SkigillLocation)
+        regions[SkillNodeRegion.STRONGMAN].add_locations(get_location_names_with_ids(["Escaped with Strongman"]), SkigillLocation)
+        regions[SkillNodeRegion.FOX].add_locations(get_location_names_with_ids(["Escaped with Fox"]), SkigillLocation)
+        regions[SkillNodeRegion.PROTOTYPE].add_locations(get_location_names_with_ids(["Escaped with Prototype"]), SkigillLocation)
+        regions[SkillNodeRegion.DWARVES].add_locations(get_location_names_with_ids(["Escaped with Dwarves"]), SkigillLocation)
+        regions[SkillNodeRegion.DRAGON].add_locations(get_location_names_with_ids(["Escaped with Dragon"]), SkigillLocation)
             
     lnidList = list(LOCATION_NAME_TO_ID.keys())
     regions[SkillNodeRegion.BOSSES].add_locations(get_location_names_with_ids(lnidList[0:6]), SkigillLocation)

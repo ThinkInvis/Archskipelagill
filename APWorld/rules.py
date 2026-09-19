@@ -61,8 +61,9 @@ def set_all_entrance_rules(world: SkigillWorld) -> None:
     world.set_rule(world.get_entrance("Dwarves to Bosses"), has_r_all & has_r_boss)
 
 def set_all_location_rules(world: SkigillWorld) -> None:
-    for weapon in WEAPON_NAMES:
-        world.set_rule(world.get_location(f"Escaped with Weapon {weapon}"), Has(f"Weapon: {weapon}"))
+    if world.options.check_weapon_escapes:
+        for weapon in WEAPON_NAMES:
+            world.set_rule(world.get_location(f"Escaped with Weapon {weapon}"), Has(f"Weapon: {weapon}"))
         
     has_bosses = Has("Skigill Region: Bosses")
     has_finalboss = has_bosses & Has("Final Boss Key")
