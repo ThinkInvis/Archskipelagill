@@ -1,4 +1,5 @@
-﻿using Archskipelagill.Itemizers;
+﻿using Archipelago.MultiClient.Net;
+using Archskipelagill.Itemizers;
 using MonoMod.Cil;
 using System;
 using System.Collections.Generic;
@@ -114,6 +115,17 @@ public class ArchiSaver:JSONsaver {
             metaProg["archi_unsentChecks"] = "";
             PostSave();
             Plugin.ArchipelagoClient.CheckLocationsByName([.. unsentChecks]);
+        }
+    }
+
+    public void StoreSlotData(Dictionary<string, object> slotData) {
+        try {
+            PreSave();
+            metaProg["archi_goal"] = ((Int64)slotData["goal_type"]).ToString();
+            metaProg["archi_boss_last"] = ((Int64)slotData["boss_region_last"]).ToString();
+            PostSave();
+        } catch(Exception e) {
+            Plugin.BepinLogger.LogError(e);
         }
     }
 

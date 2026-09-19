@@ -75,6 +75,16 @@ public class SkillTreeItemizer {
             var hasRegion = ArchiSaver.GetItemCount($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToTitleCase()}") > 0;
             var hasFBK = ArchiSaver.GetItemCount($"Final Boss Key") > 0;
 
+            var bossLast = Int64.Parse(ArchiSaver.instance.metaProg["archi_boss_last"]);
+            if(bossLast > 0 && tkr.node.region == SkillTree.SkillNodeRegion.BOSSES) {
+                foreach(var n in Enum.GetNames(typeof(SkillTree.SkillNodeRegion))) {
+                    if(ArchiSaver.GetItemCount($"Skigill Region: {n.ToTitleCase()}") == 0) {
+                        hasRegion = false;
+                        break;
+                    }
+                }
+            }
+
             if(hasRegion && (tkr.node.type != SkillTree.SkillNodeType.BOSS_FINAL || hasFBK))
                 tkr.Unlock();
             else

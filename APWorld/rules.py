@@ -44,21 +44,29 @@ def set_all_entrance_rules(world: SkigillWorld) -> None:
     
     world.set_rule(world.get_entrance("Mage to Dragon"), has_r_mage & has_r_dragon)
     world.set_rule(world.get_entrance("Mage to Prototype"), has_r_mage & has_r_prototype)
-    world.set_rule(world.get_entrance("Mage to Bosses"), has_r_all & has_r_boss)
     
     world.set_rule(world.get_entrance("Prototype to Strongman"), has_r_prototype & has_r_strongman)
-    world.set_rule(world.get_entrance("Prototype to Bosses"), has_r_all & has_r_boss)
 
     world.set_rule(world.get_entrance("Dragon to Fox"), has_r_dragon & has_r_fox)
-    world.set_rule(world.get_entrance("Dragon to Bosses"), has_r_all & has_r_boss)
     
     world.set_rule(world.get_entrance("Strongman to Dwarves"), has_r_strongman & has_r_dwarves)
-    world.set_rule(world.get_entrance("Strongman to Bosses"), has_r_all & has_r_boss)
     
     world.set_rule(world.get_entrance("Fox to Dwarves"), has_r_fox & has_r_dwarves)
-    world.set_rule(world.get_entrance("Fox to Bosses"), has_r_all & has_r_boss)
     
-    world.set_rule(world.get_entrance("Dwarves to Bosses"), has_r_all & has_r_boss)
+    if world.options.boss_region_last:
+        world.set_rule(world.get_entrance("Mage to Bosses"), has_r_all & has_r_boss)
+        world.set_rule(world.get_entrance("Prototype to Bosses"), has_r_all & has_r_boss)
+        world.set_rule(world.get_entrance("Dragon to Bosses"), has_r_all & has_r_boss)
+        world.set_rule(world.get_entrance("Strongman to Bosses"), has_r_all & has_r_boss)
+        world.set_rule(world.get_entrance("Fox to Bosses"), has_r_all & has_r_boss)
+        world.set_rule(world.get_entrance("Dwarves to Bosses"), has_r_all & has_r_boss)
+    else:
+        world.set_rule(world.get_entrance("Mage to Bosses"), has_r_mage & has_r_boss)
+        world.set_rule(world.get_entrance("Prototype to Bosses"), has_r_prototype & has_r_boss)
+        world.set_rule(world.get_entrance("Dragon to Bosses"), has_r_dragon & has_r_boss)
+        world.set_rule(world.get_entrance("Strongman to Bosses"), has_r_strongman & has_r_boss)
+        world.set_rule(world.get_entrance("Fox to Bosses"), has_r_fox & has_r_boss)
+        world.set_rule(world.get_entrance("Dwarves to Bosses"), has_r_dwarves & has_r_boss)
 
 def set_all_location_rules(world: SkigillWorld) -> None:
     if world.options.check_weapon_escapes:

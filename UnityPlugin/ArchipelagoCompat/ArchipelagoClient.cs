@@ -87,13 +87,16 @@ public class ArchipelagoClient {
             ServerData.SetupSession(success.SlotData, session.RoomState.Seed);
             Authenticated = true;
 
-            DeathLinkHandler = new(session.CreateDeathLinkService(), ServerData.SlotName);
-            session.Locations.CompleteLocationChecksAsync([.. ServerData.CheckedLocations]);
             outText = $"Successfully connected to {ServerData.Uri} as {ServerData.SlotName}!";
 
             ArchipelagoConsole.LogMessage(outText);
 
+            Plugin.BepinLogger.LogMessage($"Pre begin SSD on {ArchiSaver.instance}");
+            ArchiSaver.instance.StoreSlotData(session.DataStorage.GetSlotData());
+            DeathLinkHandler = new(session.CreateDeathLinkService(), ServerData.SlotName);
+            session.Locations.CompleteLocationChecksAsync([.. ServerData.CheckedLocations]);
             ArchiSaver.instance.ResendChecks();
+
         } else {
             var failure = (LoginFailure)result;
             outText = $"Failed to connect to {ServerData.Uri} as {ServerData.SlotName}.";
@@ -179,7 +182,8 @@ public class ArchipelagoClient {
         session.Locations.CompleteLocationChecks([.. unsentNames.Select(n => session.Locations.GetLocationIdFromName("Skigill", n))]);
         ArchiSaver.instance.ReceiveSentChecks([.. unsentNames]);
         var slotData = session.DataStorage.GetSlotData();
-        var goalType = (Int64)slotData["goal_type"];
+
+        var goalType = Int64.Parse(ArchiSaver.instance.metaProg["archi_goal"]);
         string[] validGoals = goalType switch {
             0 => ["Defeated Gari", "Defeated Bouboul", "Defeated Jello", "Defeated Roger", "Defeated Pilpou", "Defeated Rosa"],
             2 => ["I'm The Boss Now"],

@@ -35,4 +35,4 @@ class SkigillWorld(World):
         return items.get_random_filler_item_name(self)
 
     def fill_slot_data(self) -> Mapping[str, Any]:
-        return self.options.as_dict("goal_type")
+        return self.options.as_dict("goal_type", "boss_region_last")

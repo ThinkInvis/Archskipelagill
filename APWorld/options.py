@@ -64,6 +64,13 @@ class RegionChecksNeedCharacter(Toggle):
     """
     
     display_name = "Region Checks Need Character"
+    
+class BossRegionLast(DefaultOnToggle):
+    """
+    If enabled, the boss region will not unlock until all other regions are also unlocked.
+    """
+    
+    display_name = "Boss Region Needs All Other Regions"
 
 class TrapChance(Range):
     """
@@ -103,6 +110,7 @@ class SkigillOptions(PerGameCommonOptions):
     check_weapon_escapes: CheckWeaponEscapes
     check_hero_escapes: CheckHeroEscapes
     region_checks_need_character: RegionChecksNeedCharacter
+    boss_region_last: BossRegionLast
     trap_chance: TrapChance
     goal_type: GoalType
 
@@ -118,7 +126,7 @@ option_groups = [
     ),
     OptionGroup(
         "Logic and Goals",
-        [RegionChecksNeedCharacter, GoalType],
+        [RegionChecksNeedCharacter, BossRegionLast, GoalType],
     ),
 ]
 
@@ -133,6 +141,7 @@ option_presets = {
         "check_weapon_escapes": True,
         "check_hero_escapes": True,
         "region_checks_need_character": False,
+        "boss_region_last": True,
         "trap_chance": 0,
         "goal_type": GoalType.option_finalboss
     }
