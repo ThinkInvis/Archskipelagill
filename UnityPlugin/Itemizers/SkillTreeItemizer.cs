@@ -15,24 +15,20 @@ public class SkillTreeItemizer {
     private void CharaStats_Start(On.CharaStats.orig_Start orig, CharaStats self) {
         orig(self);
 
+        ApplyTrackers();
+        RescanRegions();
+        EnsureSafeSpawn(self);
+    }
+
+    void ApplyTrackers() {
         var gridObj = GameObject.Find("gridHolder/grid")?.transform;
         if(gridObj == null) return;
-
         var allValidNodes = GameObject.FindObjectsByType<skigillNode>(FindObjectsSortMode.InstanceID).Where(n => n.isActiveAndEnabled && !n.metaProg && n.transform.IsChildOf(gridObj)).OrderBy(n => n.transform.position.y).ThenBy(n => n.transform.position.x).ToList();
         for(var i = 0; i < allValidNodes.Count; i++) {
             if(!allValidNodes[i].gameObject.TryGetComponent<SkillTreeIndexTracker>(out var tkr))
                 tkr = allValidNodes[i].gameObject.AddComponent<SkillTreeIndexTracker>();
             tkr.node = SkillTree.skillTree[i];
-
-            var hasRegion = ArchiSaver.instance.receivedItemCounts.TryGetValue($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToTitleCase()}", out var n) && n > 0;
-            var hasFBK = ArchiSaver.instance.receivedItemCounts.TryGetValue($"Final Boss Key", out n) && n > 0;
-
-            if(hasRegion && (tkr.node.type != SkillTree.SkillNodeType.BOSS_FINAL || hasFBK))
-                tkr.Unlock();
-            else
-                tkr.Lock();
         }
-        EnsureSafeSpawn(self);
     }
 
     void EnsureSafeSpawn(CharaStats self) {
@@ -63,11 +59,13 @@ public class SkillTreeItemizer {
         foreach(var tkr in GameObject.FindObjectsByType<SkillTreeIndexTracker>(FindObjectsSortMode.InstanceID)) {
             if(!tkr.isActiveAndEnabled) continue;
 
-            if(ArchiSaver.instance.receivedItemCounts.TryGetValue($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToTitleCase()}", out var n) && n > 0)
+            var hasRegion = ArchiSaver.instance.receivedItemCounts.TryGetValue($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToTitleCase()}", out var n) && n > 0;
+            var hasFBK = ArchiSaver.instance.receivedItemCounts.TryGetValue($"Final Boss Key", out n) && n > 0;
+
+            if(hasRegion && (tkr.node.type != SkillTree.SkillNodeType.BOSS_FINAL || hasFBK))
                 tkr.Unlock();
             else
                 tkr.Lock();
-
         }
     }
 }
