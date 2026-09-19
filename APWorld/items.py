@@ -60,8 +60,8 @@ DEFAULT_ITEM_CLASSIFICATIONS = {
     "Trap: Pull Enemies": ItemClassification.trap,
     "Trap: Weapon Jam": ItemClassification.trap,
     "Trap: Drain Ski": ItemClassification.trap,
-    "Trap: Drain Gill": ItemClassification.trap,
-    "Trap: Slow Movement": ItemClassification.trap,
+    "Trap: Scramble Stats": ItemClassification.trap,
+    "Trap: Flash Mob": ItemClassification.trap,
     "Trap: Stronger Enemies": ItemClassification.trap
 }
 
