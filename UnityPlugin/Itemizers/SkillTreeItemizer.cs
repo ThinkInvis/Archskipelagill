@@ -93,13 +93,19 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>().color = new(1f, 1f, 1f, 1f);
         transform.Find("IconColor").GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f, 1f);
         transform.Find("nodeOcto").GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f, 1f);
+        foreach(var sr in transform.Find("chiffres").GetComponentsInChildren<SpriteRenderer>()) {
+            sr.color = new(1f, 1f, 1f, 1f);
+        }
     }
 
     public void Lock() {
         isUnlocked = false;
-        GetComponent<SpriteRenderer>().color = new(0.35f, 0f, 0f, 1f);
-        transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>().color = new(0.35f, 0f, 0f, 1f);
+        GetComponent<SpriteRenderer>().color = new(0.35f, 0.35f, 0.35f, 1f);
+        transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>().color = new(0.25f, 0.25f, 0.25f, 1f);
         transform.Find("IconColor").GetComponent<SpriteRenderer>().color = new(0.6f, 0.6f, 0.6f, 0.25f);
-        transform.Find("nodeOcto").GetComponent<SpriteRenderer>().color = new(0.35f, 0f, 0f, 1f);
+        transform.Find("nodeOcto").GetComponent<SpriteRenderer>().color = new(0.35f, 0.35f, 0.35f, 1f);
+        foreach(var sr in transform.Find("chiffres").GetComponentsInChildren<SpriteRenderer>()) {
+            sr.color = new(0.35f, 0.35f, 0.35f, 1f);
+        }
     }
 }
