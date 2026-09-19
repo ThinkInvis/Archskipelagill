@@ -92,12 +92,14 @@ def set_all_location_rules(world: SkigillWorld) -> None:
         world.set_rule(world.get_location("Defeated Final Boss on Difficulty 7"), has_finalboss_diff7)
     if world.options.goal_type == 5:
         world.set_rule(world.get_location("I'm The Boss Now on Difficulty 7"), has_bosses_diff7)
-    world.set_rule(world.get_location("Escaped with Mage"), Has("Character: Mage"))
-    world.set_rule(world.get_location("Escaped with Strongman"), Has("Character: Strongman"))
-    world.set_rule(world.get_location("Escaped with Fox"), Has("Character: Fox"))
-    world.set_rule(world.get_location("Escaped with Prototype"), Has("Character: Prototype"))
-    world.set_rule(world.get_location("Escaped with Dwarves"), Has("Character: Dwarves"))
-    world.set_rule(world.get_location("Escaped with Dragon"), Has("Character: Dragon"))
+        
+    if world.options.check_hero_escapes:
+        world.set_rule(world.get_location("Escaped with Mage"), Has("Character: Mage"))
+        world.set_rule(world.get_location("Escaped with Strongman"), Has("Character: Strongman"))
+        world.set_rule(world.get_location("Escaped with Fox"), Has("Character: Fox"))
+        world.set_rule(world.get_location("Escaped with Prototype"), Has("Character: Prototype"))
+        world.set_rule(world.get_location("Escaped with Dwarves"), Has("Character: Dwarves"))
+        world.set_rule(world.get_location("Escaped with Dragon"), Has("Character: Dragon"))
 
 def set_completion_condition(world: SkigillWorld) -> None:
     world.set_completion_rule(Has("Victory"))
