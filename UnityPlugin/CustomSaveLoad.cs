@@ -21,6 +21,8 @@ public class ArchiSaver:JSONsaver {
     public readonly List<string> sentChecks = [];
     public readonly Queue<string> queuedTraps = [];
     public readonly Queue<string> itemsToProcess = [];
+    public readonly Queue<string> itemNotifsToProcess = [];
+    public int sendNotifsToProcess = 0;
 
     public void Awake() {
         if(instance != null) {
@@ -48,10 +50,37 @@ public class ArchiSaver:JSONsaver {
 
     public new void Start() {}
 
+    float tSinceLastSend = 0f;
+    float tSinceLastReceive = 0f;
     public new void Update() {
         base.Update();
         while(itemsToProcess.Count > 0)
             ProcessItem(itemsToProcess.Dequeue());
+
+        bool doNotifs = false;
+        var camObj = GameObject.FindGameObjectWithTag("MainCamera");
+        if(camObj != null) {
+            if(camObj.TryGetComponent<mainCameraScript>(out var mcs) && mcs.transitionVal >= mcs.transitionValTarget) doNotifs = true;
+            else if(camObj.TryGetComponent<mainMenuCamScript>(out var mmcs) && mmcs.shopMenuTransitionValue == 1) doNotifs = true;
+        }
+        if(doNotifs) {
+            if(sendNotifsToProcess > 0) {
+                tSinceLastSend += Time.deltaTime;
+                if(tSinceLastSend > 0.4f) {
+                    tSinceLastSend = 0f;
+                    ArchiSendController.CreateSend();
+                    sendNotifsToProcess--;
+                }
+            } else tSinceLastSend = 0f;
+
+            if(itemNotifsToProcess.Count > 0) {
+                tSinceLastReceive += Time.deltaTime;
+                if(tSinceLastReceive > 0.4f) {
+                    tSinceLastReceive = 0f;
+                    ArchiDropController.CreateDrop(itemNotifsToProcess.Dequeue());
+                }
+            } else tSinceLastReceive = 0f;
+        }
     }
 
     public void ReceiveArchiItem(Archipelago.MultiClient.Net.Models.ItemInfo receivedItem) {
@@ -70,7 +99,7 @@ public class ArchiSaver:JSONsaver {
             receivedItemCounts[itemName] = 0;
         receivedItemCounts[itemName]++;
 
-        ArchiDropController.CreateDrop(itemName);
+        itemNotifsToProcess.Enqueue(itemName);
 
         PreSave();
         var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
@@ -119,9 +148,7 @@ public class ArchiSaver:JSONsaver {
         metaProg["archi_sentChecks"] = String.Join("|", sentChecks);
         PostSave();
 
-        foreach(var _ in checkNames) {
-            ArchiSendController.CreateSend();
-        }
+        sendNotifsToProcess += checkNames.Length;
     }
     public void ResendChecks() {
         if(unsentChecks.Count > 0) {

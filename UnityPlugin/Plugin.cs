@@ -185,6 +185,12 @@ public class Plugin:BaseUnityPlugin {
             };
             ArchipelagoClient.CheckLocationsByName(targetGoal);
         }
+        if(GUI.Button(new Rect(16, 390, 200, 20), "DEBUG: Test send notif")) {
+            ArchiSaver.instance.sendNotifsToProcess++;
+        }
+        if(GUI.Button(new Rect(16, 420, 200, 20), "DEBUG: Test receive notif (key item)")) {
+            ArchiSaver.instance.itemNotifsToProcess.Enqueue("Skigill Region: Mage");
+        }
 #endif
         GUI.EndGroup();
     }
