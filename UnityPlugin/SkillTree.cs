@@ -1,8 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using UnityEngine;
-using System.IO;
+using UnityEngine.UIElements;
 
 namespace Archskipelagill;
 
@@ -21,11 +22,11 @@ public static partial class SkillTree {
 
     static readonly string[] SPAWN_TARGET_NAMES = [
         "Mage",
+        "Jugger",
+        "Dragon",
         "Baldo",
         "Fox",
-        "Nain",
-        "Jugger",
-        "Dragon"
+        "Nain"
     ];
 
     static int FindNodeDistance(List<skigillNode> allValidNodes, skigillNode node1, skigillNode node2) {
