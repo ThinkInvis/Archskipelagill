@@ -120,19 +120,6 @@ public static partial class SkillTree {
             outputCs.Add($"\t\tnew SkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeSpawnId.{spawnId}, SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
         }
         var dir = Directory.GetCurrentDirectory();
-        string[] linesPy = [
-            "from .skilltree import SkillNodeType, SkillNodeSpawnId, SkillNodeRegion, SkillNode",
-            "from enum import Enum",
-            "",
-            "SKILL_TREE = {",
-            string.Join("," + System.Environment.NewLine, outputPy),
-            "}"
-            ];
-        string[] linesCs = [
-            "using System.Collections.Generic;",
-            "",
-            "namespace Archskipelagill;",
-            ];
         File.WriteAllText(Path.Join(dir, "skilltree_data.py"),
             $$"""
             from .skilltree import SkillNodeType, SkillNodeSpawnId, SkillNodeRegion, SkillNode
