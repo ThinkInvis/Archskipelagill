@@ -35,7 +35,7 @@ public class SkillTreeItemizer {
 
     void EnsureSafeSpawn(CharaStats self) {
         var targetChar = "Skigill Region: " + Enum.GetName(typeof(SkillTree.SkillNodeRegion), self.chara - 1).ToTitleCase();
-        if(!ArchiSaver.instance.receivedItemCounts.TryGetValue(targetChar, out var tcc) || tcc == 0) { //spawn region is locked, teleport to and activate mage region which for now is guaranteed unlocked
+        if(ArchiSaver.GetItemCount(targetChar) == 0) { //spawn region is locked, teleport to and activate mage region which for now is guaranteed unlocked
             var mgo = GameObject.Find("gridHolder/grid/Perks/Mage");
             mgo.GetComponent<skigillNode>().autoActivate();
             self.transform.position = new(mgo.transform.position.x, mgo.transform.position.y, 0);
@@ -72,8 +72,8 @@ public class SkillTreeItemizer {
         foreach(var tkr in GameObject.FindObjectsByType<SkillTreeIndexTracker>(FindObjectsSortMode.InstanceID)) {
             if(!tkr.isActiveAndEnabled) continue;
 
-            var hasRegion = ArchiSaver.instance.receivedItemCounts.TryGetValue($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToTitleCase()}", out var n) && n > 0;
-            var hasFBK = ArchiSaver.instance.receivedItemCounts.TryGetValue($"Final Boss Key", out n) && n > 0;
+            var hasRegion = ArchiSaver.GetItemCount($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToTitleCase()}") > 0;
+            var hasFBK = ArchiSaver.GetItemCount($"Final Boss Key") > 0;
 
             if(hasRegion && (tkr.node.type != SkillTree.SkillNodeType.BOSS_FINAL || hasFBK))
                 tkr.Unlock();

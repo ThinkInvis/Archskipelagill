@@ -136,6 +136,10 @@ public class ArchiSaver:JSONsaver {
         }
         save();
     }
+
+    public static int GetItemCount(string name) {
+        return instance.receivedItemCounts.GetValueOrDefault(name, 0);
+    }
 }
 
 public class CustomSaveLoad {

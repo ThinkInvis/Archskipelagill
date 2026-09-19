@@ -18,7 +18,7 @@ public class AbilityUnlockItemizer {
         for(int i = 0; i < origList.Length; i++) {
             if(origList[i] == null) continue;
             var wname = origList[i].gameObject.name.Replace("(Clone)", "");
-            if(!ArchiSaver.instance.receivedItemCounts.TryGetValue("Weapon: " + wname, out var wcount) || wcount == 0) {
+            if(ArchiSaver.GetItemCount("Weapon: " + wname) == 0) {
                 Plugin.BepinLogger.LogMessage($"Blocked weapon {wname} from loot due to archilock");
                 dict.WeaponList[i] = null;
             }
@@ -38,8 +38,7 @@ public class AbilityUnlockItemizer {
 
     private void DiffSelectScript_updateUnlockStatus(On.diffSelectScript.orig_updateUnlockStatus orig, diffSelectScript self) {
         orig(self);
-        ArchiSaver.instance.receivedItemCounts.TryGetValue("Progressive Difficulty", out var tcc);
-        if(tcc < self.difficulty && self.unlocked) {
+        if(ArchiSaver.GetItemCount("Progressive Difficulty") < self.difficulty && self.unlocked) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
         }
@@ -48,7 +47,7 @@ public class AbilityUnlockItemizer {
     private void CharaSelectScript_updateUnlockStatus(On.charaSelectScript.orig_updateUnlockStatus orig, charaSelectScript self) {
         orig(self);
         var targetChar = "Character: " + Enum.GetName(typeof(SkillTree.SkillNodeRegion), self.ID - 1).ToTitleCase();
-        if(self.unlocked && (!ArchiSaver.instance.receivedItemCounts.TryGetValue(targetChar, out var tcc) || tcc == 0)) {
+        if(self.unlocked && ArchiSaver.GetItemCount(targetChar) == 0) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
         }
@@ -57,7 +56,7 @@ public class AbilityUnlockItemizer {
     private void CharaSelectScript_selected(On.charaSelectScript.orig_selected orig, charaSelectScript self) {
         orig(self);
         var targetChar = "Character: " + Enum.GetName(typeof(SkillTree.SkillNodeRegion), self.ID - 1).ToTitleCase();
-        if(self.unlocked && (!ArchiSaver.instance.receivedItemCounts.TryGetValue(targetChar, out var tcc) || tcc == 0)) {
+        if(self.unlocked && ArchiSaver.GetItemCount(targetChar) == 0) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
             self.ls.charaUnlocked = false;
