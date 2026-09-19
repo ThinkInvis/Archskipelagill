@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 
-namespace Archskipelagill;
+namespace Archskipelagill.Itemizers;
 
 public class TrapHandler {
     float lastTrapTime = 0f;
