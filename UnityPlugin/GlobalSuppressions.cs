@@ -6,3 +6,4 @@
 using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("Style", "IDE0031:Use null propagation", Justification = "Best not to use null prop around Unity objects", Scope = "module")]
+[assembly: SuppressMessage("CodeQuality", "IDE0079:Remove unnecessary suppression", Justification = "Unused member suppression for UnityEngine methods fails intermittently", Scope = "module")]
