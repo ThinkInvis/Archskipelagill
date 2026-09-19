@@ -2,8 +2,7 @@
 
 ## Where is the options page?
 
-The [player options page for this game](../player-options) contains all the options you need to configure and export a
-config file.
+To configure and export a config file: install Archskipelagill's `.apworld` file into your local copy of Archipelago, then run the Options Generator directly or from the Archipelago Launcher. If the `.apworld` is installed correctly, Skigill should appear as a selectable game on the left side of the Options Generator.
 
 ## What is Skigill?
 
@@ -24,14 +23,14 @@ This Archipelago mod currently implements the following changes to its game:
 
 ### Items
 
-Items cannot be configured; use Starting Inventory instead.
-
 - (7) Unlock access to a region of the Skigill corresponding to each character (other than the starting character), the bosses, or the final boss node
-- (5) Unlock access to each character (other than the starting character)
-- (30) Unlock access to each weapon (other than the starting weapons)
+- (5) Unlock access to each character, other than the starting character
+- (30) Unlock access to each weapon, other than the starting weapons
+- (Filler) Gain bonus Gill based on progression (cannot be disabled)
+
+The following items are in starting inventory by default:
 - (6) Unlock access to each difficulty level
-- (1) Unlock access to Endless Mode (NYI)
-- (Filler) Gain bonus Gill based on progression (NYI)
+- (1) Unlock access to Endless Mode
 
 ### Locations/Checks
 
@@ -50,12 +49,12 @@ The following checks are only included if an equal or harder goal is chosen:
 
 ### Traps
 
-Traps are disabled by default and must be configured to appear.
+Traps are disabled by default and must be configured to appear. Each trap has additional difficulty options in the client's BepInEx config. Traps will queue up and trigger one at a time for every 15 seconds of non-paused run time.
 
-- NYI! Traps are a work in progress and will do nothing if enabled.
-
-### Credits
-
-- The Archipelago project itself, and its excellent guides/examples for implementing an APWorld!
-  - The APQuest world, used as a basis for this mod's APWorld implementation
-- alwaysintreble's [ArchipelagoBepInExPluginTemplate](https://github.com/alwaysintreble/ArchipelagoBepInExPluginTemplate), which is the basis for this mod's Unity plugin
+- Damage: instantly lose 50% health
+- Pull Enemies: all currently living enemies get +200% speed for 5 seconds
+- Weapon Jam: most weapons have -99% fire rate for 10 seconds
+- Drain Ski: instantly lose 50% Ski (temporary currency) (not configurable)
+- Scramble Stats: Str/Dex/Int stats are exchanged with each other
+- Flash Mob: add 30 extra enemies to the next spawn wave
+- Stronger Enemies: add 1 minute to the run timer for purposes of enemy/wave difficulty only
