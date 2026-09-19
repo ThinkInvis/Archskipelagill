@@ -34,7 +34,6 @@ public class TrapHandler {
 
             switch(trapName) {
                 case "Damage":
-                    Plugin.BepinLogger.LogMessage($"Damage Trap triggered, current HP halved!");
                     cs.HP *= 0.5f;
                     hb.hurtSFX.PlayHurtSFX();
                     var hurtNotif = UnityEngine.Object.Instantiate<GameObject>(hb.damageTakenNotif, hb.transform.position, Quaternion.identity);

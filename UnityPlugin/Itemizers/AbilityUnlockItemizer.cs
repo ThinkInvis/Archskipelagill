@@ -19,7 +19,7 @@ public class AbilityUnlockItemizer {
             if(origList[i] == null) continue;
             var wname = origList[i].gameObject.name.Replace("(Clone)", "");
             if(ArchiSaver.GetItemCount("Weapon: " + wname) == 0) {
-                Plugin.BepinLogger.LogMessage($"Blocked weapon {wname} from loot due to archilock");
+                Plugin.BepinLogger.LogDebug($"Blocked weapon {wname} from loot due to archilock");
                 dict.WeaponList[i] = null;
             }
         }
