@@ -13,53 +13,25 @@ public class RoundEndItemizer {
         orig(self);
         var stats = GameObject.Find("PlayerCharacter").GetComponent<CharaStats>();
         if(self.isBoss) {
-            Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Any Boss (Event)");
-            if(stats.difficulty > 6)
-                Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Any Boss on Difficulty 7 (Event)");
-            switch(self.bossName) {
-                case "OVNI":
-                    Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Rosa");
-                    if(stats.difficulty > 6)
-                        Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Rosa on Difficulty 7");
-                    break;
-                case "GRENOUILLE":
-                    Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Roger");
-                    if(stats.difficulty > 6)
-                        Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Roger on Difficulty 7");
-                    break;
-                case "SLIME":
-                    Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Jello");
-                    if(stats.difficulty > 6)
-                        Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Jello on Difficulty 7");
-                    break;
-                case "POULPE":
-                    Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Pilpou");
-                    if(stats.difficulty > 6)
-                        Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Pilpou on Difficulty 7");
-                    break;
-                case "BOULE":
-                    Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Bouboul");
-                    if(stats.difficulty > 6)
-                        Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Bouboul on Difficulty 7");
-                    break;
-                case "COCHON":
-                    Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Gari");
-                    if(stats.difficulty > 6)
-                        Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Gari on Difficulty 7");
-                    break;
-                case "FINAL":
-                    Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Final Boss");
-                    Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Final Boss (Event)");
-                    if(stats.difficulty > 6)
-                        Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated Final Boss on Difficulty 7 (Event)");
-                    break;
+            var targetBossName = self.bossName switch {
+                "OVNI" => "Rosa",
+                "GRENOUILLE" => "Roger",
+                "SLIME" => "Jello",
+                "POULPE" => "Pilpou",
+                "BOULE" => "Bouboul",
+                "COCHON" => "Gari",
+                "FINAL" => "Final Boss",
+                _ => "N/A"
+            };
+            if(targetBossName != "N/A") {
+                Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated {targetBossName}");
+                if(stats.difficulty > 6)
+                    Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated {targetBossName} on Difficulty 7");
             }
             if(stats.bossesKilled >= 6) {
-                Plugin.ArchipelagoClient.CheckLocationsByName($"I'm The Boss Now");
-                Plugin.ArchipelagoClient.CheckLocationsByName($"I'm The Boss Now (Event)");
+                Plugin.ArchipelagoClient.CheckLocationsByName("I'm The Boss Now");
                 if(stats.difficulty > 6) {
-                    Plugin.ArchipelagoClient.CheckLocationsByName($"I'm The Boss Now on Difficulty 7");
-                    Plugin.ArchipelagoClient.CheckLocationsByName($"I'm The Boss Now on Difficulty 7 (Event)");
+                    Plugin.ArchipelagoClient.CheckLocationsByName("I'm The Boss Now on Difficulty 7");
                 }
             }
         }

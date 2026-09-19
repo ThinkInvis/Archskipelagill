@@ -111,14 +111,24 @@ def create_events(world: SkigillWorld) -> None:
 
     match world.options.goal_type:
         case 0:
-            boss_region.add_event("Defeated Any Boss (Event)", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Rosa", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Roger", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Jello", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Pilpou", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Bouboul", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Gari", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
         case 1:
-            boss_region.add_event("Defeated Final Boss (Event)", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Final Boss", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
         case 2:
-            boss_region.add_event("I'm The Boss Now (Event)", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("I'm The Boss Now", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
         case 3:
-            boss_region.add_event("Defeated Any Boss on Difficulty 7 (Event)", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Rosa on Difficulty 7", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Roger on Difficulty 7", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Jello on Difficulty 7", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Pilpou on Difficulty 7", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Bouboul on Difficulty 7", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Gari on Difficulty 7", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
         case 4:
-            boss_region.add_event("Defeated Final Boss on Difficulty 7 (Event)", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("Defeated Final Boss on Difficulty 7", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
         case 5:
-            boss_region.add_event("I'm The Boss Now on Difficulty 7 (Event)", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)
+            boss_region.add_event("I'm The Boss Now on Difficulty 7", "Victory", location_type=SkigillLocation, item_type=items.SkigillItem)

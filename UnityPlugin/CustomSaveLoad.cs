@@ -183,6 +183,12 @@ public class CustomSaveLoad {
         chara.XP = 0;
         chara.XPtoDisplay = 0;
 
+        ArchiSaver.instance.receivedItemCounts.Clear();
+        ArchiSaver.instance.lastReceivedIndex = 0;
+        ArchiSaver.instance.lastSavedIndex = 0;
+        ArchiSaver.instance.sentChecks.Clear();
+        ArchiSaver.instance.unsentChecks.Clear();
+
         GameObject.FindFirstObjectByType<gridResetter>().resetMetaProg(); //also saves save file
     }
 }

@@ -178,5 +178,19 @@ public class ArchipelagoClient {
         }
         session.Locations.CompleteLocationChecks([.. unsentNames.Select(n => session.Locations.GetLocationIdFromName("Skigill", n))]);
         ArchiSaver.instance.ReceiveSentChecks([.. unsentNames]);
+        var slotData = session.DataStorage.GetSlotData();
+        var goalType = (Int64)slotData["goal_type"];
+        string[] validGoals = goalType switch {
+            0 => ["Defeated Gari", "Defeated Bouboul", "Defeated Jello", "Defeated Roger", "Defeated Pilpou", "Defeated Rosa"],
+            2 => ["I'm The Boss Now"],
+            3 => ["Defeated Gari on Difficulty 7", "Defeated Bouboul on Difficulty 7", "Defeated Jello on Difficulty 7", "Defeated Roger on Difficulty 7", "Defeated Pilpou on Difficulty 7", "Defeated Rosa on Difficulty 7"],
+            4 => ["Defeated Final Boss on Difficulty 7"],
+            5 => ["I'm The Boss Now on Difficulty 7"],
+            _ => ["Defeated Final Boss"]
+        };
+        if(names.Intersect(validGoals).Any()) {
+            Plugin.BepinLogger.LogMessage("Goal!!!");
+            session.SetGoalAchieved();
+        }
     }
 }

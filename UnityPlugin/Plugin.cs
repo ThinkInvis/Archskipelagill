@@ -4,6 +4,7 @@ using Archskipelagill.Utils;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
+using System;
 using System.IO;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -146,6 +147,19 @@ public class Plugin:BaseUnityPlugin {
         if(GUI.Button(new Rect(16, 330, 200, 20), "DEBUG: Cheat: Skip Time")) {
             var ts = GameObject.Find("Main Camera/Canvas/timer").GetComponent<timerScript>();
             ts.t = ts.endTime - 10f;
+        }
+        if(GUI.Button(new Rect(16, 360, 200, 20), "DEBUG: Cheat: Test Goal")) {
+            var slotData = ArchipelagoClient.session.DataStorage.GetSlotData();
+            var goalType = (Int64)slotData["goal_type"];
+            string targetGoal = goalType switch {
+                0 => "Defeated Gari",
+                2 => "I'm The Boss Now",
+                3 => "Defeated Gari on Difficulty 7",
+                4 => "Defeated Final Boss on Difficulty 7",
+                5 => "I'm The Boss Now on Difficulty 7",
+                _ => "Defeated Final Boss"
+            };
+            ArchipelagoClient.CheckLocationsByName(targetGoal);
         }
 #endif
         GUI.EndGroup();
