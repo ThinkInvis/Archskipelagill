@@ -2,6 +2,7 @@
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Archskipelagill.Itemizers;
 
@@ -10,6 +11,7 @@ public class SkillTreeItemizer {
         On.skigillNode.activate += SkigillNode_activate;
         On.skigillNode.OnTriggerStay2D += SkigillNode_OnTriggerStay2D;
         On.CharaStats.Start += CharaStats_Start;
+        On.skigillNode.showConnex += SkigillNode_showConnex;
     }
 
     private void CharaStats_Start(On.CharaStats.orig_Start orig, CharaStats self) {
@@ -55,6 +57,17 @@ public class SkillTreeItemizer {
         Plugin.ArchipelagoClient.CheckLocationsByName($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? tkr.node.chestIndex : tkr.node.perkIndex) + 1} ({Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region)})");
     }
 
+    private void SkigillNode_showConnex(On.skigillNode.orig_showConnex orig, skigillNode self) {
+        orig(self);
+        if(self.TryGetComponent<SkillTreeIndexTracker>(out var tkr)) {
+            for(var j = 0; j < self.transform.childCount; j++) {
+                var ch = self.transform.GetChild(j);
+                if(ch.name != "connexion(Clone)") continue;
+                ch.Find("GameObject").localScale = tkr.isUnlocked ? new(0.5f, 0.5f, 1f) : new(0.2f, 0.1f, 1f);
+            }
+        }
+    }
+
     public void RescanRegions() {
         foreach(var tkr in GameObject.FindObjectsByType<SkillTreeIndexTracker>(FindObjectsSortMode.InstanceID)) {
             if(!tkr.isActiveAndEnabled) continue;
@@ -80,11 +93,6 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>().color = new(1f, 1f, 1f, 1f);
         transform.Find("IconColor").GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f, 1f);
         transform.Find("nodeOcto").GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f, 1f);
-        for(var j = 0; j < transform.childCount; j++) {
-            var ch = transform.GetChild(j);
-            if(ch.name != "connexion(Clone)") continue;
-            ch.Find("GameObject").localScale = new(0.5f, 0.5f, 1f);
-        }
     }
 
     public void Lock() {
@@ -93,10 +101,5 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>().color = new(0.35f, 0f, 0f, 1f);
         transform.Find("IconColor").GetComponent<SpriteRenderer>().color = new(0.6f, 0.6f, 0.6f, 0.25f);
         transform.Find("nodeOcto").GetComponent<SpriteRenderer>().color = new(0.35f, 0f, 0f, 1f);
-        for(var j = 0; j < transform.childCount; j++) {
-            var ch = transform.GetChild(j);
-            if(ch.name != "connexion(Clone)") continue;
-            ch.Find("GameObject").localScale = new(0.15f, 0.15f, 1f);
-        }
     }
 }
