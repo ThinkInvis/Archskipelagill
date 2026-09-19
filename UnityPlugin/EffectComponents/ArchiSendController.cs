@@ -24,7 +24,8 @@ public class ArchiSendController : MonoBehaviour {
         var sfx = obj.AddComponent<AudioSource>();
         sfx.clip = Plugin.resources.LoadAsset<AudioClip>("Assets/Sounds/archi_send.wav");
         sfx.volume = PlayerPrefs.GetFloat("SFXvol") * 1.3f;
-        sfx.pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+        ctrl.basePitch = UnityEngine.Random.Range(0.9f, 1.1f);
+        sfx.pitch = ctrl.basePitch * Time.timeScale;
         sfx.Play();
 
         return obj;
@@ -34,6 +35,7 @@ public class ArchiSendController : MonoBehaviour {
     CharaStats chara;
     Vector3 v;
     AudioSource sfx;
+    float basePitch;
     Transform[] spinners;
 
 #pragma warning disable IDE0051 //Used by Unity Engine
@@ -54,15 +56,16 @@ public class ArchiSendController : MonoBehaviour {
 
     void Update() {
         if(sfx.isPlaying) {
+            sfx.pitch = basePitch * Time.timeScale;
             sfx.volume = (1f - sfx.time / sfx.clip.length) * 1.3f * PlayerPrefs.GetFloat("SFXvol");
-            transform.position += v * Time.unscaledDeltaTime;
-            v += new Vector3(0, (!chara.metaMenu ? 5f : 1f) * Time.unscaledDeltaTime, (!chara.metaMenu ? 5f : 1f) * Time.unscaledDeltaTime);
+            transform.position += v * Time.deltaTime;
+            v += new Vector3(0, (!chara.metaMenu ? 5f : 1f) * Time.deltaTime, (!chara.metaMenu ? 5f : 1f) * Time.deltaTime);
             var phase = Mathf.Pow(sfx.time + 1f, 1.2f) * 1f * Mathf.PI;
             for(var i = 0; i < spinners.Length; i++) {
                 var iphase = i / 3f * Mathf.PI;
                 spinners[i].transform.localPosition = new(Mathf.Cos(phase + iphase) * 0.08f, Mathf.Sin(phase + iphase) * 0.08f, Mathf.Sin(phase + iphase) * 0.08f);
             }
-            transform.localScale *= 1f - Time.unscaledDeltaTime * 0.5f;
+            transform.localScale *= 1f - Time.deltaTime * 0.5f;
         } else {
             Destroy(gameObject);
         }

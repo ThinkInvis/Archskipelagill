@@ -25,13 +25,14 @@ public class ArchiDropController : MonoBehaviour {
         var sfx = obj.AddComponent<AudioSource>();
         sfx.clip = Plugin.resources.LoadAsset<AudioClip>("Assets/Sounds/archi_item_fall.wav");
         sfx.volume = 0f;
-        sfx.pitch = UnityEngine.Random.Range(0.9f, 1.1f);
+        ctrl.basePitch = UnityEngine.Random.Range(0.9f, 1.1f);
+        sfx.pitch = ctrl.basePitch * Time.timeScale;
         sfx.Play();
 
         var sfx2 = obj.AddComponent<AudioSource>();
         sfx2.clip = Plugin.resources.LoadAsset<AudioClip>($"Assets/Sounds/archi_{(itemName.StartsWith("Trap: ") ? "trap" : "item")}_arrive.wav");
         sfx2.volume = PlayerPrefs.GetFloat("SFXvol") * 1.3f;
-        sfx2.pitch = 1f;
+        sfx2.pitch = Time.timeScale;
 
         return obj;
     }
@@ -45,6 +46,7 @@ public class ArchiDropController : MonoBehaviour {
     Transform[] spinners;
     Vector3[] spinnerV;
     bool landed = false;
+    float basePitch;
 
 #pragma warning disable IDE0051 //Used by Unity Engine
     void Start() {
@@ -73,6 +75,8 @@ public class ArchiDropController : MonoBehaviour {
     }
 
     void Update() {
+        sfx.pitch = basePitch * Time.timeScale;
+        sfx2.pitch = Time.timeScale;
         if(!landed && sfx.time < 0.85f) {
             sfx.volume = (sfx.time / 0.85f) * 1.3f * PlayerPrefs.GetFloat("SFXvol");
             transform.position = posStart + (sfx.time / 0.85f) * (posTarget - posStart);
@@ -84,9 +88,9 @@ public class ArchiDropController : MonoBehaviour {
         } else if(landed && sfx2.isPlaying) {
             transform.position = posTarget;
             for(var i = 0; i < spinners.Length; i++) {
-                spinners[i].transform.position += spinnerV[i] * Time.unscaledDeltaTime;
-                spinners[i].transform.localScale *= 1f - Time.unscaledDeltaTime * 2f;
-                spinnerV[i] += new Vector3(0, (!chara.metaMenu ? -25f : -1f) * Time.unscaledDeltaTime, (!chara.metaMenu ? -25f : -1f) * Time.unscaledDeltaTime);
+                spinners[i].transform.position += spinnerV[i] * Time.deltaTime;
+                spinners[i].transform.localScale *= 1f - Time.deltaTime * 2f;
+                spinnerV[i] += new Vector3(0, (!chara.metaMenu ? -25f : -1f) * Time.deltaTime, (!chara.metaMenu ? -25f : -1f) * Time.deltaTime);
             }
             //todo: add rising sprite for received item type
         } else {
