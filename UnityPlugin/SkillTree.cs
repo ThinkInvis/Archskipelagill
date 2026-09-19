@@ -102,15 +102,6 @@ public static partial class SkillTree {
             } else if(skillNodeType == "BOSS") {
                 connexList.Add(allValidNodes.IndexOf(finalBossNode));
             }
-            var spawnId = node.name switch {
-                "Mage" => 0,
-                "Baldo" => 1,
-                "Fox" => 2,
-                "Dragon" => 3,
-                "Jugger" => 4,
-                "Nain" => 5,
-                _ => -1
-            };
 
             var spawnDistances = new List<int>();
             for(var j = 0; j < SPAWN_TARGET_NAMES.Length; j++) {
