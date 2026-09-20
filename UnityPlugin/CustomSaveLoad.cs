@@ -60,7 +60,7 @@ public class ArchiSaver:JSONsaver {
         bool doNotifs = false;
         var camObj = GameObject.FindGameObjectWithTag("MainCamera");
         if(camObj != null) {
-            if(camObj.TryGetComponent<mainCameraScript>(out var mcs) && mcs.transitionVal >= mcs.transitionValTarget) doNotifs = true;
+            if(camObj.TryGetComponent<mainCameraScript>(out var mcs) && mcs.transitionVal <= 1f) doNotifs = true;
             else if(camObj.TryGetComponent<mainMenuCamScript>(out var mmcs) && mmcs.shopMenuTransitionValue == 1) doNotifs = true;
         }
         if(doNotifs) {
