@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.2.7f2
-CRC: 1059987437
+CRC: 4150419773
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: f2cb3acd6c5bb4a87d5f54ada49aeb55
+    Hash: 4b22cf0738d6a8c1a31362cc444dda4f
   TypeTreeHash:
     serializedVersion: 2
     Hash: 9805626a0a960da8f69a56443df5de53
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 5df4b74f8482f5e22bb30c6185af5c53
+    Hash: fa387245a775e0decf662413d22a7406
 HashAppended: 0
 ClassTypes:
 - Class: 28
@@ -23,6 +23,7 @@ SerializeReferenceClassIdentifiers: []
 Assets:
 - Assets/Textures/archi-button-conn.png
 - Assets/Sounds/archi_trap_activate.wav
+- Assets/Textures/item-gill.png
 - Assets/Sounds/archi_item_fall.wav
 - Assets/Sounds/archi_send.wav
 - Assets/Textures/archi-big-single.png
@@ -31,7 +32,11 @@ Assets:
 - Assets/Sounds/archi_trap_arrive.wav
 - Assets/Sounds/archi_item_arrive.wav
 - Assets/Textures/archi-button-dc.png
+- Assets/Textures/item-character.png
+- Assets/Textures/item-unknown.png
+- Assets/Textures/item-weapon.png
 - Assets/Textures/archi-button-conn-selected.png
+- Assets/Textures/item-trap.png
 - Assets/Textures/archi-button.png
 - Assets/Textures/archi-button-dc-selected.png
 - Assets/Textures/item-key.png

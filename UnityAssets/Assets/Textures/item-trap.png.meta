@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: c5602797ff67e2341acd0a14aa4df025
+guid: c741d7959ab18584d98c8088442fa67e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -2328303012742121738
-    second: archi-button-dc-selected_0
+      213: -4640296049067823009
+    second: item-trap_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: archi-button-dc-selected_0
+      name: item-trap_0
       rect:
         serializedVersion: 2
-        x: 4
-        y: 4
-        width: 24
-        height: 24
+        x: 5
+        y: 0
+        width: 22
+        height: 32
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 6f6b80ceeb430bfd0800000000000000
-      internalID: -2328303012742121738
+      spriteID: f50f9a6245b5a9fb0800000000000000
+      internalID: -4640296049067823009
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      archi-button-dc-selected_0: -2328303012742121738
+      item-trap_0: -4640296049067823009
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 
