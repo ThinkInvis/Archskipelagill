@@ -66,6 +66,7 @@ public class ArchiDropController : MonoBehaviour {
         } else {
             posTarget = chara.transform.position + (Vector3)UnityEngine.Random.insideUnitCircle * 0.35f;
             posStart = posTarget + new Vector3(0f, 2f, 2f) + (Vector3)UnityEngine.Random.insideUnitCircle * 0.7f;
+            transform.localScale *= 0.5f;
             for(var i = 0; i < 6; i++) {
                 spinners[i] = transform.GetChild(i);
                 spinnerV[i] = (UnityEngine.Random.onUnitSphere + new Vector3(0f, 1.5f, 1.5f)) * UnityEngine.Random.Range(0.4f, 0.8f);

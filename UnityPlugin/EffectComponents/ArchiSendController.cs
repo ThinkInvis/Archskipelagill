@@ -51,6 +51,7 @@ public class ArchiSendController : MonoBehaviour {
             transform.localScale *= 5f;
         } else {
             v = new(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-0.05f, 0.125f));
+            transform.localScale *= 0.5f;
         }
     }
 
