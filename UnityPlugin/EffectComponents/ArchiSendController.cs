@@ -6,12 +6,13 @@ using UnityEngine;
 namespace Archskipelagill.EffectComponents;
 
 public class ArchiSendController : MonoBehaviour {
-    public static GameObject CreateSend() {
+    public static GameObject CreateSend(bool goal = false) {
         var obj = new GameObject("ArchiSend");
 
         var ctrl = obj.AddComponent<ArchiSendController>();
         var chara = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
         ctrl.transform.position = chara.transform.position;
+        ctrl.goal = goal;
 
         for(var i = 0; i < 6; i++) {
             var spinner = new GameObject("Spinner");
@@ -37,6 +38,7 @@ public class ArchiSendController : MonoBehaviour {
     AudioSource sfx;
     float basePitch;
     Transform[] spinners;
+    bool goal;
 
 #pragma warning disable IDE0051 //Used by Unity Engine
     void Start() {
@@ -53,6 +55,11 @@ public class ArchiSendController : MonoBehaviour {
             v = new(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-0.05f, 0.125f));
             transform.localScale *= 0.5f;
         }
+        if(goal) {
+            transform.localScale *= 3f;
+            basePitch *= 0.5f;
+            v *= 0.5f;
+        }
     }
 
     void Update() {
@@ -60,11 +67,13 @@ public class ArchiSendController : MonoBehaviour {
             sfx.pitch = basePitch * Time.timeScale;
             sfx.volume = (1f - sfx.time / sfx.clip.length) * 1.3f * PlayerPrefs.GetFloat("SFXvol");
             transform.position += v * Time.deltaTime;
-            v += new Vector3(0, (!chara.metaMenu ? 5f : 1f) * Time.deltaTime, (!chara.metaMenu ? 5f : 1f) * Time.deltaTime);
+            v += new Vector3(0, (!chara.metaMenu ? 5f : 1f) * Time.deltaTime, (!chara.metaMenu ? 5f : 1f) * Time.deltaTime) * (goal ? 0.2f : 1f);
             var phase = Mathf.Pow(sfx.time + 1f, 1.2f) * 1f * Mathf.PI;
+            var phaseb = Mathf.Pow(sfx.time + 1f, 1.2f) * 0.384f * Mathf.PI;
             for(var i = 0; i < spinners.Length; i++) {
                 var iphase = i / 3f * Mathf.PI;
                 spinners[i].transform.localPosition = new(Mathf.Cos(phase + iphase) * 0.08f, Mathf.Sin(phase + iphase) * 0.08f, Mathf.Sin(phase + iphase) * 0.08f);
+                spinners[i].GetComponent<SpriteRenderer>().color = Color.HSVToRGB((phaseb + iphase * 0.25f) % 1f, 1f, 1f);
             }
             transform.localScale *= 1f - Time.deltaTime * 0.5f;
         } else {

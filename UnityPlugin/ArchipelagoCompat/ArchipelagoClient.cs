@@ -4,6 +4,7 @@ using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.MessageLog.Messages;
 using Archipelago.MultiClient.Net.Packets;
+using Archskipelagill.EffectComponents;
 using Archskipelagill.Utils;
 using BepInEx.Logging;
 using System;
@@ -197,6 +198,7 @@ public class ArchipelagoClient {
         if(names.Intersect(validGoals).Any()) {
             Plugin.BepinLogger.LogMessage("Goal!!!");
             session.SetGoalAchieved();
+            ArchiSendController.CreateSend(true);
         }
     }
 }
