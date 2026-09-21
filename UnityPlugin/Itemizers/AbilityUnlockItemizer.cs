@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
+using static Unity.Audio.Handle;
 
 namespace Archskipelagill.Itemizers;
 
@@ -13,8 +15,16 @@ public class AbilityUnlockItemizer {
         On.modeSelectScript.updateUnlockStatus += ModeSelectScript_updateUnlockStatus;
         On.chestLootScript.loote += ChestLootScript_loote;
         On.skigillNode.Update += SkigillNode_Update;
+        On.weaponDisplayer.Start += WeaponDisplayer_Start;
 
         customLockSprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/locked-archi.png");
+    }
+
+    private void WeaponDisplayer_Start(On.weaponDisplayer.orig_Start orig, weaponDisplayer self) {
+        orig(self);
+        var checkStr = $"Escaped with Weapon {self.GetComponent<weaponDisplayer>().source.name.Replace("(Clone)", "")}";
+        if(!ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr))
+            self.gameObject.AddComponent<WeaponDisplayerCheckInd>();
     }
 
     private void SkigillNode_Update(On.skigillNode.orig_Update orig, skigillNode self) {
@@ -120,5 +130,39 @@ public class AbilityUnlockItemizer {
             renderer = GetComponent<SpriteRenderer>();
             originalSprite = renderer.sprite;
         }
+    }
+
+    class WeaponDisplayerCheckInd : MonoBehaviour {
+        Transform[] spinners;
+        CharaStats chara;
+#pragma warning disable IDE0051 //Used by Unity Engine
+        void Awake() {
+            var icon = this.transform.Find("GameObject/icon");
+            chara = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
+            spinners = new Transform[6];
+            for(var i = 0; i < 6; i++) {
+                var spinner = new GameObject("Spinner");
+                spinner.transform.parent = icon;
+                var spr = spinner.AddComponent<SpriteRenderer>();
+                spr.sprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-big-single.png");
+                spr.drawMode = SpriteDrawMode.Sliced;
+                spr.size *= 0.5f;
+                spr.gameObject.layer = 5;
+                spr.sortingOrder = 2;
+                spinner.transform.localScale = new(1f, 1f, 1f);
+                spinners[i] = spinner.transform;
+            }
+        }
+
+        void Update() {
+            var phase = Time.unscaledTime * 0.5f * Mathf.PI;
+            for(var i = 0; i < spinners.Length; i++) {
+                var iphase = i / 3f * Mathf.PI;
+                spinners[i].transform.localPosition = new(Mathf.Cos(phase + iphase) * 1f, Mathf.Sin(phase + iphase) * 1f, -2f);
+                if(chara.won)
+                    spinners[i].GetComponent<SpriteRenderer>().color = new(0f, 1f, 0f);
+            }
+        }
+#pragma warning restore IDE0051
     }
 }
