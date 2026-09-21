@@ -20,6 +20,8 @@ public class ArchiDropController : MonoBehaviour {
             var spr = spinner.AddComponent<SpriteRenderer>();
             spr.material = spriteMtl;
             spr.sprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-big-single.png");
+            spr.drawMode = SpriteDrawMode.Sliced;
+            spr.size *= 0.16f;
         }
 
         var sfx = obj.AddComponent<AudioSource>();
@@ -50,6 +52,8 @@ public class ArchiDropController : MonoBehaviour {
                 "Bonus Gill" => "gill",
                 _ => "unknown"
             }}.png");
+        spr2.drawMode = SpriteDrawMode.Sliced;
+        spr2.size *= 0.16f;
 
         return obj;
     }
@@ -130,7 +134,7 @@ public class ArchiDropController : MonoBehaviour {
             var fadeInFac = Mathf.Min(itemTimer / 0.5f, 1f);
             follower.localScale = new Vector3(fadeInFac, fadeInFac, fadeInFac);
 
-            follower.position = follower.position + Time.deltaTime * 2f * (chara.transform.position + followerOffset - follower.position);
+            follower.position += Time.deltaTime * 2f * (chara.transform.position + followerOffset - follower.position);
 
             if(itemTimer > 4f) {
                 follower.gameObject.SetActive((itemTimer % 0.25f) > 0.125f);

@@ -20,6 +20,8 @@ public class ArchiSendController : MonoBehaviour {
             var spr = spinner.AddComponent<SpriteRenderer>();
             spr.material = GameObject.FindGameObjectWithTag("Player").transform.Find("Skins/Mage").GetComponent<SpriteRenderer>().material;
             spr.sprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-big-single.png");
+            spr.drawMode = SpriteDrawMode.Sliced;
+            spr.size *= 0.16f;
         }
 
         var sfx = obj.AddComponent<AudioSource>();
@@ -73,7 +75,8 @@ public class ArchiSendController : MonoBehaviour {
             for(var i = 0; i < spinners.Length; i++) {
                 var iphase = i / 3f * Mathf.PI;
                 spinners[i].transform.localPosition = new(Mathf.Cos(phase + iphase) * 0.08f, Mathf.Sin(phase + iphase) * 0.08f, Mathf.Sin(phase + iphase) * 0.08f);
-                spinners[i].GetComponent<SpriteRenderer>().color = Color.HSVToRGB((phaseb + iphase * 0.25f) % 1f, 1f, 1f);
+                if(goal)
+                    spinners[i].GetComponent<SpriteRenderer>().color = Color.HSVToRGB((phaseb + iphase * 0.25f) % 1f, 1f, 1f);
             }
             transform.localScale *= 1f - Time.deltaTime * 0.5f;
         } else {

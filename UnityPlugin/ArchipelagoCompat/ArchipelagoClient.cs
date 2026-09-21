@@ -5,13 +5,13 @@ using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.MessageLog.Messages;
 using Archipelago.MultiClient.Net.Packets;
 using Archskipelagill.EffectComponents;
-using Archskipelagill.Utils;
 using BepInEx.Logging;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
+using UnityEngine;
 
 namespace Archskipelagill.ArchipelagoCompat;
 
@@ -90,7 +90,8 @@ public class ArchipelagoClient {
 
             outText = $"Successfully connected to {ServerData.Uri} as {ServerData.SlotName}!";
 
-            ArchipelagoConsole.LogMessage(outText);
+            Plugin.instance.mainMenuInjector.OnConnect();
+            Plugin.instance.mainMenuInjector.ReceiveMessage(outText);
 
             Plugin.BepinLogger.LogMessage($"Pre begin SSD on {ArchiSaver.instance}");
             ArchiSaver.instance.StoreSlotData(session.DataStorage.GetSlotData());
@@ -106,9 +107,10 @@ public class ArchipelagoClient {
 
             Authenticated = false;
             Disconnect();
+            Plugin.instance.mainMenuInjector.OnDisconnect();
         }
 
-        ArchipelagoConsole.LogMessage(outText);
+        Plugin.instance.mainMenuInjector.ReceiveMessage(outText);
         attemptingConnection = false;
     }
 
@@ -129,15 +131,15 @@ public class ArchipelagoClient {
         session = null;
         Authenticated = false;
         disconnecting = false;
+        Plugin.instance.mainMenuInjector.OnDisconnect();
     }
-
 
     public void SendMessage(string message) {
         session.Socket.SendPacketAsync(new SayPacket { Text = message });
     }
 
     private void OnMessageReceived(LogMessage message) {
-        ArchipelagoConsole.LogMessage(message.ToString());
+        Plugin.instance.mainMenuInjector.ReceiveMessage(message.ToString());
     }
 
     /// <summary>
@@ -159,7 +161,7 @@ public class ArchipelagoClient {
     /// <param name="message">message received from the server</param>
     private void OnSessionErrorReceived(Exception e, string message) {
         Plugin.BepinLogger.LogError(e);
-        ArchipelagoConsole.LogMessage(message);
+        Plugin.instance.mainMenuInjector.ReceiveMessage(message);
     }
 
     /// <summary>

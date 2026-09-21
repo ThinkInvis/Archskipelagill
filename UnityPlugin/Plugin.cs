@@ -1,6 +1,5 @@
 ﻿using Archskipelagill.ArchipelagoCompat;
 using Archskipelagill.Itemizers;
-using Archskipelagill.Utils;
 using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
@@ -32,9 +31,10 @@ public class Plugin:BaseUnityPlugin {
     public ConfigEntry<float> cfgSpawnTimeTrapStrength;
 
     public const string ModDisplayInfo = $"{PluginName} v{PluginVersion}";
-    private const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
+    public const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ManualLogSource BepinLogger;
     public static ArchipelagoClient ArchipelagoClient;
+    public MainMenuInjector mainMenuInjector;
     public SkillTreeItemizer skillTreeItemizer;
     public RoundEndItemizer roundEndItemizer;
     public AbilityUnlockItemizer abilityUnlockItemizer;
@@ -67,38 +67,26 @@ public class Plugin:BaseUnityPlugin {
         cfgSpawnTimeTrapStrength = config.Bind<float>(new ConfigDefinition("Difficulty", "Stronger Enemies Trap Strength"), 60f, new ConfigDescription("Time added to the monster wave strength timer by Trap: Stronger Enemies.", new AcceptableValueRange<float>(0f, 300f)));
 
         ArchipelagoClient = new ArchipelagoClient();
-        ArchipelagoConsole.Awake();
 
+        mainMenuInjector = new();
         skillTreeItemizer = new();
         roundEndItemizer = new();
         abilityUnlockItemizer = new();
         customSaveLoad = new();
         trapHandler = new();
 
-        ArchipelagoConsole.LogMessage($"{ModDisplayInfo} loaded!");
+        mainMenuInjector.ReceiveMessage($"{ModDisplayInfo} loaded!");
     }
 
     private void OnApplicationQuit() {
         ArchipelagoClient.Disconnect();
     }
 
-    private void Update() {
-        if(confirmWipeSaveMode) {
-            confirmWipeSaveTimer += Time.deltaTime;
-            if(confirmWipeSaveTimer >= 20f) {
-                confirmWipeSaveMode = false;
-                confirmWipeSaveTimer = 0f;
-            }
-        }
-    }
-    float confirmWipeSaveTimer = 0f;
-    bool confirmWipeSaveMode = false;
+#if DEBUG
     private void OnGUI() {
-        
         GUI.BeginGroup(new Rect(Screen.width - 332, 200, 332, Screen.height - 200));
         // show the mod is currently loaded in the corner
         GUI.Label(new Rect(16, 16, 300, 20), ModDisplayInfo);
-        ArchipelagoConsole.OnGUI();
 
         string statusMessage;
         // show the Archipelago Version and whether we're connected or not
@@ -126,32 +114,7 @@ public class Plugin:BaseUnityPlugin {
             }
         }
 
-        var wipeStr = "! Reset Save File !";
-        bool allowWipe = false;
-        if(confirmWipeSaveMode) {
-            if(confirmWipeSaveTimer < 5f) {
-                wipeStr = $"! Reset - ARE YOU SURE? Wait {(5f - confirmWipeSaveTimer):n0}s... !";
-            } else {
-                wipeStr = $"! Reset - Click again to confirm !";
-                allowWipe = true;
-            }
-        }
-        if(SceneManager.GetActiveScene().name == "menu") {
-            if(GUI.Button(new Rect(16, 180, 300, 20), wipeStr)) {
-                if(confirmWipeSaveMode) {
-                    if(allowWipe) {
-                        customSaveLoad.Wipe();
-                        confirmWipeSaveTimer = 0f;
-                        confirmWipeSaveMode = false;
-                    }
-                } else {
-                    confirmWipeSaveMode = true;
-                    confirmWipeSaveTimer = 0f;
-                }
-            }
-        }
         // a bunch of debug buttons
-#if DEBUG
         if(GUI.Button(new Rect(16, 210, 200, 20), "DEBUG: Scrape Game Data")) {
             SkillTree.ScrapeSkillTree();
         }
@@ -191,8 +154,8 @@ public class Plugin:BaseUnityPlugin {
         if(GUI.Button(new Rect(16, 420, 200, 20), "DEBUG: Test receive notif (key item)")) {
             ArchiSaver.instance.itemNotifsToProcess.Enqueue("Skigill Region: Mage");
         }
-#endif
         GUI.EndGroup();
     }
+#endif
 #pragma warning restore IDE0051
 }

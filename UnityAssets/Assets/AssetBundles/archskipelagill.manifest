@@ -1,43 +1,111 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.2.7f2
-CRC: 2233510093
+CRC: 729282953
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 9152908ebeeb64e834410f2202ac916b
+    Hash: 8656cf677d6d8fef411535516c67e2dd
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 9805626a0a960da8f69a56443df5de53
+    Hash: 3cc4a3a212ae2b1e1249bcc390f260b9
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: e34abc3631699cb4ae1491c2bc7cb073
+    Hash: ba24146840435e4d83195d58fd13cb00
 HashAppended: 0
 ClassTypes:
+- Class: 1
+  Script: {instanceID: 0}
+- Class: 21
+  Script: {instanceID: 0}
 - Class: 28
+  Script: {instanceID: 0}
+- Class: 48
   Script: {instanceID: 0}
 - Class: 83
   Script: {instanceID: 0}
+- Class: 114
+  Script: {fileID: 11500000, guid: e19747de3f5aca642ab2be37e372fb86, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 4e29b1a8efbd4b44bb3f3716e73f07ff, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3245ec927659c4140ac4f8d17403cc18, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: d199490a83bb2b844b9695cbf13b01ef, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 2a4db7a114972834c8e4117be1d82ba3, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 3312d7739989d2b4e91e6319e9a96d76, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 5f7201a12d95ffc409449d95f23cf332, type: 3}
+- Class: 114
+  Script: {fileID: 11500000, guid: 1aa08ab6e0800fa44ae55d278d1423e3, type: 3}
+- Class: 115
+  Script: {instanceID: 0}
+- Class: 128
+  Script: {instanceID: 0}
 - Class: 213
   Script: {instanceID: 0}
-SerializeReferenceClassIdentifiers: []
+- Class: 222
+  Script: {instanceID: 0}
+- Class: 224
+  Script: {instanceID: 0}
+SerializeReferenceClassIdentifiers:
+- AssemblyName: UnityEngine.CoreModule
+  ClassName: UnityEngine.Events.PersistentCallGroup
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.AnimationTriggers
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.Button/ButtonClickedEvent
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.ColorBlock
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.FontData
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.InputField/EndEditEvent
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.InputField/OnChangeEvent
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.InputField/SubmitEvent
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.MaskableGraphic/CullStateChangedEvent
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.Navigation
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.ScrollRect/ScrollRectEvent
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.Scrollbar/ScrollEvent
+- AssemblyName: UnityEngine.UI
+  ClassName: UnityEngine.UI.SpriteState
 Assets:
+- Assets/Textures/icon-username.png
 - Assets/Textures/archi-button-conn.png
 - Assets/Sounds/archi_trap_activate.wav
 - Assets/Textures/item-gill.png
+- Assets/Textures/blank.png
 - Assets/Sounds/archi_item_fall.wav
 - Assets/Sounds/archi_send.wav
 - Assets/Textures/archi-big-single.png
 - Assets/Textures/archi-button-selected.png
+- Assets/Textures/icon-hostname.png
 - Assets/Textures/archi-big.png
 - Assets/Sounds/archi_trap_arrive.wav
+- Assets/Textures/settings-backdrop.png
 - Assets/Sounds/archi_item_arrive.wav
 - Assets/Textures/archi-button-dc.png
+- Assets/Textures/settings-backdrop-btn.png
 - Assets/Textures/item-character.png
 - Assets/Textures/item-unknown.png
 - Assets/Textures/item-weapon.png
+- Assets/Textures/icon-password.png
+- Assets/Textures/settings-backdrop-field.png
 - Assets/Textures/archi-button-conn-selected.png
+- Assets/Prefabs/ArchiMenu.prefab
 - Assets/Textures/item-trap.png
 - Assets/Textures/archi-button.png
+- Assets/Textures/settings-backdrop-hollow.png
 - Assets/Textures/archi-button-dc-selected.png
+- Assets/Fonts/PerfectDOSVGA437.ttf
 - Assets/Textures/item-key.png
 Dependencies: []

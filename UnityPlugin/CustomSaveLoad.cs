@@ -243,7 +243,9 @@ public class CustomSaveLoad {
 
         var chara = GameObject.Find("MetaGridAndStuff/PlayerCharacter").GetComponent<CharaStats>();
         chara.XP = 0;
+        chara.totalXP = 0;
         chara.XPtoDisplay = 0;
+        chara.updateXPtoDisplay();
 
         ArchiSaver.instance.receivedItemCounts.Clear();
         ArchiSaver.instance.lastReceivedIndex = 0;
