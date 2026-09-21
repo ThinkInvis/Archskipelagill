@@ -85,7 +85,7 @@ public class AbilityUnlockItemizer {
             }
             isArchiLocked = true;
         }
-        var lockObj = self.transform.GetChild(0);
+        var lockObj = self.transform.GetChild(2);
         if(!lockObj.TryGetComponent<LockIconReplacer>(out var lir))
             lir = lockObj.gameObject.AddComponent<LockIconReplacer>();
         if(lir.renderer != null)
@@ -102,7 +102,7 @@ public class AbilityUnlockItemizer {
             self.cadenas.SetActive(true);
             isArchiLocked = true;
         }
-        var lockObj = self.transform.GetChild(0);
+        var lockObj = self.transform.GetChild(2);
         if(!lockObj.TryGetComponent<LockIconReplacer>(out var lir))
             lir = lockObj.gameObject.AddComponent<LockIconReplacer>();
         lir.isArchiLocked = isArchiLocked;
