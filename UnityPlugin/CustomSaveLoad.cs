@@ -1,6 +1,4 @@
-﻿using Archipelago.MultiClient.Net;
-using Archskipelagill.EffectComponents;
-using Archskipelagill.Itemizers;
+﻿using Archskipelagill.EffectComponents;
 using MonoMod.Cil;
 using System;
 using System.Collections.Generic;

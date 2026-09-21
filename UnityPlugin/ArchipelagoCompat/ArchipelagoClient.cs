@@ -5,13 +5,9 @@ using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.MessageLog.Messages;
 using Archipelago.MultiClient.Net.Packets;
 using Archskipelagill.EffectComponents;
-using BepInEx.Logging;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading;
-using UnityEngine;
 
 namespace Archskipelagill.ArchipelagoCompat;
 
