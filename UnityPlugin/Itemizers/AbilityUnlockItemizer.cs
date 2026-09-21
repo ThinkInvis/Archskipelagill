@@ -7,6 +7,8 @@ using static Unity.Audio.Handle;
 namespace Archskipelagill.Itemizers;
 
 public class AbilityUnlockItemizer {
+    public enum CharacterInIngameOrder { None, Mage, Strongman, Fox, Dragon, Prototype, Dwarves };
+
     readonly Sprite customLockSprite;
     public AbilityUnlockItemizer() {
         On.charaSelectScript.selected += CharaSelectScript_selected;
@@ -16,15 +18,33 @@ public class AbilityUnlockItemizer {
         On.chestLootScript.loote += ChestLootScript_loote;
         On.skigillNode.Update += SkigillNode_Update;
         On.weaponDisplayer.Start += WeaponDisplayer_Start;
+        On.charaSelectScript.Start += CharaSelectScript_Start;
+        On.endMenuManager.Start += EndMenuManager_Start;
 
         customLockSprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/locked-archi.png");
+    }
+
+    private void EndMenuManager_Start(On.endMenuManager.orig_Start orig, endMenuManager self) {
+        orig(self);
+        var checkStr = $"Escaped with {Enum.GetName(typeof(CharacterInIngameOrder), self.st.chara)}";
+        if(!ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr))
+            self.winIcons[self.st.chara].AddComponent<AbilityDisplayerCheckInd>();
+    }
+
+    private void CharaSelectScript_Start(On.charaSelectScript.orig_Start orig, charaSelectScript self) {
+        orig(self);
+        var checkStr = $"Escaped with {self.unlockKey}";
+        if(!ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr)) {
+            var adci = self.gameObject.AddComponent<AbilityDisplayerCheckInd>();
+            adci.isLocked = !ArchiSaver.instance.metaProg.TryGetValue(self.unlockKey, out var ulStr) || ulStr != "unlocked" || ArchiSaver.GetItemCount("Character: " + self.unlockKey) == 0;
+        }
     }
 
     private void WeaponDisplayer_Start(On.weaponDisplayer.orig_Start orig, weaponDisplayer self) {
         orig(self);
         var checkStr = $"Escaped with Weapon {self.GetComponent<weaponDisplayer>().source.name.Replace("(Clone)", "")}";
         if(!ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr))
-            self.gameObject.AddComponent<WeaponDisplayerCheckInd>();
+            self.gameObject.AddComponent<AbilityDisplayerCheckInd>();
     }
 
     private void SkigillNode_Update(On.skigillNode.orig_Update orig, skigillNode self) {
@@ -65,10 +85,9 @@ public class AbilityUnlockItemizer {
         if(self.cadenas != null) {
             if(!self.cadenas.TryGetComponent<LockIconReplacer>(out var lir))
                 lir = self.cadenas.AddComponent<LockIconReplacer>();
-            if(lir.renderer != null) {
-                lir.renderer.sprite = isArchiLocked ? customLockSprite : lir.originalSprite;
+            if(lir.renderer != null)
                 lir.renderer.color = isArchiLocked ? new(1f, 0f, 0f) : new(1f, 1f, 1f);
-            }
+            lir.isArchiLocked = isArchiLocked;
         }
     }
 
@@ -83,15 +102,14 @@ public class AbilityUnlockItemizer {
         if(self.cadenas != null) {
             if(!self.cadenas.TryGetComponent<LockIconReplacer>(out var lir))
                 lir = self.cadenas.AddComponent<LockIconReplacer>();
-            if(lir.renderer != null)
-                lir.renderer.sprite = isArchiLocked ? customLockSprite : lir.originalSprite;
+            lir.isArchiLocked = isArchiLocked;
         }
     }
 
     private void CharaSelectScript_updateUnlockStatus(On.charaSelectScript.orig_updateUnlockStatus orig, charaSelectScript self) {
         orig(self);
         var isArchiLocked = false;
-        var targetChar = "Character: " + Enum.GetName(typeof(SkillTree.SkillNodeRegion), self.ID - 1).ToTitleCase();
+        var targetChar = "Character: " + self.unlockKey;
         if(self.unlocked && ArchiSaver.GetItemCount(targetChar) == 0) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
@@ -100,15 +118,14 @@ public class AbilityUnlockItemizer {
         if(self.cadenas != null) {
             if(!self.cadenas.TryGetComponent<LockIconReplacer>(out var lir))
                 lir = self.cadenas.AddComponent<LockIconReplacer>();
-            if(lir.renderer != null)
-                lir.renderer.sprite = isArchiLocked ? customLockSprite : lir.originalSprite;
+            lir.isArchiLocked = isArchiLocked;
         }
     }
 
     private void CharaSelectScript_selected(On.charaSelectScript.orig_selected orig, charaSelectScript self) {
         orig(self);
         var isArchiLocked = false;
-        var targetChar = "Character: " + Enum.GetName(typeof(SkillTree.SkillNodeRegion), self.ID - 1).ToTitleCase();
+        var targetChar = "Character: " + self.unlockKey;
         if(self.unlocked && ArchiSaver.GetItemCount(targetChar) == 0) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
@@ -118,26 +135,33 @@ public class AbilityUnlockItemizer {
         if(self.cadenas != null) {
             if(!self.cadenas.TryGetComponent<LockIconReplacer>(out var lir))
                 lir = self.cadenas.AddComponent<LockIconReplacer>();
-            if(lir.renderer != null)
-                lir.renderer.sprite = isArchiLocked ? customLockSprite : lir.originalSprite;
+            lir.isArchiLocked = isArchiLocked;
         }
     }
 
     class LockIconReplacer : MonoBehaviour {
         public Sprite originalSprite;
         public SpriteRenderer renderer;
+        public bool isArchiLocked = false;
+#pragma warning disable IDE0051 //Used by Unity Engine
         void Awake() {
             renderer = GetComponent<SpriteRenderer>();
             originalSprite = renderer.sprite;
         }
+        void Update() {
+            renderer.sprite = isArchiLocked ? Plugin.instance.abilityUnlockItemizer.customLockSprite : originalSprite;
+        }
+#pragma warning restore IDE0051
     }
 
-    class WeaponDisplayerCheckInd : MonoBehaviour {
+    class AbilityDisplayerCheckInd : MonoBehaviour {
         Transform[] spinners;
         CharaStats chara;
+        public bool isLocked = false;
 #pragma warning disable IDE0051 //Used by Unity Engine
         void Awake() {
             var icon = this.transform.Find("GameObject/icon");
+            if(icon == null) icon = this.transform;
             chara = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
             spinners = new Transform[6];
             for(var i = 0; i < 6; i++) {
@@ -159,8 +183,14 @@ public class AbilityUnlockItemizer {
             for(var i = 0; i < spinners.Length; i++) {
                 var iphase = i / 3f * Mathf.PI;
                 spinners[i].transform.localPosition = new(Mathf.Cos(phase + iphase) * 1f, Mathf.Sin(phase + iphase) * 1f, -2f);
-                if(chara.won)
+                if(chara.won) {
                     spinners[i].GetComponent<SpriteRenderer>().color = new(0f, 1f, 0f);
+                    spinners[i].transform.localPosition *= 2f;
+                    }
+                else if(isLocked)
+                    spinners[i].GetComponent<SpriteRenderer>().color = new(0.2f, 0.2f, 0.2f);
+                else
+                    spinners[i].GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f);
             }
         }
 #pragma warning restore IDE0051

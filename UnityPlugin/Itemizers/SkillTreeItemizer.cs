@@ -34,7 +34,7 @@ public class SkillTreeItemizer {
     }
 
     void EnsureSafeSpawn(CharaStats self) {
-        var targetChar = "Skigill Region: " + Enum.GetName(typeof(SkillTree.SkillNodeRegion), self.chara - 1).ToTitleCase();
+        var targetChar = "Skigill Region: " + Enum.GetName(typeof(AbilityUnlockItemizer.CharacterInIngameOrder), self.chara - 1).ToTitleCase();
         if(ArchiSaver.GetItemCount(targetChar) == 0) { //spawn region is locked, teleport to and activate mage region which for now is guaranteed unlocked
             var mgo = GameObject.Find("gridHolder/grid/Perks/Mage");
             mgo.GetComponent<skigillNode>().autoActivate();
