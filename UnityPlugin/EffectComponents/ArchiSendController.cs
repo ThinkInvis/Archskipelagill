@@ -31,6 +31,13 @@ public class ArchiSendController : MonoBehaviour {
         sfx.pitch = ctrl.basePitch * Time.timeScale;
         sfx.Play();
 
+        var sparkler = obj.AddComponent<instantiateRepeat>();
+        sparkler.GO = Plugin.instance.resourceGrabber.worldLayerSparklePrefab.transform;
+        sparkler.radius = 0f;
+        sparkler.randomRot = false;
+        sparkler.rate = 0.05f;
+        sparkler.makeChild = false;
+
         return obj;
     }
 

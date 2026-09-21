@@ -34,6 +34,7 @@ public class Plugin:BaseUnityPlugin {
     public const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
     public static ManualLogSource BepinLogger;
     public static ArchipelagoClient ArchipelagoClient;
+    public ResourceGrabber resourceGrabber;
     public MainMenuInjector mainMenuInjector;
     public SkillTreeItemizer skillTreeItemizer;
     public RoundEndItemizer roundEndItemizer;
@@ -68,6 +69,7 @@ public class Plugin:BaseUnityPlugin {
 
         ArchipelagoClient = new ArchipelagoClient();
 
+        resourceGrabber = new();
         mainMenuInjector = new();
         skillTreeItemizer = new();
         roundEndItemizer = new();

@@ -55,6 +55,13 @@ public class ArchiDropController : MonoBehaviour {
         spr2.drawMode = SpriteDrawMode.Sliced;
         spr2.size *= 0.16f;
 
+        var sparkler = obj.AddComponent<instantiateRepeat>();
+        sparkler.GO = Plugin.instance.resourceGrabber.worldLayerSparklePrefab.transform;
+        sparkler.radius = 0f;
+        sparkler.randomRot = false;
+        sparkler.rate = 0.03f;
+        sparkler.makeChild = false;
+
         return obj;
     }
 
@@ -71,11 +78,13 @@ public class ArchiDropController : MonoBehaviour {
     float itemTimer = 0f;
     Transform follower;
     Vector3 followerOffset;
+    instantiateRepeat sparkler;
 
 #pragma warning disable IDE0051 //Used by Unity Engine
     void Start() {
         sfx = GetComponents<AudioSource>()[0];
         sfx2 = GetComponents<AudioSource>()[1];
+        sparkler = GetComponent<instantiateRepeat>();
         spinners = new Transform[6];
         spinnerV = new Vector3[6];
         follower = transform.GetChild(6);
@@ -117,6 +126,9 @@ public class ArchiDropController : MonoBehaviour {
             } else {
                 landed = true;
                 sfx2.Play();
+                for(var i = 0; i < 8; i++)
+                    sparkler.insto();
+                GameObject.Destroy(sparkler);
             }
         } else {
             if(itemTimer == 0f) {
