@@ -18,6 +18,8 @@ public class MainMenuInjector {
     const int MAX_LOG_LINES = 80;
     bool _logDirty = false;
     bool hasWiped = false;
+    bool _consoleStateDirty = false;
+    bool _nextConsoleState = false;
 
     public MainMenuInjector() {
         On.mainMenuCamScript.Start += MainMenuCamScript_Start;
@@ -45,6 +47,11 @@ public class MainMenuInjector {
                     archiMenu.transform.position += Vector3.up * Time.deltaTime * 20f;
                     self.eventSystem.sendNavigationEvents = false;
                 }
+            }
+            if(_consoleStateDirty) {
+                _consoleStateDirty = false;
+                archiConsoleGroup.SetActive(_nextConsoleState);
+                archiConnGroup.SetActive(!_nextConsoleState);
             }
             if(_logDirty) {
                 _logDirty = false;
@@ -128,14 +135,14 @@ public class MainMenuInjector {
         btnScript.onClick.m_PersistentCalls.m_Calls[0].arguments.stringArgument = "archiMenu";
         btnScript.onClick.m_PersistentCalls.m_Calls[2].m_Target = newBackBtn;
 
-        archiConsoleGroup.SetActive(isConnected);
-        archiConnGroup.SetActive(!isConnected);
+        _nextConsoleState = isConnected;
+        _consoleStateDirty = true;
     }
 
     public void OnConnect() {
         if(archiMenu == null) return;
-        archiConnGroup.SetActive(false);
-        archiConsoleGroup.SetActive(true);
+        _nextConsoleState = true;
+        _consoleStateDirty = true;
         archiMenu.transform.Find("ConnInfo").GetComponent<Text>().text = Plugin.APDisplayInfo + " connected";
         var btnScript = archiMenuBtn.GetComponent<Button>();
         btnScript.spriteState = archiBtnConnState;
@@ -144,8 +151,8 @@ public class MainMenuInjector {
 
     public void OnDisconnect() {
         if(archiMenu == null) return;
-        archiConsoleGroup.SetActive(false);
-        archiConnGroup.SetActive(true);
+        _nextConsoleState = false;
+        _consoleStateDirty = true;
         archiMenu.transform.Find("ConnInfo").GetComponent<Text>().text = Plugin.APDisplayInfo + " disconnected";
         var btnScript = archiMenuBtn.GetComponent<Button>();
         btnScript.spriteState = archiBtnDcState;
