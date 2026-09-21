@@ -5,7 +5,7 @@ using UnityEngine;
 namespace Archskipelagill.Itemizers;
 
 public class AbilityUnlockItemizer {
-    Sprite customLockSprite;
+    readonly Sprite customLockSprite;
     public AbilityUnlockItemizer() {
         On.charaSelectScript.selected += CharaSelectScript_selected;
         On.charaSelectScript.updateUnlockStatus += CharaSelectScript_updateUnlockStatus;
