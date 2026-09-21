@@ -124,6 +124,7 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         var hasRegion = ArchiSaver.GetItemCount($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), node.region).ToTitleCase()}") > 0;
         var hasFBK = ArchiSaver.GetItemCount($"Final Boss Key") > 0;
 
+        //lock boss region behind all others if option enabled
         var bossLast = Int64.Parse(ArchiSaver.instance.metaProg["archi_boss_last"]);
         if(bossLast > 0 && node.region == SkillTree.SkillNodeRegion.BOSSES) {
             foreach(var n in Enum.GetNames(typeof(SkillTree.SkillNodeRegion))) {
@@ -133,6 +134,23 @@ public class SkillTreeIndexTracker:MonoBehaviour {
                 }
             }
         }
+
+        //lock unreachable regions
+        if(node.region == SkillTree.SkillNodeRegion.STRONGMAN
+            && ArchiSaver.GetItemCount("Skigill Region: Prototype") == 0
+            && ArchiSaver.GetItemCount("Character: Strongman") == 0)
+            hasRegion = false;
+        if(node.region == SkillTree.SkillNodeRegion.FOX
+            && ArchiSaver.GetItemCount("Skigill Region: Dragon") == 0
+            && ArchiSaver.GetItemCount("Character: Fox") == 0)
+            hasRegion = false;
+        if(node.region == SkillTree.SkillNodeRegion.DWARVES
+            && ((ArchiSaver.GetItemCount("Skigill Region: Prototype") == 0 && ArchiSaver.GetItemCount("Character: Strongman") == 0)
+                || ArchiSaver.GetItemCount("Skigill Region: Strongman") == 0)
+            && ((ArchiSaver.GetItemCount("Skigill Region: Dragon") == 0 && ArchiSaver.GetItemCount("Character: Fox") == 0)
+                || ArchiSaver.GetItemCount("Skigill Region: Fox") == 0)
+            )
+            hasRegion = false;
 
         hasCheck = false;
         var isChest = node.type == SkillTree.SkillNodeType.CHEST;
