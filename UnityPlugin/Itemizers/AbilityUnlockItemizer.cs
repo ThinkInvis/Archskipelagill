@@ -85,13 +85,13 @@ public class AbilityUnlockItemizer {
             }
             isArchiLocked = true;
         }
-        if(self.cadenas != null) {
-            if(!self.cadenas.TryGetComponent<LockIconReplacer>(out var lir))
-                lir = self.cadenas.AddComponent<LockIconReplacer>();
-            if(lir.renderer != null)
-                lir.renderer.color = isArchiLocked ? new(1f, 0f, 0f) : new(1f, 1f, 1f);
-            lir.isArchiLocked = isArchiLocked;
-        }
+        var lockObj = self.transform.GetChild(0);
+        if(!lockObj.TryGetComponent<LockIconReplacer>(out var lir))
+            lir = lockObj.gameObject.AddComponent<LockIconReplacer>();
+        if(lir.renderer != null)
+            lir.renderer.color = isArchiLocked ? new(1f, 0f, 0f) : new(1f, 1f, 1f);
+        lir.isArchiLocked = isArchiLocked;
+        lir.UpdateIcon();
     }
 
     private void DiffSelectScript_updateUnlockStatus(On.diffSelectScript.orig_updateUnlockStatus orig, diffSelectScript self) {
@@ -102,11 +102,11 @@ public class AbilityUnlockItemizer {
             self.cadenas.SetActive(true);
             isArchiLocked = true;
         }
-        if(self.cadenas != null) {
-            if(!self.cadenas.TryGetComponent<LockIconReplacer>(out var lir))
-                lir = self.cadenas.AddComponent<LockIconReplacer>();
-            lir.isArchiLocked = isArchiLocked;
-        }
+        var lockObj = self.transform.GetChild(0);
+        if(!lockObj.TryGetComponent<LockIconReplacer>(out var lir))
+            lir = lockObj.gameObject.AddComponent<LockIconReplacer>();
+        lir.isArchiLocked = isArchiLocked;
+        lir.UpdateIcon();
     }
 
     private void CharaSelectScript_updateUnlockStatus(On.charaSelectScript.orig_updateUnlockStatus orig, charaSelectScript self) {
@@ -118,11 +118,11 @@ public class AbilityUnlockItemizer {
             self.cadenas.SetActive(true);
             isArchiLocked = true;
         }
-        if(self.cadenas != null) {
-            if(!self.cadenas.TryGetComponent<LockIconReplacer>(out var lir))
-                lir = self.cadenas.AddComponent<LockIconReplacer>();
-            lir.isArchiLocked = isArchiLocked;
-        }
+        var lockObj = self.transform.GetChild(0);
+        if(!lockObj.TryGetComponent<LockIconReplacer>(out var lir))
+            lir = lockObj.gameObject.AddComponent<LockIconReplacer>();
+        lir.isArchiLocked = isArchiLocked;
+        lir.UpdateIcon();
     }
 
     private void CharaSelectScript_selected(On.charaSelectScript.orig_selected orig, charaSelectScript self) {
@@ -135,11 +135,11 @@ public class AbilityUnlockItemizer {
             self.ls.charaUnlocked = false;
             isArchiLocked = true;
         }
-        if(self.cadenas != null) {
-            if(!self.cadenas.TryGetComponent<LockIconReplacer>(out var lir))
-                lir = self.cadenas.AddComponent<LockIconReplacer>();
-            lir.isArchiLocked = isArchiLocked;
-        }
+        var lockObj = self.transform.GetChild(0);
+        if(!lockObj.TryGetComponent<LockIconReplacer>(out var lir))
+            lir = lockObj.gameObject.AddComponent<LockIconReplacer>();
+        lir.isArchiLocked = isArchiLocked;
+        lir.UpdateIcon();
     }
 
     class LockIconReplacer : MonoBehaviour {
@@ -147,12 +147,13 @@ public class AbilityUnlockItemizer {
         public SpriteRenderer renderer;
         public bool isArchiLocked = false;
 #pragma warning disable IDE0051 //Used by Unity Engine
-        void Awake() {
-            renderer = GetComponent<SpriteRenderer>();
-            originalSprite = renderer.sprite;
-        }
-        void Update() {
-            renderer.sprite = isArchiLocked ? Plugin.instance.abilityUnlockItemizer.customLockSprite : originalSprite;
+        public void UpdateIcon() {
+            if(renderer == null) {
+                if(TryGetComponent<SpriteRenderer>(out renderer))
+                    originalSprite = renderer.sprite;
+            }
+            if(renderer != null)
+                renderer.sprite = isArchiLocked ? Plugin.instance.abilityUnlockItemizer.customLockSprite : originalSprite;
         }
 #pragma warning restore IDE0051
     }
