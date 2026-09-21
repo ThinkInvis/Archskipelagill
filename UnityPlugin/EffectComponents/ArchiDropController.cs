@@ -9,13 +9,10 @@ public class ArchiDropController : MonoBehaviour {
         var ctrl = obj.AddComponent<ArchiDropController>();
         ctrl.itemName = itemName;
 
-        var spriteMtl = GameObject.FindGameObjectWithTag("Player").transform.Find("Skins/Mage").GetComponent<SpriteRenderer>().material;
-
         for(var i = 0; i < 6; i++) {
             var spinner = new GameObject("Spinner");
             spinner.transform.parent = obj.transform;
             var spr = spinner.AddComponent<SpriteRenderer>();
-            spr.material = spriteMtl;
             spr.sprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-big-single.png");
             spr.drawMode = SpriteDrawMode.Sliced;
             spr.size *= 0.16f;
@@ -37,7 +34,6 @@ public class ArchiDropController : MonoBehaviour {
         follower.transform.parent = obj.transform;
         follower.SetActive(false);
         var spr2 = follower.AddComponent<SpriteRenderer>();
-        spr2.material = spriteMtl;
         spr2.sprite = Plugin.resources.LoadAsset<Sprite>($"Assets/Textures/item-{
             itemName switch {
                 string str when str.StartsWith("Character: ") => "character",

@@ -18,7 +18,7 @@ public class SkillTreeItemizer {
         if(self.metaMenu) return;
 
         ApplyTrackers();
-        RescanRegions();
+        RescanAll();
         EnsureSafeSpawn(self);
     }
 
@@ -55,6 +55,7 @@ public class SkillTreeItemizer {
         var isPerk = tkr.node.type == SkillTree.SkillNodeType.PERK;
         if(!isChest && !isPerk) return;
         Plugin.ArchipelagoClient.CheckLocationsByName($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? tkr.node.chestIndex : tkr.node.perkIndex) + 1} ({Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region)})");
+        tkr.Rescan();
     }
 
     private void SkigillNode_showConnex(On.skigillNode.orig_showConnex orig, skigillNode self) {
@@ -68,27 +69,9 @@ public class SkillTreeItemizer {
         }
     }
 
-    public void RescanRegions() {
+    public void RescanAll() {
         foreach(var tkr in GameObject.FindObjectsByType<SkillTreeIndexTracker>(FindObjectsSortMode.InstanceID)) {
-            if(!tkr.isActiveAndEnabled) continue;
-
-            var hasRegion = ArchiSaver.GetItemCount($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region).ToTitleCase()}") > 0;
-            var hasFBK = ArchiSaver.GetItemCount($"Final Boss Key") > 0;
-
-            var bossLast = Int64.Parse(ArchiSaver.instance.metaProg["archi_boss_last"]);
-            if(bossLast > 0 && tkr.node.region == SkillTree.SkillNodeRegion.BOSSES) {
-                foreach(var n in Enum.GetNames(typeof(SkillTree.SkillNodeRegion))) {
-                    if(ArchiSaver.GetItemCount($"Skigill Region: {n.ToTitleCase()}") == 0) {
-                        hasRegion = false;
-                        break;
-                    }
-                }
-            }
-
-            if(hasRegion && (tkr.node.type != SkillTree.SkillNodeType.BOSS_FINAL || hasFBK))
-                tkr.Unlock();
-            else
-                tkr.Lock();
+            tkr.Rescan();
         }
     }
 }
@@ -96,13 +79,86 @@ public class SkillTreeItemizer {
 public class SkillTreeIndexTracker:MonoBehaviour {
     public SkillTree.SkillNode node;
     public bool isUnlocked { get; private set; } = false;
+    bool hasCheck = false;
+    Transform[] spinners;
+    UnityEngine.UI.Image activateVfx;
+    SpriteRenderer iconColor, nodeOcto;
+
+
+#pragma warning disable IDE0051 //Used by Unity Engine
+    void Awake() {
+        spinners = new Transform[6];
+        for(var i = 0; i < 6; i++) {
+            var spinner = new GameObject("Spinner");
+            spinner.transform.parent = this.transform;
+            var spr = spinner.AddComponent<SpriteRenderer>();
+            spr.sprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-big-single.png");
+            spr.drawMode = SpriteDrawMode.Sliced;
+            spr.size *= 0.5f;
+            spinners[i] = spinner.transform;
+            spinners[i].gameObject.SetActive(hasCheck);
+        }
+        activateVfx = transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>();
+        iconColor = transform.Find("IconColor").GetComponent<SpriteRenderer>();
+        nodeOcto = transform.Find("nodeOcto").GetComponent<SpriteRenderer>();
+    }
+
+    void Update() {
+        if(hasCheck) {
+            var phase = Time.time * 0.5f * Mathf.PI;
+            for(var i = 0; i < spinners.Length; i++) {
+                var iphase = i / 3f * Mathf.PI;
+                spinners[i].transform.localPosition = new(Mathf.Cos(phase + iphase) * 1.25f, Mathf.Sin(phase + iphase) * 1.25f, -2f);
+            }
+            if(isUnlocked)
+                iconColor.color = ((Time.unscaledTime % 1f) > 0.5f) ? new(1f, 1f, 1f) : new(0.25f, 1f, 0.25f);
+            else
+                iconColor.color = ((Time.unscaledTime % 1f) > 0.5f) ? new(0.6f, 0.6f, 0.6f, 0.25f) : new(0.8f, 0.15f, 0.15f, 0.25f);
+        }
+    }
+#pragma warning restore IDE0051
+
+    public void Rescan() {
+        if(!isActiveAndEnabled) return;
+
+        var hasRegion = ArchiSaver.GetItemCount($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), node.region).ToTitleCase()}") > 0;
+        var hasFBK = ArchiSaver.GetItemCount($"Final Boss Key") > 0;
+
+        var bossLast = Int64.Parse(ArchiSaver.instance.metaProg["archi_boss_last"]);
+        if(bossLast > 0 && node.region == SkillTree.SkillNodeRegion.BOSSES) {
+            foreach(var n in Enum.GetNames(typeof(SkillTree.SkillNodeRegion))) {
+                if(ArchiSaver.GetItemCount($"Skigill Region: {n.ToTitleCase()}") == 0) {
+                    hasRegion = false;
+                    break;
+                }
+            }
+        }
+
+        hasCheck = false;
+        var isChest = node.type == SkillTree.SkillNodeType.CHEST;
+        var isPerk = node.type == SkillTree.SkillNodeType.PERK;
+        if(isChest || isPerk) {
+            var checkStr = $"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? node.chestIndex : node.perkIndex) + 1} ({Enum.GetName(typeof(SkillTree.SkillNodeRegion), node.region)})";
+            hasCheck = !ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr);
+        }
+
+        if(hasRegion && (node.type != SkillTree.SkillNodeType.BOSS_FINAL || hasFBK))
+            Unlock();
+        else
+            Lock();
+
+        foreach(var s in spinners) {
+            s.gameObject.SetActive(hasCheck);
+            s.GetComponent<SpriteRenderer>().color = isUnlocked ? new(1f, 1f, 1f) : new(0.2f, 0.2f, 0.2f);
+        }
+    }
 
     public void Unlock() {
         isUnlocked = true;
         GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f, 1f);
-        transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>().color = new(1f, 1f, 1f, 1f);
-        transform.Find("IconColor").GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f, 1f);
-        transform.Find("nodeOcto").GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f, 1f);
+        activateVfx.color = new(1f, 1f, 1f, 1f);
+        iconColor.color = new(1f, 1f, 1f, 1f);
+        nodeOcto.color = new(1f, 1f, 1f, 1f);
         foreach(var sr in transform.Find("chiffres").GetComponentsInChildren<SpriteRenderer>()) {
             sr.color = new(1f, 1f, 1f, 1f);
         }
@@ -111,9 +167,9 @@ public class SkillTreeIndexTracker:MonoBehaviour {
     public void Lock() {
         isUnlocked = false;
         GetComponent<SpriteRenderer>().color = new(0.35f, 0.35f, 0.35f, 1f);
-        transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>().color = new(0.25f, 0.25f, 0.25f, 1f);
-        transform.Find("IconColor").GetComponent<SpriteRenderer>().color = new(0.6f, 0.6f, 0.6f, 0.25f);
-        transform.Find("nodeOcto").GetComponent<SpriteRenderer>().color = new(0.35f, 0.35f, 0.35f, 1f);
+        activateVfx.color = new(0.25f, 0.25f, 0.25f, 1f);
+        iconColor.color = new(0.6f, 0.6f, 0.6f, 0.25f);
+        nodeOcto.color = new(0.35f, 0.35f, 0.35f, 1f);
         foreach(var sr in transform.Find("chiffres").GetComponentsInChildren<SpriteRenderer>()) {
             sr.color = new(0.35f, 0.35f, 0.35f, 1f);
         }

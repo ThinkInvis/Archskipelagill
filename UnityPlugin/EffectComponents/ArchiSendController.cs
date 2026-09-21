@@ -15,7 +15,6 @@ public class ArchiSendController : MonoBehaviour {
             var spinner = new GameObject("Spinner");
             spinner.transform.parent = obj.transform;
             var spr = spinner.AddComponent<SpriteRenderer>();
-            spr.material = GameObject.FindGameObjectWithTag("Player").transform.Find("Skins/Mage").GetComponent<SpriteRenderer>().material;
             spr.sprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-big-single.png");
             spr.drawMode = SpriteDrawMode.Sliced;
             spr.size *= 0.16f;

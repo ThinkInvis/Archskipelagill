@@ -17,6 +17,7 @@ public class ArchiSaver:JSONsaver {
     public readonly Dictionary<string, int> receivedItemCounts = [];
     public readonly List<string> unsentChecks = [];
     public readonly List<string> sentChecks = [];
+    public readonly List<string> allValidChecks = [];
     public readonly Queue<string> queuedTraps = [];
     public readonly Queue<string> itemsToProcess = [];
     public readonly Queue<string> itemNotifsToProcess = [];
@@ -43,6 +44,9 @@ public class ArchiSaver:JSONsaver {
         }
         if(metaProg.TryGetValue("archi_sentChecks", out var checksStr2) && checksStr2.Length > 0) {
             sentChecks.AddRange(checksStr2.Split("|"));
+        }
+        if(metaProg.TryGetValue("archi_validChecks", out var checksStr3) && checksStr3.Length > 0) {
+            allValidChecks.AddRange(checksStr3.Split("|"));
         }
     }
 
@@ -118,7 +122,7 @@ public class ArchiSaver:JSONsaver {
             case "Skigill Region: Dragon":
             case "Skigill Region: Dwarves":
             case "Skigill Region: Bosses":
-                Plugin.instance.skillTreeItemizer.RescanRegions();
+                Plugin.instance.skillTreeItemizer.RescanAll();
                 break;
             case string trapTest when trapTest.StartsWith("Trap: "):
                 queuedTraps.Enqueue(itemName[6..]);
@@ -157,11 +161,15 @@ public class ArchiSaver:JSONsaver {
         }
     }
 
-    public void StoreSlotData(Dictionary<string, object> slotData) {
+    public void StoreSlotData(Dictionary<string, object> slotData, Archipelago.MultiClient.Net.ArchipelagoSession session) {
         try {
             PreSave();
             metaProg["archi_goal"] = ((Int64)slotData["goal_type"]).ToString();
             metaProg["archi_boss_last"] = ((Int64)slotData["boss_region_last"]).ToString();
+            var locNames = session.Locations.AllLocations.Select(l => session.Locations.GetLocationNameFromId(l));
+            metaProg["archi_validChecks"] = string.Join('|', locNames);
+            allValidChecks.Clear();
+            allValidChecks.AddRange(locNames);
             PostSave();
         } catch(Exception e) {
             Plugin.BepinLogger.LogError(e);
