@@ -60,7 +60,7 @@ public static partial class SkillTree {
 
     public static void ScrapeSkillTree() {
         //Setup
-        var gridObj = UnityEngine.GameObject.Find("gridHolder/grid");
+        var gridObj = GameObject.Find("gridHolder/grid");
         if(gridObj == null) {
             Plugin.BepinLogger.LogError("Can't run ScrapeSkillTree without the Skigill active, start a run first");
             return;

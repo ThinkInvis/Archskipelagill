@@ -238,7 +238,7 @@ public class CustomSaveLoad {
         if(mb != null)
             GameObject.Destroy(mb);
 
-        var chara = GameObject.Find("MetaGridAndStuff/PlayerCharacter").GetComponent<CharaStats>();
+        var chara = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
         chara.XP = 0;
         chara.totalXP = 0;
         chara.XPtoDisplay = 0;

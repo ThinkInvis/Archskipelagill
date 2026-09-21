@@ -123,13 +123,13 @@ public class Plugin:BaseUnityPlugin {
             ArchipelagoClient.Disconnect();
         }
         if(GUI.Button(new Rect(16, 270, 200, 20), "DEBUG: Cheat: Lodsemone")) {
-            var cs = GameObject.Find("PlayerCharacter").GetComponent<CharaStats>();
+            var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
             cs.XP += 1000;
             cs.XPtoDisplay += 1000;
             cs.totalXP += 1000;
         }
         if(GUI.Button(new Rect(16, 300, 200, 20), "DEBUG: Cheat: Regen")) {
-            var cs = GameObject.Find("PlayerCharacter").GetComponent<CharaStats>();
+            var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
             cs.HPREGEN += 10000;
         }
         if(GUI.Button(new Rect(16, 330, 200, 20), "DEBUG: Cheat: Skip Time")) {

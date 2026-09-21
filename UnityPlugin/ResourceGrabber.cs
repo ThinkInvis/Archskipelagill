@@ -14,11 +14,13 @@ public class ResourceGrabber {
 
     private void MainMenuCamScript_Start(On.mainMenuCamScript.orig_Start orig, mainMenuCamScript self) {
         orig(self);
-        worldLayerSparklePrefab = GameObject.Instantiate(GameObject.Find("Canvas/mainMenu/shop button").GetComponent<readPlayerMoneyAndActivate>().toActivate.GetComponent<instantiateRepeat>().GO, prefabSetup.transform);
-        worldLayerSparklePrefab.gameObject.layer = 0;
-        worldLayerSparklePrefab.transform.localScale = new(0.1f, 0.1f, 0.1f);
-        worldLayerSparklePrefab.GetComponent<moveOverTimeDirection>().Speed /= 2f;
-        worldLayerSparklePrefab.GetComponent<Animator>().speed *= 2f;
-        worldLayerSparklePrefab.GetComponent<destructionRetard>().time /= 2f;
+        if(worldLayerSparklePrefab == null) {
+            worldLayerSparklePrefab = GameObject.Instantiate(GameObject.Find("Canvas/mainMenu/shop button").GetComponent<readPlayerMoneyAndActivate>().toActivate.GetComponent<instantiateRepeat>().GO, prefabSetup.transform);
+            worldLayerSparklePrefab.gameObject.layer = 0;
+            worldLayerSparklePrefab.transform.localScale = new(0.1f, 0.1f, 0.1f);
+            worldLayerSparklePrefab.GetComponent<moveOverTimeDirection>().Speed /= 2f;
+            worldLayerSparklePrefab.GetComponent<Animator>().speed *= 2f;
+            worldLayerSparklePrefab.GetComponent<destructionRetard>().time /= 2f;
+        }
     }
 }

@@ -17,7 +17,7 @@ public class RoundEndItemizer {
 
     private void VieScript_dies(On.VieScript.orig_dies orig, VieScript self) {
         orig(self);
-        var stats = GameObject.Find("PlayerCharacter").GetComponent<CharaStats>();
+        var stats = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
         if(self.isBoss) {
             var targetBossName = self.bossName switch {
                 "OVNI" => "Rosa",
@@ -46,7 +46,7 @@ public class RoundEndItemizer {
     private void MainCameraScript_playerWin(On.mainCameraScript.orig_playerWin orig, mainCameraScript self) {
         orig(self);
 
-        var charaStats = GameObject.Find("PlayerCharacter").GetComponent<CharaStats>();
+        var charaStats = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
 
         Plugin.ArchipelagoClient.CheckLocationsByName($"Escaped with {Enum.GetName(typeof(SkillTree.SkillNodeRegion), charaStats.chara - 1).ToTitleCase()}");
 
