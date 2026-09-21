@@ -48,8 +48,6 @@ public class RoundEndItemizer {
 
         var charaStats = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
 
-        Plugin.ArchipelagoClient.CheckLocationsByName($"Escaped with {Enum.GetName(typeof(AbilityUnlockItemizer.CharacterInIngameOrder), charaStats.chara - 1).ToTitleCase()}");
-
         var itemsObj = charaStats.playerItemsParent.transform;
         for(var i = 0; i < itemsObj.childCount; i++) {
             var ch = itemsObj.GetChild(i);

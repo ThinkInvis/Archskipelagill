@@ -27,8 +27,11 @@ public class AbilityUnlockItemizer {
     private void EndMenuManager_Start(On.endMenuManager.orig_Start orig, endMenuManager self) {
         orig(self);
         var checkStr = $"Escaped with {Enum.GetName(typeof(CharacterInIngameOrder), self.st.chara)}";
-        if(!ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr))
+        if(!ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr)) {
             self.winIcons[self.st.chara].AddComponent<AbilityDisplayerCheckInd>();
+
+            Plugin.ArchipelagoClient.CheckLocationsByName(checkStr);
+        }
     }
 
     private void CharaSelectScript_Start(On.charaSelectScript.orig_Start orig, charaSelectScript self) {
