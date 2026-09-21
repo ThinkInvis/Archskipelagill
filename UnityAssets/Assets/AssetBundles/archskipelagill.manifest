@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.2.7f2
-CRC: 729282953
+CRC: 3742319098
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 8656cf677d6d8fef411535516c67e2dd
+    Hash: 03e48244a7f62f6dc407ffdd0f3694c1
   TypeTreeHash:
     serializedVersion: 2
     Hash: 3cc4a3a212ae2b1e1249bcc390f260b9
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: ba24146840435e4d83195d58fd13cb00
+    Hash: d526e42c346a64bc455507fd309ee875
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -89,6 +89,7 @@ Assets:
 - Assets/Textures/archi-big-single.png
 - Assets/Textures/archi-button-selected.png
 - Assets/Textures/icon-hostname.png
+- Assets/Textures/locked-archi.png
 - Assets/Textures/archi-big.png
 - Assets/Sounds/archi_trap_arrive.wav
 - Assets/Textures/settings-backdrop.png
