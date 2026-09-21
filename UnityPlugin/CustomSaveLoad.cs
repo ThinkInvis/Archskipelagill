@@ -106,7 +106,6 @@ public class ArchiSaver:JSONsaver {
 
         switch(itemName) {
             case "Bonus Gill":
-                //todo: progressive amount based on region/difficulty unlocks
                 metaProg["totalMetaMoney"] = (int.Parse(metaProg.GetValueOrDefault("totalMetaMoney", "0")) + 50).ToString();
                 if(cs.metaMenu) {
                     cs.XP += 50;

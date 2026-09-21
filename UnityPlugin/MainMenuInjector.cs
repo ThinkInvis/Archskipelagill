@@ -125,7 +125,7 @@ public class MainMenuInjector {
         archiMenuBtn.transform.position += new Vector3(0, -4f, 0);
         var btnScript = archiMenuBtn.GetComponent<Button>();
         bool isConnected = Plugin.ArchipelagoClient.session != null;
-        btnScript.spriteState = isConnected ? archiBtnConnState : archiBtnDcState; //TODO reassign this on connect/disconnect
+        btnScript.spriteState = isConnected ? archiBtnConnState : archiBtnDcState;
         btnScript.image.sprite = btnScript.spriteState.pressedSprite;
         btnScript.onClick.m_PersistentCalls.m_Calls[0].arguments.stringArgument = "archiMenu";
         btnScript.onClick.m_PersistentCalls.m_Calls[2].m_Target = newBackBtn;
