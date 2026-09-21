@@ -17,6 +17,8 @@ public class SkillTreeItemizer {
     private void CharaStats_Start(On.CharaStats.orig_Start orig, CharaStats self) {
         orig(self);
 
+        if(self.metaMenu) return;
+
         ApplyTrackers();
         RescanRegions();
         EnsureSafeSpawn(self);
