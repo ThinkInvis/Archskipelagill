@@ -107,6 +107,8 @@ public class DeathLinkHandler : IDisposable {
             var deathLink = deathLinks.Dequeue();
             var cause = deathLink.Cause.IsNullOrWhiteSpace() ? GetDeathLinkCause(deathLink) : deathLink.Cause;
 
+            Plugin.instance.trapHandler.CreateTrapNotif("trap-deathlink", 10f);
+
             switch(Plugin.instance.cfgDeathLinkType.Value) {
                 case DeathLinkType.EndRun:
                     GameObject.Find("PlayerCharacter/Main Camera/Canvas/endMenu").GetComponent<endMenuManager>().returnToMenu();

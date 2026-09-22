@@ -29,25 +29,32 @@ public class TrapHandler {
         cfgSpawnTimeTrapStrength = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Stronger Enemies Trap Strength"), 60f, new ConfigDescription("Time added to the monster wave strength timer by Trap: Stronger Enemies.", new AcceptableValueRange<float>(0f, 300f)));
     }
 
-    public void TriggerTrap(string trapName) {
-        var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
-        var hb = cs.transform.Find("Hitbox").GetComponent<playerHitbox>();
-        var spw = GameObject.FindGameObjectWithTag("Spawner").GetComponent<MonsterSpawner>();
-
+    public void CreateTrapNotif(string trapSpriteName, float lifetime) {
         var trapNotif = new GameObject("Trap Notification");
         trapNotif.SetActive(false);
         trapNotif.transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform.Find("Canvas");
         trapNotif.layer = 5;
         trapNotif.transform.localPosition = new(16f, 0f, 0f);
         var trapSprite = trapNotif.AddComponent<SpriteRenderer>();
-        string trapSpriteName = "trap-base";
+        trapSprite.sprite = Plugin.resources.LoadAsset<Sprite>($"Assets/Textures/{trapSpriteName}.png");
         var tnc = trapNotif.AddComponent<TrapNotificationHandler>();
+        tnc.lifetime = lifetime;
         var tac = trapNotif.AddComponent<AudioSource>();
         tac.clip = Plugin.resources.LoadAsset<AudioClip>("Assets/Sounds/archi_trap_activate.wav");
         tac.volume = 1.3f * PlayerPrefs.GetFloat("SFXvol");
         tac.pitch = UnityEngine.Random.Range(0.95f, 1.15f);
         trapNotif.SetActive(true);
         tac.Play();
+        trapNotif.transform.localScale = new(1f, 1f, 1f);
+    }
+
+    public void TriggerTrap(string trapName) {
+        var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
+        var hb = cs.transform.Find("Hitbox").GetComponent<playerHitbox>();
+        var spw = GameObject.FindGameObjectWithTag("Spawner").GetComponent<MonsterSpawner>();
+
+        string trapSpriteName = "trap-base";
+        float lifetime = 5f;
 
         switch(trapName) {
             case "Damage":
@@ -73,7 +80,7 @@ public class TrapHandler {
                     else
                         enemy.AddComponent<MonsterSpeedupTrap>();
                 }
-                tnc.lifetime = cfgSpeedTrapDuration.Value;
+                lifetime = cfgSpeedTrapDuration.Value;
                 trapSpriteName = "trap-pull";
                 break;
             case "Weapon Jam":
@@ -81,7 +88,7 @@ public class TrapHandler {
                     wjTrap.Reset();
                 else
                     cs.gameObject.AddComponent<WeaponJamTrap>();
-                tnc.lifetime = cfgJamTrapDuration.Value;
+                lifetime = cfgJamTrapDuration.Value;
                 trapSpriteName = "trap-jam";
                 break;
             case "Drain Ski":
@@ -116,7 +123,7 @@ public class TrapHandler {
                 break;
         }
 
-        trapSprite.sprite = Plugin.resources.LoadAsset<Sprite>($"Assets/Textures/{trapSpriteName}.png");
+        CreateTrapNotif(trapSpriteName, lifetime);
     }
 
     private void TimerScript_Start(On.timerScript.orig_Start orig, timerScript self) {

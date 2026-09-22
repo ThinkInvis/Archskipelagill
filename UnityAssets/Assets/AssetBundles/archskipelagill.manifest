@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.2.7f2
-CRC: 1192295737
+CRC: 3240438540
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 9e76399d36531ac1a912d9439955368e
+    Hash: 614edddfef1a09264a64ea226efc9e99
   TypeTreeHash:
     serializedVersion: 2
     Hash: 3cc4a3a212ae2b1e1249bcc390f260b9
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: a06778badb9b8cd79b859aa4d13d3a37
+    Hash: 3eecf094e206ce133a2ed37c5014d6d1
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -87,6 +87,7 @@ Assets:
 - Assets/Textures/blank.png
 - Assets/Sounds/archi_item_fall.wav
 - Assets/Sounds/archi_send.wav
+- Assets/Textures/deathlink.png
 - Assets/Textures/archi-big-single.png
 - Assets/Textures/archi-button-selected.png
 - Assets/Textures/icon-hostname.png
@@ -105,6 +106,7 @@ Assets:
 - Assets/Textures/icon-password.png
 - Assets/Textures/settings-backdrop-field.png
 - Assets/Textures/archi-button-conn-selected.png
+- Assets/Textures/trap-deathlink.png
 - Assets/Textures/trap-drainski.png
 - Assets/Textures/trap-enemytime.png
 - Assets/Textures/item-trap.png
