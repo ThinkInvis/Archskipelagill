@@ -29,6 +29,10 @@ public class TrapHandler {
         cfgSpawnTimeTrapStrength = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Stronger Enemies Trap Strength"), 60f, new ConfigDescription("Time added to the monster wave strength timer by Trap: Stronger Enemies.", new AcceptableValueRange<float>(0f, 300f)));
     }
 
+    public void TriggerNextTrapImmediately() {
+        lastTrapTime -= cfgTrapInterval.Value;
+    }
+
     private void TimerScript_Start(On.timerScript.orig_Start orig, timerScript self) {
         orig(self);
         lastTrapTime = 0f;
