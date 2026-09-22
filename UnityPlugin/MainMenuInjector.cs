@@ -119,6 +119,7 @@ public class MainMenuInjector {
         calls[1].m_Target = newBackBtn;
 
         wipeSaveBtn.gameObject.SetActive(false);
+        UpdateLog();
     }
 
     private void MainMenuCamScript_Update(On.mainMenuCamScript.orig_Update orig, mainMenuCamScript self) {
