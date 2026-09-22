@@ -79,19 +79,14 @@ public class DeathLinkHandler : IDisposable {
     }
 
     private void CharaStats_Update(On.CharaStats.orig_Update orig, CharaStats self) {
-        var wasDead = self.dead;
         orig(self);
-        var isDead = self.dead;
 
         if(self.metaMenu) return;
 
-        if(!wasDead) {
-            if(isDead) SendDeathLink();
-            else KillPlayer(self);
-        }
-        
-        if(isDead)
+        if(self.dead)
             _responding = false;
+        else
+            KillPlayer(self);
     }
 
     /// <summary>
