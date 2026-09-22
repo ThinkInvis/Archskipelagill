@@ -7,6 +7,7 @@
 - Skigill Regions that are unreachable but unlocked will now appear locked
 - Added audiovisual notifications for receiving items, sending location checks, sending goals, and activating traps
   - These notifications will be queued and only appear once in an unpaused run or the Meta Tree
+  - By default, notifications for starting inventory will be disabled; notifications for items obtained while offline can also be filtered out
 - Added visual indicators for when game start options or meta tree weapons are locked behind an unobtained Archipelago item
 - Added visual indicators for unchecked locations (chests/perks, weapons, characters)
 - Fixed incorrect characters being identified for unlock/escape conditions
