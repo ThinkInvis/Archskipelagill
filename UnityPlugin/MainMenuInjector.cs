@@ -21,6 +21,7 @@ public class MainMenuInjector {
     bool _consoleStateDirty = false;
     bool _nextConsoleState = false;
     internal bool pauseMenuState = false;
+    internal bool pauseMenuLeaving = false;
 
     public MainMenuInjector() {
         //for pause menu button: look for [#MainCamera]/Canvas/pauseMenu, /Quit, remove/replace EventTrigger and replace Button.onClick.PersistentCall[1]
@@ -28,6 +29,7 @@ public class MainMenuInjector {
         On.mainCameraScript.Update += MainCameraScript_Update;
         On.mainMenuCamScript.Start += MainMenuCamScript_Start;
         On.mainMenuCamScript.Update += MainMenuCamScript_Update;
+        On.mainCameraScript.setQuitPause += MainCameraScript_setQuitPause;
         archiBtnDcState = new SpriteState {
             highlightedSprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-button-dc-selected.png"),
             selectedSprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-button-dc-selected.png"),
@@ -38,6 +40,14 @@ public class MainMenuInjector {
             selectedSprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-button-conn-selected.png"),
             pressedSprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-button-conn.png")
         };
+    }
+
+    private void MainCameraScript_setQuitPause(On.mainCameraScript.orig_setQuitPause orig, mainCameraScript self) {
+        orig(self);
+        if(self.canPause && !self.paused) {
+            pauseMenuState = false;
+            pauseMenuLeaving = true;
+        } else pauseMenuLeaving = false;
     }
 
     private void MainCameraScript_Update(On.mainCameraScript.orig_Update orig, mainCameraScript self) {
@@ -70,6 +80,9 @@ public class MainMenuInjector {
                 archiMenu.SetActive(false);
             } else {
                 archiMenu.transform.localPosition += Vector3.down * Time.unscaledDeltaTime * 20f;
+                if(pauseMenuLeaving)
+                    pauseMenu.transform.localPosition = new Vector3(-1.25f, -15f, 0f);
+                else
                 pauseMenu.transform.localPosition = new Vector3(-1.25f, -15f, 0f) -archiMenu.transform.localPosition;
             }
         }
