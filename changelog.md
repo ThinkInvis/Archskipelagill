@@ -12,7 +12,7 @@
 - Fixed incorrect characters being identified for unlock/escape conditions
 - Backend:
   - The client will no longer even attempt to send checks that aren't active/valid on the server
-  - Fixed a probably harmful error that could sometimes occur because skill tree itemization was trying to activate on the meta tree
+  - Fixed a probably harmless error that could sometimes occur because skill tree itemization was trying to activate on the meta tree
   - Client will no longer send all checks, including previously unsent checks twice, every single time it connects; now only previously unsent checks will be sent once
   - Slightly improved performance by replacing/caching some uses of GameObject.Find
 
