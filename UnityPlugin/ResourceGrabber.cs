@@ -5,6 +5,7 @@ namespace Archskipelagill;
 public class ResourceGrabber {
     public GameObject prefabSetup = null;
     public Transform worldLayerSparklePrefab { get; private set; } = null;
+    public Transform runWorldLayerSparklePrefab { get; private set; } = null;
     public ResourceGrabber() {
         prefabSetup = new("Archskipelagill Prefab Setup Dummy");
         prefabSetup.SetActive(false);
@@ -21,6 +22,15 @@ public class ResourceGrabber {
             worldLayerSparklePrefab.GetComponent<moveOverTimeDirection>().Speed /= 2f;
             worldLayerSparklePrefab.GetComponent<Animator>().speed *= 2f;
             worldLayerSparklePrefab.GetComponent<destructionRetard>().time /= 2f;
+        }
+
+        if(runWorldLayerSparklePrefab == null) {
+            runWorldLayerSparklePrefab = GameObject.Instantiate(GameObject.Find("Canvas/mainMenu/shop button").GetComponent<readPlayerMoneyAndActivate>().toActivate.GetComponent<instantiateRepeat>().GO, prefabSetup.transform);
+            runWorldLayerSparklePrefab.gameObject.layer = 0;
+            runWorldLayerSparklePrefab.transform.localScale = new(1f, 1f, 1f);
+            runWorldLayerSparklePrefab.GetComponent<moveOverTimeDirection>().Speed *= 3f;
+            runWorldLayerSparklePrefab.GetComponent<Animator>().speed *= 2f;
+            runWorldLayerSparklePrefab.GetComponent<destructionRetard>().time /= 2f;
         }
     }
 }

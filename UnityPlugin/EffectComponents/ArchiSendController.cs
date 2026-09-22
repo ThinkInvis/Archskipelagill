@@ -29,7 +29,6 @@ public class ArchiSendController : MonoBehaviour {
             sfx.Play();
 
         var sparkler = obj.AddComponent<instantiateRepeat>();
-        sparkler.GO = Plugin.instance.resourceGrabber.worldLayerSparklePrefab.transform;
         sparkler.radius = 0f;
         sparkler.randomRot = false;
         sparkler.rate = 0.05f;
@@ -48,6 +47,7 @@ public class ArchiSendController : MonoBehaviour {
 
 #pragma warning disable IDE0051 //Used by Unity Engine
     void Start() {
+        var sparkler = GetComponent<instantiateRepeat>();
         sfx = GetComponent<AudioSource>();
         spinners = new Transform[6];
         chara = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
@@ -56,10 +56,12 @@ public class ArchiSendController : MonoBehaviour {
         }
         if(!chara.metaMenu) {
             v = new(UnityEngine.Random.Range(-5f, 5f), UnityEngine.Random.Range(-0.25f, 0.6f));
-            transform.localScale *= 5f;
+            transform.localScale *= 3f;
+            sparkler.GO = Plugin.instance.resourceGrabber.runWorldLayerSparklePrefab.transform;
         } else {
             v = new(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-0.05f, 0.125f));
             transform.localScale *= 0.5f;
+            sparkler.GO = Plugin.instance.resourceGrabber.worldLayerSparklePrefab.transform;
         }
         if(goal) {
             transform.localScale *= 3f;
