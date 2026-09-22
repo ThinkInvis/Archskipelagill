@@ -54,9 +54,10 @@ public class MainMenuInjector {
         orig(self);
         if(pauseMenuState) {
             archiMenu.SetActive(true);
-            if(Vector2.Distance(archiMenu.transform.localPosition, Vector2.zero) != 0f) {
-                if(Vector2.Distance(archiMenu.transform.localPosition, Vector2.zero) < Time.unscaledDeltaTime * 20f) {
-                    archiMenu.transform.localPosition = Vector3.zero;
+            var targetPos = new Vector3(0f, 2f, 0f);
+            if(Vector2.Distance(archiMenu.transform.localPosition, targetPos) != 0f) {
+                if(Vector2.Distance(archiMenu.transform.localPosition, targetPos) < Time.unscaledDeltaTime * 20f) {
+                    archiMenu.transform.localPosition = targetPos;
                     pauseMenu.SetActive(false);
                 } else {
                     archiMenu.transform.localPosition += Vector3.up * Time.unscaledDeltaTime * 20f;
