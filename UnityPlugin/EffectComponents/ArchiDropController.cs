@@ -147,7 +147,7 @@ public class ArchiDropController : MonoBehaviour {
 
             if(itemTimer > 4f) {
                 follower.gameObject.SetActive((itemTimer % 0.25f) > 0.125f);
-            }
+            } else follower.gameObject.SetActive(true);
 
             itemTimer += Time.deltaTime;
             if(itemTimer > 5f)
