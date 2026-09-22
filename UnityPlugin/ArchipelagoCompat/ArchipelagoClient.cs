@@ -112,7 +112,7 @@ public class ArchipelagoClient {
 
             Plugin.BepinLogger.LogMessage($"Pre begin SSD on {ArchiSaver.instance}");
             ArchiSaver.instance.StoreSlotData(session.DataStorage.GetSlotData(), session);
-            DeathLinkHandler = new(session.CreateDeathLinkService(), ServerData.SlotName);
+            DeathLinkHandler = new(session.CreateDeathLinkService(), ServerData.SlotName, Plugin.instance.cfgDeathLinkTx.Value != DeathLinkHandler.DeathLinkTx.Off);
             ArchiSaver.instance.ResendChecks();
         } else {
             var failure = (LoginFailure)result;

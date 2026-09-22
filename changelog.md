@@ -12,6 +12,9 @@
 - Added visual indicators for unchecked locations (chests/perks, weapons, characters)
 - Fixed incorrect characters being identified for unlock/escape conditions
 - Added client config options to automatically connect to Archipelago on game launch
+- Added configurable directionality (off, send, receive, or both) to Death Link
+- Added configurable action to Death Link (can now end run with no reward or inflict a random trap)
+- Fixed a possible infinite loop and other similar edge cases in Death Link
 - Backend:
   - The client will no longer even attempt to send checks that aren't active/valid on the server
   - Fixed a probably harmless error that could sometimes occur because skill tree itemization was trying to activate on the meta tree

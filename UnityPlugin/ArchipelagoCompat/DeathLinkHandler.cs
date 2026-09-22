@@ -2,6 +2,7 @@
 using BepInEx;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace Archskipelagill.ArchipelagoCompat;
 
@@ -9,7 +10,10 @@ public class DeathLinkHandler : IDisposable {
     private static bool deathLinkEnabled;
     private readonly string slotName;
     private readonly DeathLinkService service;
+    bool _responding = false;
     private readonly Queue<DeathLink> deathLinks = new();
+    public enum DeathLinkTx { Off, Receive, Send, Both }
+    public enum DeathLinkType { RandomTrap, Kill, EndRun }
 
     /// <summary>
     /// instantiates our death link handler, sets up the hook for receiving death links, and enables death link if needed
@@ -22,6 +26,7 @@ public class DeathLinkHandler : IDisposable {
         service.OnDeathLinkReceived += DeathLinkReceived;
         On.CharaStats.Update += CharaStats_Update;
         On.mainCameraScript.playerDeath += MainCameraScript_playerDeath;
+        On.endMenuManager.returnToMenu += EndMenuManager_returnToMenu;
         slotName = name;
         deathLinkEnabled = enableDeathLink;
 
@@ -30,9 +35,20 @@ public class DeathLinkHandler : IDisposable {
         }
     }
 
+    private void EndMenuManager_returnToMenu(On.endMenuManager.orig_returnToMenu orig, endMenuManager self) {
+        orig(self);
+
+        if(Plugin.instance.cfgDeathLinkQuitIsDeath.Value && (Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Send || Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Both)) {
+            var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
+            if(!cs.won && !cs.dead)
+                SendDeathLink();
+        }
+    }
+
     private void MainCameraScript_playerDeath(On.mainCameraScript.orig_playerDeath orig, mainCameraScript self) {
         orig(self);
-        SendDeathLink();
+        if(Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Send || Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Both)
+            SendDeathLink();
     }
 
     /// <summary>
@@ -53,7 +69,8 @@ public class DeathLinkHandler : IDisposable {
     /// </summary>
     /// <param name="deathLink">Received Death Link object to handle</param>
     private void DeathLinkReceived(DeathLink deathLink) {
-        deathLinks.Enqueue(deathLink);
+        if(Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Receive || Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Both)
+            deathLinks.Enqueue(deathLink);
 
         Plugin.BepinLogger.LogDebug(deathLink.Cause.IsNullOrWhiteSpace()
             ? $"Received Death Link from: {deathLink.Source}"
@@ -64,11 +81,16 @@ public class DeathLinkHandler : IDisposable {
         var wasDead = self.dead;
         orig(self);
         var isDead = self.dead;
-        
-        if(!self.metaMenu && !wasDead) {
+
+        if(self.metaMenu) return;
+
+        if(!wasDead) {
             if(isDead) SendDeathLink();
             else KillPlayer(self);
         }
+        
+        if(isDead)
+            _responding = false;
     }
 
     /// <summary>
@@ -77,12 +99,27 @@ public class DeathLinkHandler : IDisposable {
     /// </summary>
     public void KillPlayer(CharaStats targetPlayer) {
         try {
-            if(deathLinks.Count < 1) return;
+            if(_responding || deathLinks.Count < 1) return;
+
+            _responding = true;
 
             var deathLink = deathLinks.Dequeue();
             var cause = deathLink.Cause.IsNullOrWhiteSpace() ? GetDeathLinkCause(deathLink) : deathLink.Cause;
 
-            targetPlayer.HP = -9001f; //make the player EXCEPTIONALLY dead
+            switch(Plugin.instance.cfgDeathLinkType.Value) {
+                case DeathLinkType.EndRun:
+                    GameObject.Find("PlayerCharacter/Main Camera/Canvas/endMenu").GetComponent<endMenuManager>().returnToMenu();
+                    _responding = false;
+                    break;
+                case DeathLinkType.RandomTrap:
+                    _responding = false;
+                    break;
+                default:
+                    targetPlayer.HP = -9001f; //make the player EXCEPTIONALLY dead
+                    //don't clear responding-to-deathlink flag until after death actually happens because it isn't instant
+                    break;
+            }
+
 
             Plugin.BepinLogger.LogMessage(cause);
         } catch(Exception e) {
@@ -104,7 +141,7 @@ public class DeathLinkHandler : IDisposable {
     /// </summary>
     public void SendDeathLink() {
         try {
-            if(!deathLinkEnabled) return;
+            if(_responding || !deathLinkEnabled) return;
 
             Plugin.BepinLogger.LogMessage("sharing your death...");
 

@@ -7,6 +7,7 @@ using System;
 using System.IO;
 using System.Reflection;
 using UnityEngine;
+using static Archskipelagill.ArchipelagoCompat.DeathLinkHandler;
 
 namespace Archskipelagill;
 
@@ -20,6 +21,9 @@ public class Plugin:BaseUnityPlugin {
     internal static AssetBundle resources;
 
     public ConfigFile config { get; private set; }
+    public ConfigEntry<DeathLinkTx> cfgDeathLinkTx;
+    public ConfigEntry<DeathLinkType> cfgDeathLinkType;
+    public ConfigEntry<bool> cfgDeathLinkQuitIsDeath;
 
     public const string ModDisplayInfo = $"{PluginName} v{PluginVersion}";
     public const string APDisplayInfo = $"Archipelago v{ArchipelagoClient.APVersion}";
@@ -58,6 +62,10 @@ public class Plugin:BaseUnityPlugin {
         abilityUnlockItemizer = new();
         customSaveLoad = new();
         trapHandler = new();
+
+        cfgDeathLinkTx = config.Bind<DeathLinkTx>(new ConfigDefinition("Death Link", "Channel"), DeathLinkTx.Off, new ConfigDescription("Whether to receive and/or transmit Death Link to other players in the Archipelago run."));
+        cfgDeathLinkType = config.Bind<DeathLinkType>(new ConfigDefinition("Death Link", "Type"), DeathLinkType.Kill, new ConfigDescription("What to do when a Death Link is received. Note that End Run is more punishing than Kill: no Gill reward will be received."));
+        cfgDeathLinkQuitIsDeath = config.Bind<bool>(new ConfigDefinition("Death Link", "Death on Quit"), true, new ConfigDescription("If true, ending a run from the pause menu will count as a death for Death Link purposes."));
 
         mainMenuInjector.ReceiveMessage($"{ModDisplayInfo} loaded!");
 
