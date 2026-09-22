@@ -113,8 +113,7 @@ public class DeathLinkHandler : IDisposable {
                     _responding = false;
                     break;
                 case DeathLinkType.RandomTrap:
-                    ArchiSaver.instance.queuedTraps.Enqueue(new string[] { "Damage", "Pull Enemies", "Weapon Jam", "Drain Ski", "Scramble Stats", "Flash Mob", "Stronger Enemies" }[UnityEngine.Random.Range(0, 7)] );
-                    Plugin.instance.trapHandler.TriggerNextTrapImmediately();
+                    Plugin.instance.trapHandler.TriggerTrap(new string[] { "Damage", "Pull Enemies", "Weapon Jam", "Drain Ski", "Scramble Stats", "Flash Mob", "Stronger Enemies" }[UnityEngine.Random.Range(0, 7)] );
                     _responding = false;
                     break;
                 default:

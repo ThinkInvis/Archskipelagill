@@ -29,8 +29,94 @@ public class TrapHandler {
         cfgSpawnTimeTrapStrength = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Stronger Enemies Trap Strength"), 60f, new ConfigDescription("Time added to the monster wave strength timer by Trap: Stronger Enemies.", new AcceptableValueRange<float>(0f, 300f)));
     }
 
-    public void TriggerNextTrapImmediately() {
-        lastTrapTime -= cfgTrapInterval.Value;
+    public void TriggerTrap(string trapName) {
+        var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
+        var hb = cs.transform.Find("Hitbox").GetComponent<playerHitbox>();
+        var spw = GameObject.FindGameObjectWithTag("Spawner").GetComponent<MonsterSpawner>();
+
+        var trapNotif = new GameObject("Trap Notification");
+        trapNotif.SetActive(false);
+        trapNotif.transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform.Find("Canvas");
+        trapNotif.layer = 5;
+        trapNotif.transform.localPosition = new(16f, 0f, 0f);
+        var trapSprite = trapNotif.AddComponent<SpriteRenderer>();
+        string trapSpriteName = "trap-base";
+        var tnc = trapNotif.AddComponent<TrapNotificationHandler>();
+        var tac = trapNotif.AddComponent<AudioSource>();
+        tac.clip = Plugin.resources.LoadAsset<AudioClip>("Assets/Sounds/archi_trap_activate.wav");
+        tac.volume = 1.3f * PlayerPrefs.GetFloat("SFXvol");
+        tac.pitch = UnityEngine.Random.Range(0.95f, 1.15f);
+        trapNotif.SetActive(true);
+        tac.Play();
+
+        switch(trapName) {
+            case "Damage":
+                cs.HP *= 0.5f;
+                hb.hurtSFX.PlayHurtSFX();
+                var hurtNotif = UnityEngine.Object.Instantiate<GameObject>(hb.damageTakenNotif, hb.transform.position, Quaternion.identity);
+                hurtNotif.GetComponent<Rigidbody2D>().AddForce(Vector2.up * 300f);
+                var dsp = hurtNotif.GetComponent<displayDamage>();
+                dsp.damage = (int)(cs.HP / 10f);
+                dsp.fond.enabled = false;
+                dsp.virgule.enabled = true;
+                dsp.color = new Color(0.57254905f, 0.07450981f, 0.10980392f);
+                hb.shake.dur = 0.35f;
+                hb.shake.amp = 0.75f;
+                trapSpriteName = "trap-damage";
+                break;
+            case "Pull Enemies":
+                foreach(var enemy in GameObject.FindGameObjectsWithTag("Monster")) {
+                    if(!enemy.TryGetComponent<WalkerScript>(out _))
+                        continue;
+                    if(enemy.TryGetComponent<MonsterSpeedupTrap>(out var msuTrap))
+                        msuTrap.Reset();
+                    else
+                        enemy.AddComponent<MonsterSpeedupTrap>();
+                }
+                tnc.lifetime = cfgSpeedTrapDuration.Value;
+                trapSpriteName = "trap-pull";
+                break;
+            case "Weapon Jam":
+                if(cs.TryGetComponent<WeaponJamTrap>(out var wjTrap))
+                    wjTrap.Reset();
+                else
+                    cs.gameObject.AddComponent<WeaponJamTrap>();
+                tnc.lifetime = cfgJamTrapDuration.Value;
+                trapSpriteName = "trap-jam";
+                break;
+            case "Drain Ski":
+                var penalty = cs.XP * 0.5f;
+                cs.XP -= penalty;
+                cs.totalXP -= penalty;
+                trapSpriteName = "trap-drainski";
+                break;
+            case "Scramble Stats":
+                (cs.INT, cs.STR, cs.DEX) = (cs.STR, cs.DEX, cs.INT);
+                cs.statsUI.transform.GetChild(0).GetChild(0).GetComponent<numberDisplayer>()
+.display((int)cs.STR);
+                cs.statsUI.transform.GetChild(1).GetChild(0).GetComponent<numberDisplayer>()
+                    .display((int)cs.DEX);
+                cs.statsUI.transform.GetChild(2).GetChild(0).GetComponent<numberDisplayer>()
+                    .display((int)cs.INT);
+                cs.bringStatUIDown(0);
+                cs.bringStatUIDown(1);
+                cs.bringStatUIDown(2);
+                trapSpriteName = "trap-scramble";
+                break;
+            case "Flash Mob":
+                spw.spawnAmountOverflow += cfgMobTrapStrength.Value;
+                trapSpriteName = "trap-flashmob";
+                break;
+            case "Stronger Enemies":
+                spw.t += cfgSpawnTimeTrapStrength.Value;
+                trapSpriteName = "trap-enemytime";
+                break;
+            default:
+                Plugin.BepinLogger.LogWarning($"Triggered unrecognized trap with name \"{trapName}\"");
+                break;
+        }
+
+        trapSprite.sprite = Plugin.resources.LoadAsset<Sprite>($"Assets/Textures/{trapSpriteName}.png");
     }
 
     private void TimerScript_Start(On.timerScript.orig_Start orig, timerScript self) {
@@ -43,95 +129,7 @@ public class TrapHandler {
         if(ArchiSaver.instance.queuedTraps.Count == 0) return;
         if((self.t - lastTrapTime) > cfgTrapInterval.Value) {
             lastTrapTime = self.t;
-            var trapName = ArchiSaver.instance.queuedTraps.Dequeue();
-
-            var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
-            var hb = cs.transform.Find("Hitbox").GetComponent<playerHitbox>();
-            var spw = GameObject.FindGameObjectWithTag("Spawner").GetComponent<MonsterSpawner>();
-
-            var trapNotif = new GameObject("Trap Notification");
-            trapNotif.SetActive(false);
-            trapNotif.transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform.Find("Canvas");
-            trapNotif.layer = 5;
-            trapNotif.transform.localPosition = new(16f, 0f, 0f);
-            var trapSprite = trapNotif.AddComponent<SpriteRenderer>();
-            string trapSpriteName = "trap-base";
-            var tnc = trapNotif.AddComponent<TrapNotificationHandler>();
-            var tac = trapNotif.AddComponent<AudioSource>();
-            tac.clip = Plugin.resources.LoadAsset<AudioClip>("Assets/Sounds/archi_trap_activate.wav");
-            tac.volume = 1.3f * PlayerPrefs.GetFloat("SFXvol");
-            tac.pitch = UnityEngine.Random.Range(0.95f, 1.15f);
-            trapNotif.SetActive(true);
-            tac.Play();
-
-            switch(trapName) {
-                case "Damage":
-                    cs.HP *= 0.5f;
-                    hb.hurtSFX.PlayHurtSFX();
-                    var hurtNotif = UnityEngine.Object.Instantiate<GameObject>(hb.damageTakenNotif, hb.transform.position, Quaternion.identity);
-                    hurtNotif.GetComponent<Rigidbody2D>().AddForce(Vector2.up * 300f);
-                    var dsp = hurtNotif.GetComponent<displayDamage>();
-                    dsp.damage = (int)(cs.HP / 10f);
-                    dsp.fond.enabled = false;
-                    dsp.virgule.enabled = true;
-                    dsp.color = new Color(0.57254905f, 0.07450981f, 0.10980392f);
-                    hb.shake.dur = 0.35f;
-                    hb.shake.amp = 0.75f;
-                    trapSpriteName = "trap-damage";
-                    break;
-                case "Pull Enemies":
-                    foreach(var enemy in GameObject.FindGameObjectsWithTag("Monster")) {
-                        if(!enemy.TryGetComponent<WalkerScript>(out _))
-                            continue;
-                        if(enemy.TryGetComponent<MonsterSpeedupTrap>(out var msuTrap))
-                            msuTrap.Reset();
-                        else
-                            enemy.AddComponent<MonsterSpeedupTrap>();
-                    }
-                    tnc.lifetime = cfgSpeedTrapDuration.Value;
-                    trapSpriteName = "trap-pull";
-                    break;
-                case "Weapon Jam":
-                    if(cs.TryGetComponent<WeaponJamTrap>(out var wjTrap))
-                        wjTrap.Reset();
-                    else
-                        cs.gameObject.AddComponent<WeaponJamTrap>();
-                    tnc.lifetime = cfgJamTrapDuration.Value;
-                    trapSpriteName = "trap-jam";
-                    break;
-                case "Drain Ski":
-                    var penalty = cs.XP * 0.5f;
-                    cs.XP -= penalty;
-                    cs.totalXP -= penalty;
-                    trapSpriteName = "trap-drainski";
-                    break;
-                case "Scramble Stats":
-                    (cs.INT, cs.STR, cs.DEX) = (cs.STR, cs.DEX, cs.INT);
-                    cs.statsUI.transform.GetChild(0).GetChild(0).GetComponent<numberDisplayer>()
-    .display((int)cs.STR);
-                    cs.statsUI.transform.GetChild(1).GetChild(0).GetComponent<numberDisplayer>()
-                        .display((int)cs.DEX);
-                    cs.statsUI.transform.GetChild(2).GetChild(0).GetComponent<numberDisplayer>()
-                        .display((int)cs.INT);
-                    cs.bringStatUIDown(0);
-                    cs.bringStatUIDown(1);
-                    cs.bringStatUIDown(2);
-                    trapSpriteName = "trap-scramble";
-                    break;
-                case "Flash Mob":
-                    spw.spawnAmountOverflow += cfgMobTrapStrength.Value;
-                    trapSpriteName = "trap-flashmob";
-                    break;
-                case "Stronger Enemies":
-                    spw.t += cfgSpawnTimeTrapStrength.Value;
-                    trapSpriteName = "trap-enemytime";
-                    break;
-                default:
-                    Plugin.BepinLogger.LogWarning($"Triggered unrecognized trap with name \"{trapName}\"");
-                    break;
-            }
-
-            trapSprite.sprite = Plugin.resources.LoadAsset<Sprite>($"Assets/Textures/{trapSpriteName}.png");
+            TriggerTrap(ArchiSaver.instance.queuedTraps.Dequeue());
         }
     }
 
