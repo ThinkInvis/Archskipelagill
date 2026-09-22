@@ -1,4 +1,5 @@
 ﻿using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
+using Archskipelagill.Itemizers;
 using BepInEx;
 using System;
 using System.Collections.Generic;
@@ -112,6 +113,7 @@ public class DeathLinkHandler : IDisposable {
                     _responding = false;
                     break;
                 case DeathLinkType.RandomTrap:
+                    ArchiSaver.instance.queuedTraps.Enqueue(new string[] { "Damage", "Pull Enemies", "Weapon Jam", "Drain Ski", "Scramble Stats", "Flash Mob", "Stronger Enemies" }[UnityEngine.Random.Range(0, 7)] );
                     _responding = false;
                     break;
                 default:
