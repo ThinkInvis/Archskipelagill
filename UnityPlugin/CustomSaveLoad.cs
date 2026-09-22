@@ -1,4 +1,5 @@
 ﻿using Archskipelagill.EffectComponents;
+using BepInEx.Configuration;
 using MonoMod.Cil;
 using System;
 using System.Collections.Generic;
@@ -202,6 +203,8 @@ public class ArchiSaver:JSONsaver {
 }
 
 public class CustomSaveLoad {
+    public ConfigEntry<string> cfgRunSuffix;
+
     public CustomSaveLoad() {
         IL.JSONsaver.save += JSONsaver_save;
         IL.JSONsaver.load += JSONsaver_load;
@@ -209,6 +212,8 @@ public class CustomSaveLoad {
         var cslGO = new GameObject(); //main menu JSONSaver uses a tag for ident/finding, so this should be safe from intercepting MoneyBagScript et al.
         UnityEngine.Object.DontDestroyOnLoad(cslGO);
         cslGO.AddComponent<ArchiSaver>();
+
+        cfgRunSuffix = Plugin.instance.config.Bind<string>(new ConfigDefinition("Save/Load", "Run Suffix"), "default", new ConfigDescription("A suffix added to the custom save file redirect used by the client plugin. Must be changed if you want to participate in multiple Archipelago runs including this game simultaneously."));
     }
 
     private void MoneyBagScript_addMoneyToBag(On.MoneyBagScript.orig_addMoneyToBag orig, MoneyBagScript self) {
@@ -224,15 +229,15 @@ public class CustomSaveLoad {
     private void JSONsaver_load(ILContext il) {
         ILCursor c = new(il);
         c.GotoNext(MoveType.After, x => x.MatchLdstr("/save.json"));
-        c.EmitDelegate<Func<string, string>>((origStr) => $"/archi-save-{Plugin.instance.cfgRunSuffix.Value}.json");
+        c.EmitDelegate<Func<string, string>>((origStr) => $"/archi-save-{cfgRunSuffix.Value}.json");
         c.GotoNext(MoveType.After, x => x.MatchLdstr("/save.json"));
-        c.EmitDelegate<Func<string, string>>((origStr) => $"/archi-save-{Plugin.instance.cfgRunSuffix.Value}.json");
+        c.EmitDelegate<Func<string, string>>((origStr) => $"/archi-save-{cfgRunSuffix.Value}.json");
     }
 
     private void JSONsaver_save(ILContext il) {
         ILCursor c = new(il);
         c.GotoNext(MoveType.After, x => x.MatchLdstr("/save.json"));
-        c.EmitDelegate<Func<string, string>>((origStr) => $"/archi-save-{Plugin.instance.cfgRunSuffix.Value}.json");
+        c.EmitDelegate<Func<string, string>>((origStr) => $"/archi-save-{cfgRunSuffix.Value}.json");
     }
 
     public void Wipe() {

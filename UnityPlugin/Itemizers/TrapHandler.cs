@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using BepInEx.Configuration;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -7,10 +8,26 @@ namespace Archskipelagill.Itemizers;
 public class TrapHandler {
     float lastTrapTime = 0f;
 
+    public ConfigEntry<float> cfgTrapInterval;
+    public ConfigEntry<float> cfgDamageTrapStrength;
+    public ConfigEntry<float> cfgSpeedTrapDuration;
+    public ConfigEntry<float> cfgSpeedTrapStrength;
+    public ConfigEntry<float> cfgJamTrapDuration;
+    public ConfigEntry<float> cfgMobTrapStrength;
+    public ConfigEntry<float> cfgSpawnTimeTrapStrength;
+
     public TrapHandler() {
         On.timerScript.Update += TimerScript_Update;
         On.timerScript.Start += TimerScript_Start;
         On.CharaStats.Update += CharaStats_Update;
+
+        cfgTrapInterval = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Trap Interval"), 15f, new ConfigDescription("How much mid-run time to wait between activating queued traps. Traps will not activate while the game is paused or on the menu.", new AcceptableValueRange<float>(0f, 300f)));
+        cfgDamageTrapStrength = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Damage Trap Strength"), 0.5f, new ConfigDescription("Fraction of health in damage dealt by Trap: Damage.", new AcceptableValueRange<float>(0f, 1f)));
+        cfgSpeedTrapDuration = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Pull Enemies Trap Duration"), 5f, new ConfigDescription("Duration of Trap: Pull Enemies in seconds.", new AcceptableValueRange<float>(0f, 300f)));
+        cfgSpeedTrapStrength = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Pull Enemies Trap Strength"), 2f, new ConfigDescription("Strength of Trap: Pull Enemies as an added multiplier to base speed.", new AcceptableValueRange<float>(0f, 100f)));
+        cfgJamTrapDuration = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Weapon Jam Trap Duration"), 10f, new ConfigDescription("Duration of Trap: Weapon Jam in seconds.", new AcceptableValueRange<float>(0f, 180f)));
+        cfgMobTrapStrength = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Flash Mob Trap Strength"), 30f, new ConfigDescription("Additional enemies spawned by Trap: Flash Mob.", new AcceptableValueRange<float>(0f, 1000f)));
+        cfgSpawnTimeTrapStrength = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Stronger Enemies Trap Strength"), 60f, new ConfigDescription("Time added to the monster wave strength timer by Trap: Stronger Enemies.", new AcceptableValueRange<float>(0f, 300f)));
     }
 
     private void TimerScript_Start(On.timerScript.orig_Start orig, timerScript self) {
@@ -21,7 +38,7 @@ public class TrapHandler {
     private void TimerScript_Update(On.timerScript.orig_Update orig, timerScript self) {
         orig(self);
         if(ArchiSaver.instance.queuedTraps.Count == 0) return;
-        if((self.t - lastTrapTime) > Plugin.instance.cfgTrapInterval.Value) {
+        if((self.t - lastTrapTime) > cfgTrapInterval.Value) {
             lastTrapTime = self.t;
             var trapName = ArchiSaver.instance.queuedTraps.Dequeue();
 
@@ -68,7 +85,7 @@ public class TrapHandler {
                         else
                             enemy.AddComponent<MonsterSpeedupTrap>();
                     }
-                    tnc.lifetime = Plugin.instance.cfgSpeedTrapDuration.Value;
+                    tnc.lifetime = cfgSpeedTrapDuration.Value;
                     trapSpriteName = "trap-pull";
                     break;
                 case "Weapon Jam":
@@ -76,7 +93,7 @@ public class TrapHandler {
                         wjTrap.Reset();
                     else
                         cs.gameObject.AddComponent<WeaponJamTrap>();
-                    tnc.lifetime = Plugin.instance.cfgJamTrapDuration.Value;
+                    tnc.lifetime = cfgJamTrapDuration.Value;
                     trapSpriteName = "trap-jam";
                     break;
                 case "Drain Ski":
@@ -99,11 +116,11 @@ public class TrapHandler {
                     trapSpriteName = "trap-scramble";
                     break;
                 case "Flash Mob":
-                    spw.spawnAmountOverflow += Plugin.instance.cfgMobTrapStrength.Value;
+                    spw.spawnAmountOverflow += cfgMobTrapStrength.Value;
                     trapSpriteName = "trap-flashmob";
                     break;
                 case "Stronger Enemies":
-                    spw.t += Plugin.instance.cfgSpawnTimeTrapStrength.Value;
+                    spw.t += cfgSpawnTimeTrapStrength.Value;
                     trapSpriteName = "trap-enemytime";
                     break;
                 default:
@@ -184,7 +201,7 @@ public class TrapHandler {
         }
     }
     public class MonsterSpeedupTrap:TimedTrapBase {
-        protected override float duration => Plugin.instance.cfgSpeedTrapDuration.Value;
+        protected override float duration => Plugin.instance.trapHandler.cfgSpeedTrapDuration.Value;
         float startingSpeed;
         float startingRunSpeed;
         float startingAccel;
@@ -206,7 +223,7 @@ public class TrapHandler {
                 walker.acceleration = startingAccel;
                 GameObject.Destroy(this);
             } else {
-                var adjFactor = 1f + (1f - (timer.t - startTime) / duration) * Plugin.instance.cfgSpeedTrapStrength.Value;
+                var adjFactor = 1f + (1f - (timer.t - startTime) / duration) * Plugin.instance.trapHandler.cfgSpeedTrapStrength.Value;
                 walker.speed = startingSpeed * adjFactor;
                 walker.runSpeed = startingRunSpeed * adjFactor;
                 walker.acceleration = startingAccel * adjFactor;
@@ -214,7 +231,7 @@ public class TrapHandler {
         }
     }
     public class WeaponJamTrap:TimedTrapBase {
-        protected override float duration => Plugin.instance.cfgJamTrapDuration.Value;
+        protected override float duration => Plugin.instance.trapHandler.cfgJamTrapDuration.Value;
     }
 #pragma warning restore IDE0051
 }
