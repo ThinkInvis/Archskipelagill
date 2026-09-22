@@ -1,4 +1,5 @@
-﻿using System;
+﻿using BepInEx.Configuration;
+using System;
 using System.Linq;
 using UnityEngine;
 
@@ -8,6 +9,8 @@ public class AbilityUnlockItemizer {
     public enum CharacterInIngameOrder { None, Mage, Strongman, Fox, Dragon, Prototype, Dwarves };
 
     readonly Sprite customLockSprite;
+    public ConfigEntry<bool> cfgAbilityLocationTracker;
+
     public AbilityUnlockItemizer() {
         On.charaSelectScript.selected += CharaSelectScript_selected;
         On.charaSelectScript.updateUnlockStatus += CharaSelectScript_updateUnlockStatus;
@@ -20,13 +23,16 @@ public class AbilityUnlockItemizer {
         On.endMenuManager.Start += EndMenuManager_Start;
 
         customLockSprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/locked-archi.png");
+
+        cfgAbilityLocationTracker = Plugin.instance.config.Bind<bool>(new ConfigDefinition("Special Effects", "Ability Location Tracker"), true, new ConfigDescription("If true, unchecked locations corresponding to weapons and characters will be marked."));
     }
 
     private void EndMenuManager_Start(On.endMenuManager.orig_Start orig, endMenuManager self) {
         orig(self);
         var checkStr = $"Escaped with {Enum.GetName(typeof(CharacterInIngameOrder), self.st.chara)}";
         if(!ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr)) {
-            self.winIcons[self.st.chara].AddComponent<AbilityDisplayerCheckInd>();
+            if(cfgAbilityLocationTracker.Value)
+                self.winIcons[self.st.chara].AddComponent<AbilityDisplayerCheckInd>();
 
             Plugin.ArchipelagoClient.CheckLocationsByName(checkStr);
         }
@@ -35,7 +41,8 @@ public class AbilityUnlockItemizer {
     private void CharaSelectScript_Start(On.charaSelectScript.orig_Start orig, charaSelectScript self) {
         orig(self);
         var checkStr = $"Escaped with {self.unlockKey}";
-        if(!ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr)) {
+        if(cfgAbilityLocationTracker.Value && 
+            !ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr)) {
             var adci = self.gameObject.AddComponent<AbilityDisplayerCheckInd>();
             adci.isLocked = !ArchiSaver.instance.metaProg.TryGetValue(self.unlockKey, out var ulStr) || ulStr != "unlocked" || ArchiSaver.GetItemCount("Character: " + self.unlockKey) == 0;
         }
@@ -44,7 +51,8 @@ public class AbilityUnlockItemizer {
     private void WeaponDisplayer_Start(On.weaponDisplayer.orig_Start orig, weaponDisplayer self) {
         orig(self);
         var checkStr = $"Escaped with Weapon {self.GetComponent<weaponDisplayer>().source.name.Replace("(Clone)", "")}";
-        if(!ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr))
+        if(cfgAbilityLocationTracker.Value &&
+            !ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr))
             self.gameObject.AddComponent<AbilityDisplayerCheckInd>();
     }
 

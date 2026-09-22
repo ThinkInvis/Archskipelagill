@@ -1,15 +1,20 @@
-﻿using System;
+﻿using BepInEx.Configuration;
+using System;
 using System.Linq;
 using UnityEngine;
 
 namespace Archskipelagill.Itemizers;
 
 public class SkillTreeItemizer {
+    public ConfigEntry<bool> cfgSkillTreeLocationTracker;
+
     public SkillTreeItemizer() {
         On.skigillNode.activate += SkigillNode_activate;
         On.skigillNode.OnTriggerStay2D += SkigillNode_OnTriggerStay2D;
         On.CharaStats.Start += CharaStats_Start;
         On.skigillNode.showConnex += SkigillNode_showConnex;
+
+        cfgSkillTreeLocationTracker = Plugin.instance.config.Bind<bool>(new ConfigDefinition("Special Effects", "Skigill Location Tracker"), true, new ConfigDescription("If true, unchecked locations on the Skigill will be marked."));
     }
 
     private void CharaStats_Start(On.CharaStats.orig_Start orig, CharaStats self) {
@@ -87,16 +92,18 @@ public class SkillTreeIndexTracker:MonoBehaviour {
 
 #pragma warning disable IDE0051 //Used by Unity Engine
     void Awake() {
-        spinners = new Transform[6];
-        for(var i = 0; i < 6; i++) {
-            var spinner = new GameObject("Spinner");
-            spinner.transform.parent = this.transform;
-            var spr = spinner.AddComponent<SpriteRenderer>();
-            spr.sprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-big-single.png");
-            spr.drawMode = SpriteDrawMode.Sliced;
-            spr.size *= 0.5f;
-            spinners[i] = spinner.transform;
-            spinners[i].gameObject.SetActive(hasCheck);
+        if(Plugin.instance.skillTreeItemizer.cfgSkillTreeLocationTracker.Value) {
+            spinners = new Transform[6];
+            for(var i = 0; i < 6; i++) {
+                var spinner = new GameObject("Spinner");
+                spinner.transform.parent = this.transform;
+                var spr = spinner.AddComponent<SpriteRenderer>();
+                spr.sprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-big-single.png");
+                spr.drawMode = SpriteDrawMode.Sliced;
+                spr.size *= 0.5f;
+                spinners[i] = spinner.transform;
+                spinners[i].gameObject.SetActive(hasCheck);
+            }
         }
         activateVfx = transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>();
         iconColor = transform.Find("IconColor").GetComponent<SpriteRenderer>();
@@ -105,15 +112,22 @@ public class SkillTreeIndexTracker:MonoBehaviour {
 
     void Update() {
         if(hasCheck) {
-            var phase = Time.time * 0.5f * Mathf.PI;
-            for(var i = 0; i < spinners.Length; i++) {
-                var iphase = i / 3f * Mathf.PI;
-                spinners[i].transform.localPosition = new(Mathf.Cos(phase + iphase) * 1.25f, Mathf.Sin(phase + iphase) * 1.25f, -2f);
+            if(Plugin.instance.skillTreeItemizer.cfgSkillTreeLocationTracker.Value) {
+                var phase = Time.time * 0.5f * Mathf.PI;
+                for(var i = 0; i < spinners.Length; i++) {
+                    var iphase = i / 3f * Mathf.PI;
+                    spinners[i].transform.localPosition = new(Mathf.Cos(phase + iphase) * 1.25f, Mathf.Sin(phase + iphase) * 1.25f, -2f);
+                }
+                if(isUnlocked)
+                    iconColor.color = ((Time.unscaledTime % 1f) > 0.5f) ? new(1f, 1f, 1f) : new(0.25f, 1f, 0.25f);
+                else
+                    iconColor.color = ((Time.unscaledTime % 1f) > 0.5f) ? new(0.6f, 0.6f, 0.6f, 0.25f) : new(0.8f, 0.15f, 0.15f, 0.25f);
+            } else {
+                if(isUnlocked)
+                    iconColor.color = new(1f, 1f, 1f);
+                else
+                    iconColor.color = new(0.6f, 0.6f, 0.6f, 0.25f);
             }
-            if(isUnlocked)
-                iconColor.color = ((Time.unscaledTime % 1f) > 0.5f) ? new(1f, 1f, 1f) : new(0.25f, 1f, 0.25f);
-            else
-                iconColor.color = ((Time.unscaledTime % 1f) > 0.5f) ? new(0.6f, 0.6f, 0.6f, 0.25f) : new(0.8f, 0.15f, 0.15f, 0.25f);
         }
     }
 #pragma warning restore IDE0051
