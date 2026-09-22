@@ -1,14 +1,14 @@
 ## Changelog
 
-### 1.0.0-alpha4
+### Upcoming Release
 
 - Added a new Archipelago connection panel and a new submenu on the main menu
 - Added a new Archipelago console, replacing the previous nonfunctional implementation
 - Skigill Regions that are unreachable but unlocked will now appear locked
-- Added audiovisual notifications for receiving items, sending location checks, and sending goals
+- Added audiovisual notifications for receiving items, sending location checks, sending goals, and activating traps
   - These notifications will be queued and only appear once in an unpaused run or the Meta Tree
 - Added visual indicators for when game start options or meta tree weapons are locked behind an unobtained Archipelago item
-- Added visual indicators for unchecked locations (chests/perks, weapons)
+- Added visual indicators for unchecked locations (chests/perks, weapons, characters)
 - Fixed incorrect characters being identified for unlock/escape conditions
 - Backend:
   - The client will no longer even attempt to send checks that aren't active/valid on the server
