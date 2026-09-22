@@ -23,7 +23,8 @@ public class ArchiDropController : MonoBehaviour {
         sfx.volume = 0f;
         ctrl.basePitch = UnityEngine.Random.Range(0.9f, 1.1f);
         sfx.pitch = ctrl.basePitch * Time.timeScale;
-        sfx.Play();
+        if(!Plugin.instance.customSaveLoad.cfgMuteNotifs.Value)
+            sfx.Play();
 
         var sfx2 = obj.AddComponent<AudioSource>();
         sfx2.clip = Plugin.resources.LoadAsset<AudioClip>($"Assets/Sounds/archi_{(itemName.StartsWith("Trap: ") ? "trap" : "item")}_arrive.wav");
@@ -108,7 +109,7 @@ public class ArchiDropController : MonoBehaviour {
         sfx.pitch = basePitch * Time.timeScale;
         sfx2.pitch = Time.timeScale;
         if(!landed) {
-            if(sfx.time <= 0.85f) {
+            if(itemTimer <= 0.85f) {
                 sfx.volume = (sfx.time / 0.85f) * 1.3f * PlayerPrefs.GetFloat("SFXvol");
                 transform.position = posStart + (sfx.time / 0.85f) * (posTarget - posStart);
                 var phase = sfx.time * 6f * Mathf.PI;
@@ -118,11 +119,14 @@ public class ArchiDropController : MonoBehaviour {
                 }
             } else {
                 landed = true;
-                sfx2.Play();
+                itemTimer = 0f;
+                if(!Plugin.instance.customSaveLoad.cfgMuteNotifs.Value)
+                    sfx2.Play();
                 for(var i = 0; i < 8; i++)
                     sparkler.insto();
                 GameObject.Destroy(sparkler);
             }
+            itemTimer += Time.deltaTime;
         } else {
             if(itemTimer == 0f) {
                 follower.localScale = Vector3.zero;

@@ -25,7 +25,8 @@ public class ArchiSendController : MonoBehaviour {
         sfx.volume = PlayerPrefs.GetFloat("SFXvol") * 1.3f;
         ctrl.basePitch = UnityEngine.Random.Range(0.9f, 1.1f);
         sfx.pitch = ctrl.basePitch * Time.timeScale;
-        sfx.Play();
+        if(!Plugin.instance.customSaveLoad.cfgMuteNotifs.Value)
+            sfx.Play();
 
         var sparkler = obj.AddComponent<instantiateRepeat>();
         sparkler.GO = Plugin.instance.resourceGrabber.worldLayerSparklePrefab.transform;
