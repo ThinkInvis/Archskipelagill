@@ -8,7 +8,7 @@ namespace Archskipelagill;
 
 public class MainMenuInjector {
     SpriteState archiBtnDcState, archiBtnConnState;
-    GameObject archiMenu, archiMenuBtn, archiConsoleGroup, archiConnGroup;
+    GameObject archiMenu, archiMenuBtn, archiConsoleGroup, archiConnGroup, pauseMenu;
     InputField hostField, userField, passField, consoleField;
     Button wipeSaveBtn;
     Image wipeSaveProgress;
@@ -20,8 +20,12 @@ public class MainMenuInjector {
     bool hasWiped = false;
     bool _consoleStateDirty = false;
     bool _nextConsoleState = false;
+    internal bool pauseMenuState = false;
 
     public MainMenuInjector() {
+        //for pause menu button: look for [#MainCamera]/Canvas/pauseMenu, /Quit, remove/replace EventTrigger and replace Button.onClick.PersistentCall[1]
+        On.mainCameraScript.Start += MainCameraScript_Start;
+        On.mainCameraScript.Update += MainCameraScript_Update;
         On.mainMenuCamScript.Start += MainMenuCamScript_Start;
         On.mainMenuCamScript.Update += MainMenuCamScript_Update;
         archiBtnDcState = new SpriteState {
@@ -34,6 +38,74 @@ public class MainMenuInjector {
             selectedSprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-button-conn-selected.png"),
             pressedSprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-button-conn.png")
         };
+    }
+
+    private void MainCameraScript_Update(On.mainCameraScript.orig_Update orig, mainCameraScript self) {
+        orig(self);
+        if(pauseMenuState) {
+            archiMenu.SetActive(true);
+            if(Vector2.Distance(archiMenu.transform.localPosition, Vector2.zero) != 0f) {
+                if(Vector2.Distance(archiMenu.transform.localPosition, Vector2.zero) < Time.unscaledDeltaTime * 20f) {
+                    archiMenu.transform.localPosition = Vector3.zero;
+                    pauseMenu.SetActive(false);
+                } else {
+                    archiMenu.transform.localPosition += Vector3.up * Time.unscaledDeltaTime * 20f;
+                    pauseMenu.transform.localPosition = new Vector3(-1.25f, -15f, 0f) - archiMenu.transform.localPosition;
+                }
+            }
+            if(_consoleStateDirty) {
+                _consoleStateDirty = false;
+                archiConsoleGroup.SetActive(_nextConsoleState);
+                archiConnGroup.SetActive(!_nextConsoleState);
+            }
+            if(_logDirty) {
+                _logDirty = false;
+                UpdateLog();
+            }
+        } else if(Vector2.Distance(archiMenu.transform.localPosition, Vector2.down * 15f) != 0f) {
+            pauseMenu.SetActive(true);
+            if(Vector2.Distance(archiMenu.transform.localPosition, Vector2.down * 15f) < Time.unscaledDeltaTime * 20f) {
+                archiMenu.transform.localPosition = Vector3.down * 15f;
+                pauseMenu.transform.localPosition = new(-1.25f, 0f, 0f);
+                archiMenu.SetActive(false);
+            } else {
+                archiMenu.transform.localPosition += Vector3.down * Time.unscaledDeltaTime * 20f;
+                pauseMenu.transform.localPosition = new Vector3(-1.25f, -15f, 0f) -archiMenu.transform.localPosition;
+            }
+        }
+    }
+
+    private void MainCameraScript_Start(On.mainCameraScript.orig_Start orig, mainCameraScript self) {
+        orig(self);
+        SetupMenu();
+
+        pauseMenu = self.transform.Find("Canvas/pauseMenu").gameObject;
+
+        archiMenu.transform.parent = self.transform.Find("Canvas").transform;
+        archiMenu.transform.localPosition = new(0f, -13f, 0f);
+        archiMenu.transform.localScale = new(1f, 1f, 1f);
+
+        archiMenuBtn = GameObject.Instantiate(pauseMenu.transform.Find("Back").gameObject, pauseMenu.transform);
+        archiMenuBtn.name = "archipelago button";
+        archiMenuBtn.transform.position += new Vector3(10f, 0, 0);
+
+        var backBtn = self.pauseMenu.transform.Find("Back");
+        var newBackBtn = GameObject.Instantiate(backBtn, archiMenu.transform);
+        newBackBtn.transform.localPosition = new(-12f, 3f, 0f);
+        var calls = newBackBtn.GetComponent<Button>().onClick.m_PersistentCalls.m_Calls;
+        calls[0].m_Target = archiMenu.GetComponent<PauseMenuScrollHandler>();
+        calls[0].m_MethodName = "DoCollapse";
+        calls[1].m_Target = backBtn;
+
+        var btnScript = archiMenuBtn.GetComponent<Button>();
+        btnScript.spriteState = (Plugin.ArchipelagoClient.session != null) ? archiBtnConnState : archiBtnDcState;
+        btnScript.image.sprite = btnScript.spriteState.pressedSprite;
+        calls = btnScript.onClick.m_PersistentCalls.m_Calls;
+        calls[0].m_Target = archiMenu.GetComponent<PauseMenuScrollHandler>();
+        calls[0].m_MethodName = "DoExpand";
+        calls[1].m_Target = newBackBtn;
+
+        wipeSaveBtn.gameObject.SetActive(false);
     }
 
     private void MainMenuCamScript_Update(On.mainMenuCamScript.orig_Update orig, mainMenuCamScript self) {
@@ -84,16 +156,37 @@ public class MainMenuInjector {
 
     private void MainMenuCamScript_Start(On.mainMenuCamScript.orig_Start orig, mainMenuCamScript self) {
         orig(self);
+        SetupMenu();
 
-        archiMenu = GameObject.Instantiate(Plugin.resources.LoadAsset<GameObject>("Assets/Prefabs/ArchiMenu.prefab"));
         archiMenu.transform.parent = GameObject.Find("Canvas").transform;
         archiMenu.transform.position = new(0f, -13f, 0f);
         archiMenu.transform.localScale = new(16f, 16f, 16f);
+
+        var menuBtns = GameObject.Find("Canvas/mainMenu");
+        foreach(Transform btn in menuBtns.transform) {
+            btn.position += new Vector3(0, 2f, 0);
+        }
+        archiMenuBtn = GameObject.Instantiate(GameObject.Find("Canvas/mainMenu/setting button"), menuBtns.transform);
+        archiMenuBtn.name = "archipelago button";
+        archiMenuBtn.transform.position += new Vector3(0, -4f, 0);
+
         var newBackBtn = GameObject.Instantiate(self.settingsMenu.transform.Find("Back"), archiMenu.transform);
         newBackBtn.transform.localPosition = new(-12f, 3f, 0f);
 
+        var btnScript = archiMenuBtn.GetComponent<Button>();
+        btnScript.spriteState = (Plugin.ArchipelagoClient.session != null) ? archiBtnConnState : archiBtnDcState;
+        btnScript.image.sprite = btnScript.spriteState.pressedSprite;
+        btnScript.onClick.m_PersistentCalls.m_Calls[0].arguments.stringArgument = "archiMenu";
+        btnScript.onClick.m_PersistentCalls.m_Calls[2].m_Target = newBackBtn;
+    }
+
+    void SetupMenu() {
+        archiMenu = GameObject.Instantiate(Plugin.resources.LoadAsset<GameObject>("Assets/Prefabs/ArchiMenu.prefab"));
+
         archiMenu.transform.Find("Title").GetComponent<Text>().text = Plugin.ModDisplayInfo;
         archiMenu.transform.Find("ConnInfo").GetComponent<Text>().text = Plugin.APDisplayInfo + " disconnected";
+
+        archiMenu.AddComponent<PauseMenuScrollHandler>();
 
         archiConsoleGroup = archiMenu.transform.Find("ConsoleGroup").gameObject;
         archiConnGroup = archiMenu.transform.Find("ConnectionGroup").gameObject;
@@ -121,21 +214,7 @@ public class MainMenuInjector {
             consoleField.text = "";
         });
 
-        var menuBtns = GameObject.Find("Canvas/mainMenu");
-        foreach(Transform btn in menuBtns.transform) {
-            btn.position += new Vector3(0, 2f, 0);
-        }
-        archiMenuBtn = GameObject.Instantiate(GameObject.Find("Canvas/mainMenu/setting button"), menuBtns.transform);
-        archiMenuBtn.name = "archipelago button";
-        archiMenuBtn.transform.position += new Vector3(0, -4f, 0);
-        var btnScript = archiMenuBtn.GetComponent<Button>();
-        bool isConnected = Plugin.ArchipelagoClient.session != null;
-        btnScript.spriteState = isConnected ? archiBtnConnState : archiBtnDcState;
-        btnScript.image.sprite = btnScript.spriteState.pressedSprite;
-        btnScript.onClick.m_PersistentCalls.m_Calls[0].arguments.stringArgument = "archiMenu";
-        btnScript.onClick.m_PersistentCalls.m_Calls[2].m_Target = newBackBtn;
-
-        _nextConsoleState = isConnected;
+        _nextConsoleState = Plugin.ArchipelagoClient.session != null;
         _consoleStateDirty = true;
     }
 
@@ -175,5 +254,14 @@ public class MainMenuInjector {
         consoleText.text = string.Join("\r\n", logLines);
         LayoutRebuilder.ForceRebuildLayoutImmediate(consoleScroll.rectTransform);
         consoleScroll.SetVerticalNormalizedPosition(0f);
+    }
+
+    public class PauseMenuScrollHandler : MonoBehaviour {
+        public void DoCollapse() {
+            Plugin.instance.mainMenuInjector.pauseMenuState = false;
+        }
+        public void DoExpand() {
+            Plugin.instance.mainMenuInjector.pauseMenuState = true;
+        }
     }
 }

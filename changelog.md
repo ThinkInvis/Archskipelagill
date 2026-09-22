@@ -2,7 +2,7 @@
 
 ### Upcoming Release
 
-- Added a new Archipelago connection panel and a new submenu on the main menu
+- Added a new Archipelago connection panel and a new submenu on the main menu and pause menu
 - Added a new Archipelago console, replacing the previous nonfunctional implementation
 - Skigill Regions that are unreachable but unlocked will now appear locked
 - Added audiovisual notifications for receiving items, sending location checks, sending goals, and activating traps
