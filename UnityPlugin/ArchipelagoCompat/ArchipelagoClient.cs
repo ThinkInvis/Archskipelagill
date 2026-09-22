@@ -17,6 +17,7 @@ public class ArchipelagoClient {
 
     public static bool Authenticated;
     private bool attemptingConnection;
+    public static float lastConnectTime = 0f;
 
     public static ArchipelagoData ServerData = new();
     private DeathLinkHandler DeathLinkHandler;
@@ -86,6 +87,8 @@ public class ArchipelagoClient {
 
             outText = $"Successfully connected to {ServerData.Uri} as {ServerData.SlotName}!";
 
+            lastConnectTime = UnityEngine.Time.unscaledTime;
+
             Plugin.instance.mainMenuInjector.OnConnect();
             Plugin.instance.mainMenuInjector.ReceiveMessage(outText);
 
@@ -93,7 +96,6 @@ public class ArchipelagoClient {
             ArchiSaver.instance.StoreSlotData(session.DataStorage.GetSlotData(), session);
             DeathLinkHandler = new(session.CreateDeathLinkService(), ServerData.SlotName);
             ArchiSaver.instance.ResendChecks();
-
         } else {
             var failure = (LoginFailure)result;
             outText = $"Failed to connect to {ServerData.Uri} as {ServerData.SlotName}.";
