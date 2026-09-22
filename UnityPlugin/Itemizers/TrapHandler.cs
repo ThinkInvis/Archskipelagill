@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace Archskipelagill.Itemizers;
 
@@ -27,6 +28,21 @@ public class TrapHandler {
             var hb = cs.transform.Find("Hitbox").GetComponent<playerHitbox>();
             var spw = GameObject.FindGameObjectWithTag("Spawner").GetComponent<MonsterSpawner>();
 
+            var trapNotif = new GameObject("Trap Notification");
+            trapNotif.SetActive(false);
+            trapNotif.transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform.Find("Canvas");
+            trapNotif.layer = 5;
+            trapNotif.transform.position = new(14f, 0f, 0f);
+            var trapSprite = trapNotif.AddComponent<SpriteRenderer>();
+            trapSprite.sprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/item-trap.png");
+            var tnc = trapNotif.AddComponent<TrapNotificationHandler>();
+            var tac = trapNotif.AddComponent<AudioSource>();
+            tac.clip = Plugin.resources.LoadAsset<AudioClip>("Assets/Sounds/archi_trap_activate.wav");
+            tac.volume = 1.3f * PlayerPrefs.GetFloat("SFXvol");
+            tac.pitch = UnityEngine.Random.Range(0.95f, 1.15f);
+            trapNotif.SetActive(true);
+            tac.Play();
+
             switch(trapName) {
                 case "Damage":
                     cs.HP *= 0.5f;
@@ -50,12 +66,14 @@ public class TrapHandler {
                         else
                             enemy.AddComponent<MonsterSpeedupTrap>();
                     }
+                    tnc.lifetime = Plugin.instance.cfgSpeedTrapDuration.Value;
                     break;
                 case "Weapon Jam":
                     if(cs.TryGetComponent<WeaponJamTrap>(out var wjTrap))
                         wjTrap.Reset();
                     else
                         cs.gameObject.AddComponent<WeaponJamTrap>();
+                    tnc.lifetime = Plugin.instance.cfgJamTrapDuration.Value;
                     break;
                 case "Drain Ski":
                     var penalty = cs.XP * 0.5f;
@@ -94,6 +112,45 @@ public class TrapHandler {
     }
 
 #pragma warning disable IDE0051 //Used by Unity Engine
+    public class TrapNotificationHandler:MonoBehaviour {
+        public float lifetime = 5f;
+        float t = 0f;
+
+        int state = 0;
+
+        static readonly List<TrapNotificationHandler> instances = [];
+
+        void Awake() {
+            instances.Add(this);
+        }
+
+        void OnDestroy() {
+            instances.Remove(this);
+        }
+
+        void Update() {
+            t += Time.deltaTime;
+            var pY = instances.Count * 1f - instances.IndexOf(this) * 2f;
+            var tY = transform.localPosition.y + Time.deltaTime * 2f * (pY - transform.localPosition.y);
+
+            switch(state) {
+                case 0:
+                    transform.localPosition = new(16f - 2f * (1f - t)/0.5f, tY, 0f);
+                    if(t >= 0.5f) state++;
+                    break;
+                case 1:
+                    transform.localPosition = new(14f, tY, 0f);
+                    if(t >= lifetime - 0.5f) state++;
+                    break;
+                default:
+                    transform.localPosition = new(16f - 2f * (lifetime - t)/0.5f, tY, 0f);
+                    if(t >= lifetime)
+                        GameObject.Destroy(gameObject);
+                    break;
+            }
+        }
+    }
+
     public abstract class TimedTrapBase:MonoBehaviour {
         protected abstract float duration { get; }
         protected float startTime;

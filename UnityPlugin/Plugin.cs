@@ -155,6 +155,9 @@ public class Plugin:BaseUnityPlugin {
         if(GUI.Button(new Rect(16, 420, 200, 20), "DEBUG: Test receive notif (key item)")) {
             ArchiSaver.instance.itemNotifsToProcess.Enqueue("Skigill Region: Mage");
         }
+        if(GUI.Button(new Rect(16, 450, 200, 20), "DEBUG: Test trap")) {
+            ArchiSaver.instance.itemsToProcess.Enqueue("Trap: Drain Ski");
+        }
         GUI.EndGroup();
     }
 #endif
