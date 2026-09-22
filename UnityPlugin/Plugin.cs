@@ -60,6 +60,8 @@ public class Plugin:BaseUnityPlugin {
         trapHandler = new();
 
         mainMenuInjector.ReceiveMessage($"{ModDisplayInfo} loaded!");
+
+        ArchipelagoClient.AutoConnect();
     }
 
     private void OnApplicationQuit() {

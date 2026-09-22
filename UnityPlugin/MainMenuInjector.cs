@@ -200,7 +200,7 @@ public class MainMenuInjector {
         archiMenu = GameObject.Instantiate(Plugin.resources.LoadAsset<GameObject>("Assets/Prefabs/ArchiMenu.prefab"));
 
         archiMenu.transform.Find("Title").GetComponent<Text>().text = Plugin.ModDisplayInfo;
-        archiMenu.transform.Find("ConnInfo").GetComponent<Text>().text = Plugin.APDisplayInfo + " disconnected";
+        archiMenu.transform.Find("ConnInfo").GetComponent<Text>().text = Plugin.APDisplayInfo + (ArchipelagoClient.Authenticated ? " connected" : " disconnected");
 
         archiMenu.AddComponent<PauseMenuScrollHandler>();
 
@@ -213,6 +213,12 @@ public class MainMenuInjector {
         consoleField = archiConsoleGroup.transform.Find("ConsoleInputField/Backdrop/Field").GetComponent<InputField>();
         consoleText = archiConsoleGroup.transform.Find("ConsoleOutput/Backdrop/Scrollbox/Field").GetComponent<Text>();
         consoleScroll = archiConsoleGroup.transform.Find("ConsoleOutput/Backdrop/Scrollbox").GetComponent<ScrollRect>();
+
+        hostField.text = Plugin.ArchipelagoClient.cfgAutoConnectHostname.Value;
+        if(hostField.text == "") hostField.text = "localhost";
+        userField.text = Plugin.ArchipelagoClient.cfgAutoConnectSlot.Value;
+        if(userField.text == "") userField.text = "Player1";
+        passField.text = Plugin.ArchipelagoClient.cfgAutoConnectPassword.Value;
 
         wipeSaveBtn = archiConnGroup.transform.Find("WipeSaveBtn").GetComponent<Button>();
         wipeSaveProgress = wipeSaveBtn.transform.Find("Progress").GetComponent<Image>();

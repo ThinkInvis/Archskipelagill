@@ -5,6 +5,7 @@ using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.MessageLog.Messages;
 using Archipelago.MultiClient.Net.Packets;
 using Archskipelagill.EffectComponents;
+using BepInEx.Configuration;
 using System;
 using System.Linq;
 using System.Threading;
@@ -23,6 +24,10 @@ public class ArchipelagoClient {
     private DeathLinkHandler DeathLinkHandler;
     internal ArchipelagoSession session;
 
+    public ConfigEntry<string> cfgAutoConnectHostname;
+    public ConfigEntry<string> cfgAutoConnectSlot;
+    public ConfigEntry<string> cfgAutoConnectPassword;
+
     /// <summary>
     /// call to connect to an Archipelago session. Connection info should already be set up on ServerData
     /// </summary>
@@ -38,6 +43,19 @@ public class ArchipelagoClient {
         }
 
         TryConnect();
+    }
+
+    public void AutoConnect() {
+        cfgAutoConnectHostname = Plugin.instance.config.Bind<string>(new ConfigDefinition("Autoconnect", "Hostname"), "", new ConfigDescription("Which hostname to use when attempting autoconnect on game launch. Autoconnect will only be attempted if this setting is not a blank string."));
+        cfgAutoConnectSlot = Plugin.instance.config.Bind<string>(new ConfigDefinition("Autoconnect", "Slot name"), "", new ConfigDescription("Which slot name to use when attempting autoconnect on game launch. Autoconnect will only be attempted if this setting is not a blank string."));
+        cfgAutoConnectPassword = Plugin.instance.config.Bind<string>(new ConfigDefinition("Autoconnect", "Password"), "", new ConfigDescription("Which password to use when attempting autoconnect on game launch."));
+
+        if(cfgAutoConnectHostname.Value != "" && cfgAutoConnectSlot.Value != "") {
+            ServerData.Uri = cfgAutoConnectHostname.Value;
+            ServerData.SlotName = cfgAutoConnectSlot.Value;
+            ServerData.Password = cfgAutoConnectPassword.Value;
+            Connect();
+        }
     }
 
     /// <summary>
