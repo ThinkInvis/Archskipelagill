@@ -88,6 +88,7 @@ public class SkillTreeIndexTracker:MonoBehaviour {
     Transform[] spinners;
     UnityEngine.UI.Image activateVfx;
     SpriteRenderer iconColor, nodeOcto;
+    Color origIconColor;
 
 
 #pragma warning disable IDE0051 //Used by Unity Engine
@@ -108,6 +109,7 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         activateVfx = transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>();
         iconColor = transform.Find("IconColor").GetComponent<SpriteRenderer>();
         nodeOcto = transform.Find("nodeOcto").GetComponent<SpriteRenderer>();
+        origIconColor = iconColor.color;
     }
 
     void Update() {
@@ -119,12 +121,12 @@ public class SkillTreeIndexTracker:MonoBehaviour {
                     spinners[i].transform.localPosition = new(Mathf.Cos(phase + iphase) * 1.25f, Mathf.Sin(phase + iphase) * 1.25f, -2f);
                 }
                 if(isUnlocked)
-                    iconColor.color = ((Time.unscaledTime % 1f) > 0.5f) ? new(1f, 1f, 1f) : new(0.25f, 1f, 0.25f);
+                    iconColor.color = ((Time.unscaledTime % 1f) > 0.5f) ? origIconColor : new(0.25f, 1f, 0.25f);
                 else
                     iconColor.color = ((Time.unscaledTime % 1f) > 0.5f) ? new(0.6f, 0.6f, 0.6f, 0.25f) : new(0.8f, 0.15f, 0.15f, 0.25f);
             } else {
                 if(isUnlocked)
-                    iconColor.color = new(1f, 1f, 1f);
+                    iconColor.color = origIconColor;
                 else
                     iconColor.color = new(0.6f, 0.6f, 0.6f, 0.25f);
             }
@@ -189,7 +191,7 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         isUnlocked = true;
         GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f, 1f);
         activateVfx.color = new(1f, 1f, 1f, 1f);
-        iconColor.color = new(1f, 1f, 1f, 1f);
+        iconColor.color = origIconColor;
         nodeOcto.color = new(1f, 1f, 1f, 1f);
         foreach(var sr in transform.Find("chiffres").GetComponentsInChildren<SpriteRenderer>()) {
             sr.color = new(1f, 1f, 1f, 1f);
