@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.2.7f2
-CRC: 3742319098
+CRC: 1192295737
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 03e48244a7f62f6dc407ffdd0f3694c1
+    Hash: 9e76399d36531ac1a912d9439955368e
   TypeTreeHash:
     serializedVersion: 2
     Hash: 3cc4a3a212ae2b1e1249bcc390f260b9
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: d526e42c346a64bc455507fd309ee875
+    Hash: a06778badb9b8cd79b859aa4d13d3a37
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -80,6 +80,7 @@ SerializeReferenceClassIdentifiers:
   ClassName: UnityEngine.UI.SpriteState
 Assets:
 - Assets/Textures/icon-username.png
+- Assets/Textures/trap-damage.png
 - Assets/Textures/archi-button-conn.png
 - Assets/Sounds/archi_trap_activate.wav
 - Assets/Textures/item-gill.png
@@ -92,21 +93,28 @@ Assets:
 - Assets/Textures/locked-archi.png
 - Assets/Textures/archi-big.png
 - Assets/Sounds/archi_trap_arrive.wav
+- Assets/Textures/trap-jam.png
 - Assets/Textures/settings-backdrop.png
 - Assets/Sounds/archi_item_arrive.wav
 - Assets/Textures/archi-button-dc.png
 - Assets/Textures/settings-backdrop-btn.png
 - Assets/Textures/item-character.png
 - Assets/Textures/item-unknown.png
+- Assets/Textures/trap-base.png
 - Assets/Textures/item-weapon.png
 - Assets/Textures/icon-password.png
 - Assets/Textures/settings-backdrop-field.png
 - Assets/Textures/archi-button-conn-selected.png
-- Assets/Prefabs/ArchiMenu.prefab
+- Assets/Textures/trap-drainski.png
+- Assets/Textures/trap-enemytime.png
 - Assets/Textures/item-trap.png
+- Assets/Textures/trap-flashmob.png
+- Assets/Prefabs/ArchiMenu.prefab
 - Assets/Textures/archi-button.png
 - Assets/Textures/settings-backdrop-hollow.png
 - Assets/Textures/archi-button-dc-selected.png
+- Assets/Textures/trap-pull.png
 - Assets/Fonts/PerfectDOSVGA437.ttf
+- Assets/Textures/trap-scramble.png
 - Assets/Textures/item-key.png
 Dependencies: []

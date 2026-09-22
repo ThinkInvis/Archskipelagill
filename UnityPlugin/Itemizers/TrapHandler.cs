@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Archskipelagill.Itemizers;
 
@@ -32,9 +33,9 @@ public class TrapHandler {
             trapNotif.SetActive(false);
             trapNotif.transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform.Find("Canvas");
             trapNotif.layer = 5;
-            trapNotif.transform.position = new(14f, 0f, 0f);
+            trapNotif.transform.localPosition = new(16f, 0f, 0f);
             var trapSprite = trapNotif.AddComponent<SpriteRenderer>();
-            trapSprite.sprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/item-trap.png");
+            string trapSpriteName = "trap-base";
             var tnc = trapNotif.AddComponent<TrapNotificationHandler>();
             var tac = trapNotif.AddComponent<AudioSource>();
             tac.clip = Plugin.resources.LoadAsset<AudioClip>("Assets/Sounds/archi_trap_activate.wav");
@@ -56,6 +57,7 @@ public class TrapHandler {
                     dsp.color = new Color(0.57254905f, 0.07450981f, 0.10980392f);
                     hb.shake.dur = 0.35f;
                     hb.shake.amp = 0.75f;
+                    trapSpriteName = "trap-damage";
                     break;
                 case "Pull Enemies":
                     foreach(var enemy in GameObject.FindGameObjectsWithTag("Monster")) {
@@ -67,6 +69,7 @@ public class TrapHandler {
                             enemy.AddComponent<MonsterSpeedupTrap>();
                     }
                     tnc.lifetime = Plugin.instance.cfgSpeedTrapDuration.Value;
+                    trapSpriteName = "trap-pull";
                     break;
                 case "Weapon Jam":
                     if(cs.TryGetComponent<WeaponJamTrap>(out var wjTrap))
@@ -74,11 +77,13 @@ public class TrapHandler {
                     else
                         cs.gameObject.AddComponent<WeaponJamTrap>();
                     tnc.lifetime = Plugin.instance.cfgJamTrapDuration.Value;
+                    trapSpriteName = "trap-jam";
                     break;
                 case "Drain Ski":
                     var penalty = cs.XP * 0.5f;
                     cs.XP -= penalty;
                     cs.totalXP -= penalty;
+                    trapSpriteName = "trap-drainski";
                     break;
                 case "Scramble Stats":
                     (cs.INT, cs.STR, cs.DEX) = (cs.STR, cs.DEX, cs.INT);
@@ -91,17 +96,22 @@ public class TrapHandler {
                     cs.bringStatUIDown(0);
                     cs.bringStatUIDown(1);
                     cs.bringStatUIDown(2);
+                    trapSpriteName = "trap-scramble";
                     break;
                 case "Flash Mob":
                     spw.spawnAmountOverflow += Plugin.instance.cfgMobTrapStrength.Value;
+                    trapSpriteName = "trap-flashmob";
                     break;
                 case "Stronger Enemies":
                     spw.t += Plugin.instance.cfgSpawnTimeTrapStrength.Value;
+                    trapSpriteName = "trap-enemytime";
                     break;
                 default:
                     Plugin.BepinLogger.LogWarning($"Triggered unrecognized trap with name \"{trapName}\"");
                     break;
             }
+
+            trapSprite.sprite = Plugin.resources.LoadAsset<Sprite>($"Assets/Textures/{trapSpriteName}.png");
         }
     }
 
@@ -134,18 +144,18 @@ public class TrapHandler {
             var tY = transform.localPosition.y + Time.deltaTime * 2f * (pY - transform.localPosition.y);
 
             switch(state) {
-                case 0:
-                    transform.localPosition = new(16f - 2f * (1f - t)/0.5f, tY, 0f);
-                    if(t >= 0.5f) state++;
-                    break;
-                case 1:
-                    transform.localPosition = new(14f, tY, 0f);
-                    if(t >= lifetime - 0.5f) state++;
-                    break;
-                default:
-                    transform.localPosition = new(16f - 2f * (lifetime - t)/0.5f, tY, 0f);
+                case 2:
+                    transform.localPosition = new(16f + 3f * (t - lifetime) / 0.5f, tY, 0f);
                     if(t >= lifetime)
                         GameObject.Destroy(gameObject);
+                    break;
+                case 1:
+                    transform.localPosition = new(13f, tY, 0f);
+                    if(t >= lifetime - 0.5f) state++;
+                    break;
+                case 0:
+                    transform.localPosition = new(13f + 3f * (1f - t / 0.5f), tY, 0f);
+                    if(t >= 0.5f) state++;
                     break;
             }
         }
