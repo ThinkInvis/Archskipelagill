@@ -84,23 +84,23 @@ public class ArchiDropController : MonoBehaviour {
         chara = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
         if(!chara.metaMenu) {
             posTarget = chara.transform.position + (Vector3)UnityEngine.Random.insideUnitCircle * 1.75f;
-            posStart = posTarget + new Vector3(0f, 10f, 10f) + (Vector3)UnityEngine.Random.insideUnitCircle * 3.5f;
+            posStart = posTarget + new Vector3(0f, 10f, 0f) + (Vector3)UnityEngine.Random.insideUnitCircle * 3.5f;
             transform.localScale *= 3f;
             for(var i = 0; i < 6; i++) {
                 spinners[i] = transform.GetChild(i);
                 spinnerV[i] = (UnityEngine.Random.onUnitSphere + new Vector3(0f, 1.5f, 1.5f)) * UnityEngine.Random.Range(2f, 4f);
             }
-            followerOffset = UnityEngine.Random.onUnitSphere * 1f + new Vector3(0f, 2f, 5f);
+            followerOffset = UnityEngine.Random.onUnitSphere * 1f + new Vector3(0f, 2f, -3f);
             sparkler.GO = Plugin.instance.resourceGrabber.runWorldLayerSparklePrefab.transform;
         } else {
             posTarget = chara.transform.position + (Vector3)UnityEngine.Random.insideUnitCircle * 0.35f;
-            posStart = posTarget + new Vector3(0f, 2f, 2f) + (Vector3)UnityEngine.Random.insideUnitCircle * 0.7f;
+            posStart = posTarget + new Vector3(0f, 2f, 0f) + (Vector3)UnityEngine.Random.insideUnitCircle * 0.7f;
             transform.localScale *= 0.5f;
             for(var i = 0; i < 6; i++) {
                 spinners[i] = transform.GetChild(i);
                 spinnerV[i] = (UnityEngine.Random.onUnitSphere + new Vector3(0f, 1.5f, 1.5f)) * UnityEngine.Random.Range(0.4f, 0.8f);
             }
-            followerOffset = UnityEngine.Random.onUnitSphere * 0.1f + new Vector3(0f, 0.2f, 0.5f);
+            followerOffset = UnityEngine.Random.onUnitSphere * 0.1f + new Vector3(0f, 0.2f, -3f);
             sparkler.GO = Plugin.instance.resourceGrabber.worldLayerSparklePrefab.transform;
         }
         transform.position = posStart;
