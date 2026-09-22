@@ -74,7 +74,8 @@ public class MainMenuInjector {
                 UpdateLog();
             }
         } else if(Vector2.Distance(archiMenu.transform.localPosition, Vector2.down * 15f) != 0f) {
-            pauseMenu.SetActive(true);
+            if(!pauseMenuLeaving)
+                pauseMenu.SetActive(true);
             if(Vector2.Distance(archiMenu.transform.localPosition, Vector2.down * 15f) < Time.unscaledDeltaTime * 20f) {
                 archiMenu.transform.localPosition = Vector3.down * 15f;
                 pauseMenu.transform.localPosition = new(-1.25f, 0f, 0f);
