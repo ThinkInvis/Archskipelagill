@@ -3,6 +3,7 @@ using Archskipelagill.ArchipelagoCompat;
 using Archskipelagill.EffectComponents;
 using BepInEx.Configuration;
 using MonoMod.Cil;
+using MonoMod.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -197,7 +198,8 @@ public class ArchiSaver:JSONsaver {
         if(mpo != null)
             mpo.TryGetComponent<JSONsaver>(out stockSaver);
         if(stockSaver != null) {
-            metaProg = stockSaver.metaProg;
+            metaProg.Clear();
+            metaProg.AddRange(stockSaver.metaProg);
         }
     }
     private void PostSave() {
@@ -206,7 +208,8 @@ public class ArchiSaver:JSONsaver {
         if(mpo != null)
             mpo.TryGetComponent<JSONsaver>(out stockSaver);
         if(stockSaver != null) {
-            stockSaver.metaProg = metaProg;
+            stockSaver.metaProg.Clear();
+            stockSaver.metaProg.AddRange(metaProg);
         }
         save();
     }
@@ -235,9 +238,18 @@ public class CustomSaveLoad {
         IL.JSONsaver.save += JSONsaver_save;
         IL.JSONsaver.load += JSONsaver_load;
         On.MoneyBagScript.addMoneyToBag += MoneyBagScript_addMoneyToBag;
+        On.JSONsaver.save += JSONsaver_save1;
         var cslGO = new GameObject(); //main menu JSONSaver uses a tag for ident/finding, so this should be safe from intercepting MoneyBagScript et al.
         UnityEngine.Object.DontDestroyOnLoad(cslGO);
         cslGO.AddComponent<ArchiSaver>();
+    }
+
+    private void JSONsaver_save1(On.JSONsaver.orig_save orig, JSONsaver self) {
+        orig(self);
+        if(self != ArchiSaver.instance) {
+            ArchiSaver.instance.metaProg.Clear();
+            ArchiSaver.instance.metaProg.AddRange(self.metaProg);
+        }
     }
 
     private void MoneyBagScript_addMoneyToBag(On.MoneyBagScript.orig_addMoneyToBag orig, MoneyBagScript self) {
