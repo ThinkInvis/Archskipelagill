@@ -52,7 +52,7 @@ public class AbilityUnlockItemizer {
     private void WeaponDisplayer_Start(On.weaponDisplayer.orig_Start orig, weaponDisplayer self) {
         orig(self);
         var checkStr = $"Escaped with Weapon {self.GetComponent<weaponDisplayer>().source.name.Replace("(Clone)", "")}";
-        if(cfgAbilityLocationTracker.Value &&
+        if(cfgAbilityLocationTracker.Value && self.levelToDisplay == 0 &&
             !ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr))
             self.gameObject.AddComponent<AbilityDisplayerCheckInd>();
     }
