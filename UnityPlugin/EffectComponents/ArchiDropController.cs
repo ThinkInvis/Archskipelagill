@@ -86,11 +86,10 @@ public class ArchiDropController : MonoBehaviour {
             posTarget = chara.transform.position + (Vector3)UnityEngine.Random.insideUnitCircle * 1.75f;
             posStart = posTarget + new Vector3(0f, 10f, 0f) + (Vector3)UnityEngine.Random.insideUnitCircle * 3.5f;
             transform.localScale *= 3f;
-            for(var i = 0; i < 6; i++) {
+            for(var i = 0; i < 6; i++) { 
                 spinners[i] = transform.GetChild(i);
                 spinnerV[i] = (UnityEngine.Random.onUnitSphere + new Vector3(0f, 1.5f, 1.5f)) * UnityEngine.Random.Range(2f, 4f);
             }
-            follower.transform.localScale *= 1.5f;
             followerOffset = UnityEngine.Random.onUnitSphere * 1f + new Vector3(0f, 2f, -3f);
             sparkler.GO = Plugin.instance.resourceGrabber.runWorldLayerSparklePrefab.transform;
         } else {
@@ -142,7 +141,7 @@ public class ArchiDropController : MonoBehaviour {
                 spinnerV[i] += new Vector3(0, (!chara.metaMenu ? -25f : -1f) * Time.deltaTime, (!chara.metaMenu ? -25f : -1f) * Time.deltaTime);
             }
 
-            var fadeInFac = Mathf.Min(itemTimer / 0.5f, 1f);
+            var fadeInFac = Mathf.Min(itemTimer / 0.5f, 1f) * (chara.metaMenu ? 1f : 1.25f);
             follower.localScale = new Vector3(fadeInFac, fadeInFac, fadeInFac);
 
             follower.position += Time.deltaTime * 2f * (chara.transform.position + followerOffset - follower.position);
