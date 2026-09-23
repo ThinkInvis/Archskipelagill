@@ -177,6 +177,10 @@ public class ArchiSaver:JSONsaver {
             PreSave();
             metaProg["archi_goal"] = ((Int64)slotData["goal_type"]).ToString();
             metaProg["archi_boss_last"] = ((Int64)slotData["boss_region_last"]).ToString();
+            if(metaProg.ContainsKey("archi_uuid") && metaProg["archi_uuid"] != (string)slotData["world_uuid"] && metaProg["archi_uuid"] != "") {
+                Plugin.instance.mainMenuInjector.ReceiveMessage(" !!! WARNING !!!  Your saved world UUID doesn't match with the server's. Please make sure you've RESET YOUR SAVE FILE before proceeding if this is a new run.");
+            }
+            metaProg["archi_uuid"] = (string)slotData["world_uuid"];
             var locNames = session.Locations.AllLocations.Select(l => session.Locations.GetLocationNameFromId(l));
             metaProg["archi_validChecks"] = string.Join('|', locNames);
             allValidChecks.Clear();

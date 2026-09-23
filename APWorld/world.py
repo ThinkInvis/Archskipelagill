@@ -1,6 +1,8 @@
 from collections.abc import Mapping
 from typing import Any
 
+import uuid
+
 from worlds.AutoWorld import World
 
 from . import items, locations, regions, rules, web_world
@@ -35,4 +37,6 @@ class SkigillWorld(World):
         return items.get_random_filler_item_name(self)
 
     def fill_slot_data(self) -> Mapping[str, Any]:
-        return self.options.as_dict("goal_type", "boss_region_last")
+        retv = self.options.as_dict("goal_type", "boss_region_last")
+        retv["world_uuid"] = str(uuid.uuid4())
+        return retv
