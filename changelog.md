@@ -11,6 +11,7 @@
 - Added visual indicators for when game start options or meta tree weapons are locked behind an unobtained Archipelago item
 - Added visual indicators for unchecked locations (chests/perks, weapons, characters)
 - Fixed incorrect characters being identified for unlock/escape conditions
+- Fixed dying as a character counting as an escape
 - Added client config options to automatically connect to Archipelago on game launch
 - Added configurable directionality (off, send, receive, or both) to Death Link
 - Added configurable action to Death Link (can now end run with no reward or inflict a random trap)
