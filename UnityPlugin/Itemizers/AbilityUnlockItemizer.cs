@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -10,6 +11,15 @@ public class AbilityUnlockItemizer {
 
     readonly Sprite customLockSprite;
     public ConfigEntry<bool> cfgAbilityLocationTracker;
+
+    static readonly Dictionary<string, string> CHARACTER_NAME_TRANSLATE = new() {
+        {"Mage", "Mage"},
+        {"Jugger", "Prototype"},
+        {"Dragon", "Dragon"},
+        {"Baldo", "Strongman"},
+        {"Fox", "Fox"},
+        {"Nain", "Dwarves"}
+    };
 
     public AbilityUnlockItemizer() {
         On.charaSelectScript.selected += CharaSelectScript_selected;
@@ -59,11 +69,15 @@ public class AbilityUnlockItemizer {
 
     private void SkigillNode_Update(On.skigillNode.orig_Update orig, skigillNode self) {
         orig(self);
-        if(self.metaProg && self.activated && self.type == 20 && self.amount == 1f) {
-            var matches = ArchiSaver.instance.receivedItemCounts.Keys.Where(k => k.EndsWith(self.name));
+        if(!self.metaProg) return;
+        if(self.type == 20) {
+            var matches = ArchiSaver.instance.receivedItemCounts.Keys.Where(k => (k.StartsWith("Weapon: ") && k.EndsWith(self.name)) || (CHARACTER_NAME_TRANSLATE.TryGetValue(self.name, out var cn) && k == $"Character: {cn}"));
             if(!matches.Any() || ArchiSaver.GetItemCount(matches.First()) == 0) {
+                self.toggleMetaWeapon.SetActive(true);
                 self.toggleMetaWeapon.GetComponent<SpriteRenderer>().sprite = customLockSprite;
                 self.toggleMetaWeapon.transform.localPosition = new(0f, -1.25f, -1f);
+            } else {
+                self.toggleMetaWeapon.transform.localPosition = new(0f, -1.25f, 0f); //default position
             }
         }
     }
