@@ -269,6 +269,7 @@ public class MainMenuInjector {
         if(logLines.Count > MAX_LOG_LINES)
             logLines.RemoveAt(0);
         _logDirty = true;
+        Plugin.BepinLogger.LogMessage($"[APMsg] {msg}");
     }
 
     void UpdateLog() {
