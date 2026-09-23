@@ -61,8 +61,10 @@ public class AbilityUnlockItemizer {
         orig(self);
         if(self.metaProg && self.activated && self.type == 20 && self.amount == 1f) {
             var matches = ArchiSaver.instance.receivedItemCounts.Keys.Where(k => k.EndsWith(self.name));
-            if(!matches.Any() || ArchiSaver.GetItemCount(matches.First()) == 0)
+            if(!matches.Any() || ArchiSaver.GetItemCount(matches.First()) == 0) {
                 self.toggleMetaWeapon.GetComponent<SpriteRenderer>().sprite = customLockSprite;
+                self.toggleMetaWeapon.transform.localPosition = new(0f, -1.25f, -1f);
+            }
         }
     }
 
