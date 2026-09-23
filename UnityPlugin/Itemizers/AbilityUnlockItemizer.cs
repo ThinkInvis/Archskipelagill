@@ -40,11 +40,12 @@ public class AbilityUnlockItemizer {
 
     private void CharaSelectScript_Start(On.charaSelectScript.orig_Start orig, charaSelectScript self) {
         orig(self);
-        var checkStr = $"Escaped with {self.unlockKey}";
+        var charName = Enum.GetName(typeof(CharacterInIngameOrder), self.ID);
+        var checkStr = $"Escaped with {charName}";
         if(cfgAbilityLocationTracker.Value && 
             !ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr)) {
             var adci = self.gameObject.AddComponent<AbilityDisplayerCheckInd>();
-            adci.isLocked = !ArchiSaver.instance.metaProg.TryGetValue(self.unlockKey, out var ulStr) || ulStr != "unlocked" || ArchiSaver.GetItemCount("Character: " + self.unlockKey) == 0;
+            adci.isLocked = !ArchiSaver.instance.metaProg.TryGetValue(self.unlockKey, out var ulStr) || ulStr != "unlocked" || ArchiSaver.GetItemCount("Character: " + charName) == 0;
         }
     }
 
@@ -118,7 +119,7 @@ public class AbilityUnlockItemizer {
     private void CharaSelectScript_updateUnlockStatus(On.charaSelectScript.orig_updateUnlockStatus orig, charaSelectScript self) {
         orig(self);
         var isArchiLocked = false;
-        var targetChar = "Character: " + self.unlockKey;
+        var targetChar = "Character: " + Enum.GetName(typeof(CharacterInIngameOrder), self.ID);
         if(self.unlocked && ArchiSaver.GetItemCount(targetChar) == 0) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
@@ -134,7 +135,7 @@ public class AbilityUnlockItemizer {
     private void CharaSelectScript_selected(On.charaSelectScript.orig_selected orig, charaSelectScript self) {
         orig(self);
         var isArchiLocked = false;
-        var targetChar = "Character: " + self.unlockKey;
+        var targetChar = "Character: " + Enum.GetName(typeof(CharacterInIngameOrder), self.ID);
         if(self.unlocked && ArchiSaver.GetItemCount(targetChar) == 0) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
