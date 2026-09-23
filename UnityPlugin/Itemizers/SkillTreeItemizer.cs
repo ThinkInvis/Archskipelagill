@@ -101,7 +101,10 @@ public class SkillTreeIndexTracker:MonoBehaviour {
                 var spr = spinner.AddComponent<SpriteRenderer>();
                 spr.sprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-big-single.png");
                 spr.drawMode = SpriteDrawMode.Sliced;
-                spr.size *= 0.5f;
+                if(GetComponent<skigillNode>().metaProg)
+                    spr.size *= 0.0625f;
+                else
+                    spr.size *= 0.5f;
                 spinners[i] = spinner.transform;
                 spinners[i].gameObject.SetActive(hasCheck);
             }
@@ -187,7 +190,7 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         }
     }
 
-    public void Unlock() {
+    public void Unlock(bool forceHasCheck = false) {
         isUnlocked = true;
         GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f, 1f);
         activateVfx.color = new(1f, 1f, 1f, 1f);
@@ -195,6 +198,14 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         nodeOcto.color = new(1f, 1f, 1f, 1f);
         foreach(var sr in transform.Find("chiffres").GetComponentsInChildren<SpriteRenderer>()) {
             sr.color = new(1f, 1f, 1f, 1f);
+        }
+
+        if(forceHasCheck) {
+            hasCheck = true;
+            foreach(var s in spinners) {
+                s.gameObject.SetActive(hasCheck);
+                s.GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f);
+            }
         }
     }
 

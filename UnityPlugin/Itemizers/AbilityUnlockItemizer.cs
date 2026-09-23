@@ -28,6 +28,7 @@ public class AbilityUnlockItemizer {
         On.modeSelectScript.updateUnlockStatus += ModeSelectScript_updateUnlockStatus;
         On.chestLootScript.loote += ChestLootScript_loote;
         On.skigillNode.Update += SkigillNode_Update;
+        On.skigillNode.Start += SkigillNode_Start;
         On.weaponDisplayer.Start += WeaponDisplayer_Start;
         On.charaSelectScript.Start += CharaSelectScript_Start;
         On.endMenuManager.Start += EndMenuManager_Start;
@@ -71,6 +72,7 @@ public class AbilityUnlockItemizer {
         orig(self);
         if(!self.metaProg) return;
         if(self.type == 20) {
+            //TODO: cache this
             var matches = ArchiSaver.instance.receivedItemCounts.Keys.Where(k => (k.StartsWith("Weapon: ") && k.EndsWith(self.name)) || (CHARACTER_NAME_TRANSLATE.TryGetValue(self.name, out var cn) && k == $"Character: {cn}"));
             if(!matches.Any() || ArchiSaver.GetItemCount(matches.First()) == 0) {
                 self.toggleMetaWeapon.SetActive(true);
@@ -78,6 +80,19 @@ public class AbilityUnlockItemizer {
                 self.toggleMetaWeapon.transform.localPosition = new(0f, -1.25f, -1f);
             } else {
                 self.toggleMetaWeapon.transform.localPosition = new(0f, -1.25f, 0f); //default position
+            }
+        }
+    }
+
+    private void SkigillNode_Start(On.skigillNode.orig_Start orig, skigillNode self) {
+        orig(self);
+        if(self.metaProg) {
+            if(self.type == 20) {
+                var matches = ArchiSaver.instance.allValidChecks.Except(ArchiSaver.instance.unsentChecks).Except(ArchiSaver.instance.sentChecks).Where(k => (k.StartsWith("Escaped with Weapon") && k.EndsWith(self.name)) || (CHARACTER_NAME_TRANSLATE.TryGetValue(self.name, out var cn) && k == $"Escaped with {cn}"));
+                if(matches.Any()) {
+                    var tkr = self.gameObject.AddComponent<SkillTreeIndexTracker>();
+                    tkr.Unlock(true);
+                }
             }
         }
     }
