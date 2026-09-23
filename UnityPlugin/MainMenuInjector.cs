@@ -52,6 +52,10 @@ public class MainMenuInjector {
 
     private void MainCameraScript_Update(On.mainCameraScript.orig_Update orig, mainCameraScript self) {
         orig(self);
+        if(self.ended) {
+            pauseMenu.SetActive(false);
+            return;
+        }
         if(pauseMenuState) {
             archiMenu.SetActive(true);
             var targetPos = new Vector3(0f, 2f, 0f);
