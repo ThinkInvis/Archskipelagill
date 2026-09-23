@@ -54,7 +54,7 @@ Traps are disabled by default and must be configured in your world options `.yam
 - Damage: instantly lose 50% health
 - Pull Enemies: all currently living enemies get +200% speed for 5 seconds
 - Weapon Jam: most weapons have -99% fire rate for 10 seconds
-- Drain Ski: instantly lose 50% Ski (temporary currency) (not configurable)
+- Drain Ski: instantly lose 50% Ski (temporary currency)
 - Scramble Stats: Str/Dex/Int stats are exchanged with each other
 - Flash Mob: add 30 extra enemies to the next spawn wave
 - Stronger Enemies: add 1 minute to the run timer for purposes of enemy/wave difficulty only

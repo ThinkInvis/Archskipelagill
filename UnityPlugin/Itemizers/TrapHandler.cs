@@ -12,6 +12,7 @@ public class TrapHandler {
     public ConfigEntry<float> cfgSpeedTrapDuration;
     public ConfigEntry<float> cfgSpeedTrapStrength;
     public ConfigEntry<float> cfgJamTrapDuration;
+    public ConfigEntry<float> cfgDrainSkiTrapStrength;
     public ConfigEntry<float> cfgMobTrapStrength;
     public ConfigEntry<float> cfgSpawnTimeTrapStrength;
 
@@ -25,6 +26,7 @@ public class TrapHandler {
         cfgSpeedTrapDuration = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Pull Enemies Trap Duration"), 5f, new ConfigDescription("Duration of Trap: Pull Enemies in seconds.", new AcceptableValueRange<float>(0f, 300f)));
         cfgSpeedTrapStrength = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Pull Enemies Trap Strength"), 2f, new ConfigDescription("Strength of Trap: Pull Enemies as an added multiplier to base speed.", new AcceptableValueRange<float>(0f, 100f)));
         cfgJamTrapDuration = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Weapon Jam Trap Duration"), 10f, new ConfigDescription("Duration of Trap: Weapon Jam in seconds.", new AcceptableValueRange<float>(0f, 180f)));
+        cfgDrainSkiTrapStrength = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Drain Ski Trap Strength"), 0.5f, new ConfigDescription("Fraction of current Ski removed by Trap: Drain Ski.", new AcceptableValueRange<float>(0f, 1f)));
         cfgMobTrapStrength = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Flash Mob Trap Strength"), 30f, new ConfigDescription("Additional enemies spawned by Trap: Flash Mob.", new AcceptableValueRange<float>(0f, 1000f)));
         cfgSpawnTimeTrapStrength = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Stronger Enemies Trap Strength"), 60f, new ConfigDescription("Time added to the monster wave strength timer by Trap: Stronger Enemies.", new AcceptableValueRange<float>(0f, 300f)));
     }
@@ -92,7 +94,7 @@ public class TrapHandler {
                 trapSpriteName = "trap-jam";
                 break;
             case "Drain Ski":
-                var penalty = cs.XP * 0.5f;
+                var penalty = cs.XP * cfgDrainSkiTrapStrength.Value;
                 cs.XP -= penalty;
                 cs.totalXP -= penalty;
                 trapSpriteName = "trap-drainski";
