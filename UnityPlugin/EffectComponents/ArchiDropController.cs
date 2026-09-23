@@ -90,6 +90,7 @@ public class ArchiDropController : MonoBehaviour {
                 spinners[i] = transform.GetChild(i);
                 spinnerV[i] = (UnityEngine.Random.onUnitSphere + new Vector3(0f, 1.5f, 1.5f)) * UnityEngine.Random.Range(2f, 4f);
             }
+            follower.transform.localScale *= 1.5f;
             followerOffset = UnityEngine.Random.onUnitSphere * 1f + new Vector3(0f, 2f, -3f);
             sparkler.GO = Plugin.instance.resourceGrabber.runWorldLayerSparklePrefab.transform;
         } else {
