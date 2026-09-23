@@ -156,6 +156,7 @@ public class ArchipelagoClient {
 
     private void OnMessageReceived(LogMessage message) {
         Plugin.instance.mainMenuInjector.ReceiveMessage(message.ToString());
+        Plugin.BepinLogger.LogMessage($"[APMsg] {message}");
     }
 
     /// <summary>
