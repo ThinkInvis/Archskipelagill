@@ -73,7 +73,7 @@ public class AbilityUnlockItemizer {
         if(!self.metaProg) return;
         if(self.type == 20) {
             //TODO: cache this
-            var matches = ArchiSaver.instance.receivedItemCounts.Keys.Where(k => (k.StartsWith("Weapon: ") && k.EndsWith(self.name)) || (CHARACTER_NAME_TRANSLATE.TryGetValue(self.name, out var cn) && k == $"Character: {cn}"));
+            var matches = ArchiSaver.instance.receivedItemCounts.Keys.Where(k => (k.StartsWith("Weapon: ") && k.ToLower().EndsWith(self.name.ToLower())) || (CHARACTER_NAME_TRANSLATE.TryGetValue(self.name, out var cn) && k == $"Character: {cn}"));
             if(!matches.Any() || ArchiSaver.GetItemCount(matches.First()) == 0) {
                 self.toggleMetaWeapon.SetActive(true);
                 self.toggleMetaWeapon.GetComponent<SpriteRenderer>().sprite = customLockSprite;
