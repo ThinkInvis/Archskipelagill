@@ -30,7 +30,7 @@ public class AbilityUnlockItemizer {
     private void EndMenuManager_Start(On.endMenuManager.orig_Start orig, endMenuManager self) {
         orig(self);
         var checkStr = $"Escaped with {Enum.GetName(typeof(CharacterInIngameOrder), self.st.chara)}";
-        if(!ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr)) {
+        if(self.st.won && !ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr)) {
             if(cfgAbilityLocationTracker.Value)
                 self.winIcons[self.st.chara].AddComponent<AbilityDisplayerCheckInd>();
 
