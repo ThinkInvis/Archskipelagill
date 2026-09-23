@@ -58,6 +58,55 @@ class CheckHeroEscapes(DefaultOnToggle):
     
     display_name = "Checks: Hero Escapes"
     
+class CheckTimeSurvived(Toggle):
+    """
+    If enabled, a location will be added for every 3 minutes survived up to 30; 10 total.
+    """
+    
+    display_name = "Checks: Time Survived"
+    
+class CheckTimeSurvivedDifficulty(Toggle):
+    """
+    If enabled, a location will be added for every 3 minutes survived up to 30 on every difficulty; 70 total.
+    """
+    
+    display_name = "Difficult Checks: Time Survived Per Difficulty"
+    
+class CheckTimeSurvivedCharacter(Toggle):
+    """
+    If enabled, a location will be added for every 3 minutes survived up to 30 on every character; 60 total.
+    """
+    
+    display_name = "Difficult Checks: Time Survived Per Character"
+    
+class CheckTimeSurvivedBoth(Toggle):
+    """
+    If enabled, a location will be added for every 3 minutes survived up to 30 on every character-difficulty combination; 420 total.
+    """
+    
+    display_name = "Difficult Checks: Survivalsanity"
+    
+class CheckTreesanity(Toggle):
+    """
+    If enabled, a location will be added for every single Skigill node which isn't a Chest, Perk, or Boss; 574 total.
+    """
+    
+    display_name = "Difficult Checks: Treesanity"
+    
+class CheckSuperTreesanity(Toggle):
+    """
+    If enabled, a location will be added for every combination of Skigill Chest/Perk, character, and difficulty; 3906 total.
+    """
+    
+    display_name = "Difficult Checks: Super Treesanity"
+    
+class CheckUltraTreesanity(Toggle):
+    """
+    If enabled, a location will be added for every single Skigill node-character-difficulty combination (except Chests/Perks/Bosses); 28014(!!!) total. Not for the faint of heart.
+    """
+    
+    display_name = "Difficult Checks: Ultra Treesanity"
+    
 class RegionChecksNeedCharacter(Toggle):
     """
     If enabled, checks within a given region will be out of logic until you have the character for that region. If disabled, checking locations in distant regions may be much more difficult; but if enabled, it may be easy to get some out-of-logic items.
@@ -109,6 +158,13 @@ class SkigillOptions(PerGameCommonOptions):
     check_perks: CheckPerks
     check_weapon_escapes: CheckWeaponEscapes
     check_hero_escapes: CheckHeroEscapes
+    check_time_survived: CheckTimeSurvived
+    check_time_survived_character: CheckTimeSurvivedCharacter
+    check_time_survived_difficulty: CheckTimeSurvivedDifficulty
+    check_time_survived_both: CheckTimeSurvivedBoth
+    check_treesanity: CheckTreesanity
+    check_super_treesanity: CheckSuperTreesanity
+    check_ultra_treesanity: CheckUltraTreesanity
     region_checks_need_character: RegionChecksNeedCharacter
     boss_region_last: BossRegionLast
     trap_chance: TrapChance
@@ -122,7 +178,11 @@ option_groups = [
     ),
     OptionGroup(
         "Location Distribution",
-        [CheckChests, CheckPerks, CheckWeaponEscapes, CheckHeroEscapes],
+        [CheckChests, CheckPerks, CheckWeaponEscapes, CheckHeroEscapes, CheckTimeSurvived],
+    ),
+    OptionGroup(
+        "Difficult Locations",
+        [CheckTimeSurvivedCharacter, CheckTimeSurvivedDifficulty, CheckTimeSurvivedBoth, CheckTreesanity, CheckSuperTreesanity, CheckUltraTreesanity],
     ),
     OptionGroup(
         "Logic and Goals",
@@ -140,6 +200,13 @@ option_presets = {
         "check_perks": True,
         "check_weapon_escapes": True,
         "check_hero_escapes": True,
+        "check_time_survived": False,
+        "check_time_survived_character": False,
+        "check_time_survived_difficulty": False,
+        "check_time_survived_both": False,
+        "check_treesanity": False,
+        "check_super_treesanity": False,
+        "check_ultra_treesanity": False,
         "region_checks_need_character": False,
         "boss_region_last": True,
         "trap_chance": 0,

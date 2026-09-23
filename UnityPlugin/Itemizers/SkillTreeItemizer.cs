@@ -1,5 +1,6 @@
 ﻿using BepInEx.Configuration;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -56,10 +57,7 @@ public class SkillTreeItemizer {
         orig(self);
         var tkr = self.GetComponent<SkillTreeIndexTracker>();
         if(!tkr) return;
-        var isChest = tkr.node.type == SkillTree.SkillNodeType.CHEST;
-        var isPerk = tkr.node.type == SkillTree.SkillNodeType.PERK;
-        if(!isChest && !isPerk) return;
-        Plugin.ArchipelagoClient.CheckLocationsByName($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? tkr.node.chestIndex : tkr.node.perkIndex) + 1} ({Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region)})");
+        Plugin.ArchipelagoClient.CheckLocationsByName([.. tkr.checks]);
         tkr.Rescan();
     }
 
@@ -89,7 +87,7 @@ public class SkillTreeIndexTracker:MonoBehaviour {
     UnityEngine.UI.Image activateVfx;
     SpriteRenderer iconColor, nodeOcto;
     Color origIconColor;
-
+    public List<string> checks = [];
 
 #pragma warning disable IDE0051 //Used by Unity Engine
     void Awake() {
@@ -137,6 +135,9 @@ public class SkillTreeIndexTracker:MonoBehaviour {
     public void Rescan() {
         if(!isActiveAndEnabled) return;
 
+        checks.Clear();
+
+        var stats = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
         var hasRegion = ArchiSaver.GetItemCount($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), node.region).ToTitleCase()}") > 0;
         var hasFBK = ArchiSaver.GetItemCount($"Final Boss Key") > 0;
 
@@ -171,9 +172,27 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         hasCheck = false;
         var isChest = node.type == SkillTree.SkillNodeType.CHEST;
         var isPerk = node.type == SkillTree.SkillNodeType.PERK;
-        if(isChest || isPerk) {
-            var checkStr = $"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? node.chestIndex : node.perkIndex) + 1} ({Enum.GetName(typeof(SkillTree.SkillNodeRegion), node.region)})";
-            hasCheck = !ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr);
+        var isStat = node.type == SkillTree.SkillNodeType.STAT;
+        if(isChest || isPerk || isStat) {
+            var checkStr = $"{(isStat ? "Treesanity: Stat" : (isChest ? "Skigill Chest" : "Skigill Perk"))} #{node.indexInType + 1} ({Enum.GetName(typeof(SkillTree.SkillNodeRegion), node.region)})";
+            if(!ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr)) {
+                hasCheck = true;
+                checks.Add(checkStr);
+            }
+
+            if(isStat) {
+                var stsCheckStr = $"Super Treesanity: node C#{node.indexInType + 1} ({Enum.GetName(typeof(SkillTree.SkillNodeRegion), node.region)})/char {Enum.GetName(typeof(AbilityUnlockItemizer.CharacterInIngameOrder), stats.chara)}/diff {stats.difficulty + 1}";
+                if(!ArchiSaver.instance.sentChecks.Contains(stsCheckStr) && !ArchiSaver.instance.unsentChecks.Contains(stsCheckStr) && ArchiSaver.instance.allValidChecks.Contains(stsCheckStr)) {
+                    checks.Add(stsCheckStr);
+                    hasCheck = true;
+                }
+            }
+
+            var utsCheckStr = $"Ultra Treesanity: node {(isStat ? "S" : (isChest ? "C" : "P"))}#{node.indexInType + 1} ({Enum.GetName(typeof(SkillTree.SkillNodeRegion), node.region)})/char {Enum.GetName(typeof(AbilityUnlockItemizer.CharacterInIngameOrder), stats.chara)}/diff {stats.difficulty + 1}";
+            if(!ArchiSaver.instance.sentChecks.Contains(utsCheckStr) && !ArchiSaver.instance.unsentChecks.Contains(utsCheckStr) && ArchiSaver.instance.allValidChecks.Contains(utsCheckStr)) {
+                checks.Add(utsCheckStr);
+                hasCheck = true;
+            }
         }
 
         if(hasRegion && (node.type != SkillTree.SkillNodeType.BOSS_FINAL || hasFBK))

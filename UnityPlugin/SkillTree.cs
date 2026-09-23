@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using UnityEngine;
+using static UnityEngine.UIElements.VisualNodePropertyRegistry;
 
 namespace Archskipelagill;
 
@@ -10,13 +11,12 @@ public static partial class SkillTree {
     public enum SkillNodeType { UNKNOWN, STAT, CHEST, PERK, BOSS, BOSS_FINAL };
     public enum SkillNodeRegion { MAGE, PROTOTYPE, DRAGON, STRONGMAN, FOX, DWARVES, BOSSES };
 
-    public struct SkillNode(SkillNodeType _type, int[] _neighbors, SkillNodeRegion _region, int _originalIndex, int _chestIndex, int _perkIndex) {
+    public struct SkillNode(SkillNodeType _type, int[] _neighbors, SkillNodeRegion _region, int _originalIndex, int _indexInType) {
         public SkillNodeType type = _type;
         public int[] neighbors = _neighbors;
         public SkillNodeRegion region = _region;
         public int originalIndex = _originalIndex;
-        public int chestIndex = _chestIndex;
-        public int perkIndex = _perkIndex;
+        public int indexInType = _indexInType;
     }
 
     static readonly string[] SPAWN_TARGET_NAMES = [
@@ -74,6 +74,7 @@ public static partial class SkillTree {
 
         int chestCount = 0;
         int perkCount = 0;
+        int statCount = 0;
 
         //Build node list
         var finalBossNode = allValidNodes.Find(n => n.adjacent.Count == 0 && n.type == 22);
@@ -86,16 +87,20 @@ public static partial class SkillTree {
                 22 => "BOSS",
                 _ => "STAT"
             };
-            int chestIndex = -1;
+            int typeIndex = -1;
             if(skillNodeType == "CHEST") {
-                chestIndex = chestCount;
+                typeIndex = chestCount;
                 chestCount++;
             }
-            int perkIndex = -1;
             if(skillNodeType == "PERK") {
-                perkIndex = perkCount;
+                typeIndex = perkCount;
                 perkCount++;
             }
+            if(skillNodeType == "PERK") {
+                typeIndex = statCount;
+                statCount++;
+            }
+
             var connexList = node.adjacent.Select(n => allValidNodes.IndexOf(n.GetComponent<skigillNode>())).ToList();
             if(node == finalBossNode) {
                 skillNodeType = "BOSS_FINAL";
@@ -120,8 +125,8 @@ public static partial class SkillTree {
             node.transform.Find("IconColor").GetComponent<SpriteRenderer>().color = regionColor;
             node.transform.Find("nodeOcto").GetComponent<SpriteRenderer>().color = regionColor;
 
-            outputPy.Add($"\tSkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
-            outputCs.Add($"\t\tnew SkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
+            outputPy.Add($"\tSkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {typeIndex})");
+            outputCs.Add($"\t\tnew SkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {typeIndex})");
         }
 
         //Build weapon list

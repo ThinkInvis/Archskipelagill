@@ -41,16 +41,60 @@ LOCATION_NAME_TO_ID = {
 locNameInd = len(LOCATION_NAME_TO_ID) + 1
 
 for node in [n for n in SKILL_TREE if n.type == SkillNodeType.CHEST]:
-    LOCATION_NAME_TO_ID[f"Skigill Chest #{node.chest_index + 1} ({node.region.name})"] = locNameInd
+    LOCATION_NAME_TO_ID[f"Skigill Chest #{node.index_in_type + 1} ({node.region.name})"] = locNameInd
     locNameInd += 1
     
 for node in [n for n in SKILL_TREE if n.type == SkillNodeType.PERK]:
-    LOCATION_NAME_TO_ID[f"Skigill Perk #{node.perk_index + 1} ({node.region.name})"] = locNameInd
+    LOCATION_NAME_TO_ID[f"Skigill Perk #{node.index_in_type + 1} ({node.region.name})"] = locNameInd
     locNameInd += 1
     
 for i in range(len(WEAPON_NAMES)):
     LOCATION_NAME_TO_ID[f"Escaped with Weapon {WEAPON_NAMES[i]}"] = locNameInd
     locNameInd += 1
+    
+for i in range(10):
+    LOCATION_NAME_TO_ID[f"Survived {(i+1)*3} Minutes"] = locNameInd
+    locNameInd += 1
+    
+CHARACTER_NAMES = ["Mage", "Strongman", "Fox", "Dragon", "Prototype", "Dwarves"]
+
+for i in range(10):
+    for j in range(6):
+        LOCATION_NAME_TO_ID[f"Survived {(i+1)*3} Minutes with {CHARACTER_NAMES[j]}"] = locNameInd
+        locNameInd += 1
+        
+for i in range(10):
+    for j in range(7):
+        LOCATION_NAME_TO_ID[f"Survived {(i+1)*3} Minutes on Difficulty {j+1}"] = locNameInd
+        locNameInd += 1
+        
+for i in range(10):
+    for j in range(6):
+        for var k in range(7):
+            LOCATION_NAME_TO_ID[f"Survivalsanity: {(i+1)*3}min/char {CHARACTER_NAMES[j]}/diff {k+1}"] = locNameInd
+            locNameInd += 
+            
+for node in [n for n in SKILL_TREE if n.type == SkillNodeType.STAT]:
+    LOCATION_NAME_TO_ID[f"Treesanity: Stat #{node.index_in_type + 1} ({node.region.name})"] = locNameInd
+    locNameInd += 1
+            
+for node in [n for n in SKILL_TREE if n.type == SkillNodeType.CHEST]:
+    for i in range(6):
+        for j in range(7):
+            LOCATION_NAME_TO_ID[f"Super Treesanity: node C#{node.index_in_type + 1} ({node.region.name})/char {CHARACTER_NAMES[i]}/diff {j+1}"] = locNameInd
+            locNameInd += 
+            
+for node in [n for n in SKILL_TREE if n.type == SkillNodeType.PERK]:
+    for i in range(6):
+        for j in range(7):
+            LOCATION_NAME_TO_ID[f"Super Treesanity: node P#{node.index_in_type + 1} ({node.region.name})/char {CHARACTER_NAMES[i]}/diff {j+1}"] = locNameInd
+            locNameInd += 1
+            
+for node in [n for n in SKILL_TREE if n.type == SkillNodeType.STAT]:
+    for i in range(6):
+        for j in range(7):
+            LOCATION_NAME_TO_ID[f"Ultra Treesanity: node S#{node.index_in_type + 1} ({node.region.name})/char {CHARACTER_NAMES[i]}/diff {j+1}"] = locNameInd
+            locNameInd += 1
 
 class SkigillLocation(Location):
     game = "Skigill"
