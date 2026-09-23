@@ -49,7 +49,7 @@ The following checks are only included if an equal or harder goal is chosen:
 
 ### Traps
 
-Traps are disabled by default and must be configured to appear. Each trap has additional difficulty options in the client's BepInEx config. Traps will queue up and trigger one at a time for every 15 seconds of non-paused run time.
+Traps are disabled by default and must be configured in your world options `.yaml` file to appear. Each trap has additional difficulty options in the client's BepInEx config. Traps will queue up and trigger one at a time for every 15 seconds of non-paused run time.
 
 - Damage: instantly lose 50% health
 - Pull Enemies: all currently living enemies get +200% speed for 5 seconds
@@ -58,3 +58,7 @@ Traps are disabled by default and must be configured to appear. Each trap has ad
 - Scramble Stats: Str/Dex/Int stats are exchanged with each other
 - Flash Mob: add 30 extra enemies to the next spawn wave
 - Stronger Enemies: add 1 minute to the run timer for purposes of enemy/wave difficulty only
+
+### Death Link
+
+Death Link is disabled by default and must be configured in the client options `.cfg` file to enable. It can be configured to send and/or receive Death Link deaths; and to either kill the player, end the run with no reward, or trigger a random trap when a death is received.
