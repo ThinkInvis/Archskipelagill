@@ -48,8 +48,11 @@ public class DeathLinkHandler : IDisposable {
 
     private void MainCameraScript_playerDeath(On.mainCameraScript.orig_playerDeath orig, mainCameraScript self) {
         orig(self);
-        if(Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Send || Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Both)
-            SendDeathLink();
+        if(Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Send || Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Both) {
+            var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
+            if(!cs.won && cs.dead)
+                SendDeathLink();
+        }
     }
 
     /// <summary>
