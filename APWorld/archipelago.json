@@ -1,6 +1,8 @@
 {
 	"game": "Skigill",
 	"minimum_ap_version": "0.6.7",
-	"world_version": "1.0.0-alpha",
-	"authors": ["ThinkInvisible"]
+	"world_version": "1.0.0",
+	"authors": ["ThinkInvisible"],
+	"version": 7,
+	"compatible_version": 7
 }
