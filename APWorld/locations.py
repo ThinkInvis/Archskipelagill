@@ -7,8 +7,8 @@ from BaseClasses import ItemClassification, Location, Region
 from itertools import islice
 
 from . import items
-from .skilltree import SkillNodeType, SkillNodeRegion, SkillNode
-from .skilltree_data import WEAPON_NAMES, SKILL_TREE
+from .game_data import SkillNodeType, SkillNodeRegion, SkillNode
+from .scraped_game_data import WEAPON_NAMES, SKILL_TREE
 
 if TYPE_CHECKING:
     from .world import SkigillWorld

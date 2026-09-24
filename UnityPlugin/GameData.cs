@@ -177,7 +177,7 @@ public static partial class GameData {
 
             namespace Archskipelagill;
 
-            public static partial class SkillTree {
+            public static partial class GameData {
                 public static List<Weapon> allWeapons = [
             {{string.Join("," + System.Environment.NewLine, outputWpnCs)}}
                 ];

@@ -5,8 +5,8 @@ from typing import TYPE_CHECKING
 from rule_builder.options import OptionFilter
 from rule_builder.rules import Has, HasAll, HasAny, Rule, False_
 
-from .skilltree import SkillNodeType, SkillNodeRegion, SkillNode
-from .skilltree_data import SKILL_TREE, WEAPON_NAMES
+from .game_data import SkillNodeType, SkillNodeRegion, SkillNode
+from .scraped_game_data import SKILL_TREE, WEAPON_NAMES
 
 if TYPE_CHECKING:
     from .world import SkigillWorld
