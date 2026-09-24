@@ -39,8 +39,7 @@ public class SkillTreeItemizer {
     }
 
     void EnsureSafeSpawn(CharaStats self) {
-        var targetChar = "Skigill Region: " + Enum.GetName(typeof(AbilityUnlockItemizer.CharacterInIngameOrder), self.chara).ToTitleCase();
-        if(ArchiSaver.GetItemCount(targetChar) == 0) { //spawn region is locked, teleport to and activate mage region which for now is guaranteed unlocked
+        if(!ArchiData.HasRegionByCharacterId(self.chara)) { //spawn region is locked, teleport to and activate mage region which for now is guaranteed unlocked
             var mgo = GameObject.Find("gridHolder/grid/Perks/Mage");
             mgo.GetComponent<skigillNode>().autoActivate();
             self.transform.position = new(mgo.transform.position.x, mgo.transform.position.y, 0);
@@ -176,7 +175,7 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         var isPerk = node.type == GameData.SkillNodeType.PERK;
         if(isChest || isPerk) {
             var checkStr = $"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? node.chestIndex : node.perkIndex) + 1} ({Enum.GetName(typeof(GameData.SkillNodeRegion), node.region)})";
-            hasCheck = !ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr);
+            hasCheck = ArchiData.HasLocation(checkStr) == ArchiData.LocationState.Unchecked;
         }
 
         if(hasRegion && (node.type != GameData.SkillNodeType.BOSS_FINAL || hasFBK))

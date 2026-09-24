@@ -41,6 +41,15 @@ public static partial class GameData {
         public int id = _id;
     }
 
+    public static List<Character> AllCharacters = [
+        new("Mage", "Mage", 1),
+        new("Strongman", "Baldo", 2),
+        new("Fox", "Fox", 3),
+        new("Dragon", "Dragon", 4),
+        new("Prototype", "Jugger", 5),
+        new("Dwarves", "Nain", 6)
+        ];
+
     static int FindNodeDistance(List<skigillNode> allValidNodes, skigillNode node1, skigillNode node2) {
         var ind1 = allValidNodes.IndexOf(node1);
         var ind2 = allValidNodes.IndexOf(node2);

@@ -7,19 +7,8 @@ using UnityEngine;
 namespace Archskipelagill.Itemizers;
 
 public class AbilityUnlockItemizer {
-    public enum CharacterInIngameOrder { None, Mage, Strongman, Fox, Dragon, Prototype, Dwarves };
-
     readonly Sprite customLockSprite;
     public ConfigEntry<bool> cfgAbilityLocationTracker;
-
-    static readonly Dictionary<string, string> CHARACTER_NAME_TRANSLATE = new() {
-        {"Mage", "Mage"},
-        {"Jugger", "Prototype"},
-        {"Dragon", "Dragon"},
-        {"Baldo", "Strongman"},
-        {"Fox", "Fox"},
-        {"Nain", "Dwarves"}
-    };
 
     public AbilityUnlockItemizer() {
         On.charaSelectScript.selected += CharaSelectScript_selected;
@@ -40,8 +29,8 @@ public class AbilityUnlockItemizer {
 
     private void EndMenuManager_Start(On.endMenuManager.orig_Start orig, endMenuManager self) {
         orig(self);
-        var checkStr = $"Escaped with {Enum.GetName(typeof(CharacterInIngameOrder), self.st.chara)}";
-        if(self.st.won && !ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr)) {
+        var checkStr = $"Escaped with {GameData.AllCharacters.First(n => n.id == self.st.chara).name}";
+        if(self.st.won && ArchiData.HasLocation(checkStr) == ArchiData.LocationState.Unchecked) {
             if(cfgAbilityLocationTracker.Value)
                 self.winIcons[self.st.chara].AddComponent<AbilityDisplayerCheckInd>();
 
@@ -51,20 +40,17 @@ public class AbilityUnlockItemizer {
 
     private void CharaSelectScript_Start(On.charaSelectScript.orig_Start orig, charaSelectScript self) {
         orig(self);
-        var charName = Enum.GetName(typeof(CharacterInIngameOrder), self.ID);
-        var checkStr = $"Escaped with {charName}";
-        if(cfgAbilityLocationTracker.Value && 
-            !ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr)) {
+        var checkStr = $"Escaped with {GameData.AllCharacters.First(n => n.id == self.ID).name}";
+        if(cfgAbilityLocationTracker.Value && ArchiData.HasLocation(checkStr) == ArchiData.LocationState.Unchecked) {
             var adci = self.gameObject.AddComponent<AbilityDisplayerCheckInd>();
-            adci.isLocked = !ArchiSaver.instance.metaProg.TryGetValue(self.unlockKey, out var ulStr) || ulStr != "unlocked" || ArchiSaver.GetItemCount("Character: " + charName) == 0;
+            adci.isLocked = !ArchiSaver.instance.metaProg.TryGetValue(self.unlockKey, out var ulStr) || ulStr != "unlocked" || !ArchiData.HasCharacterById(self.ID);
         }
     }
 
     private void WeaponDisplayer_Start(On.weaponDisplayer.orig_Start orig, weaponDisplayer self) {
         orig(self);
         var checkStr = $"Escaped with Weapon {self.GetComponent<weaponDisplayer>().source.name.Replace("(Clone)", "")}";
-        if(cfgAbilityLocationTracker.Value && self.levelToDisplay == 0 &&
-            !ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr))
+        if(cfgAbilityLocationTracker.Value && self.levelToDisplay == 0 && ArchiData.HasLocation(checkStr) == ArchiData.LocationState.Unchecked)
             self.gameObject.AddComponent<AbilityDisplayerCheckInd>();
     }
 
@@ -73,8 +59,7 @@ public class AbilityUnlockItemizer {
         if(!self.metaProg) return;
         if(self.type == 20) {
             //TODO: cache this
-            var matches = ArchiSaver.instance.receivedItemCounts.Keys.Where(k => (k.StartsWith("Weapon: ") && k.ToLower().EndsWith(self.name.ToLower())) || (CHARACTER_NAME_TRANSLATE.TryGetValue(self.name, out var cn) && k == $"Character: {cn}"));
-            if(!matches.Any() || ArchiSaver.GetItemCount(matches.First()) == 0) {
+            if(!ArchiData.HasWeaponBySaveName(self.name) && !ArchiData.HasCharacterByInternalName(self.name)) {
                 self.toggleMetaWeapon.SetActive(true);
                 self.toggleMetaWeapon.GetComponent<SpriteRenderer>().sprite = customLockSprite;
                 self.toggleMetaWeapon.transform.localPosition = new(0f, -1.25f, -1f);
@@ -86,13 +71,11 @@ public class AbilityUnlockItemizer {
 
     private void SkigillNode_Start(On.skigillNode.orig_Start orig, skigillNode self) {
         orig(self);
-        if(self.metaProg) {
-            if(self.type == 20) {
-                var matches = ArchiSaver.instance.allValidChecks.Except(ArchiSaver.instance.unsentChecks).Except(ArchiSaver.instance.sentChecks).Where(k => (k.StartsWith("Escaped with Weapon") && k.EndsWith(self.name)) || (CHARACTER_NAME_TRANSLATE.TryGetValue(self.name, out var cn) && k == $"Escaped with {cn}"));
-                if(matches.Any()) {
-                    var tkr = self.gameObject.AddComponent<SkillTreeIndexTracker>();
-                    tkr.Unlock(true);
-                }
+        if(self.metaProg && self.type == 20) {
+            if(ArchiData.HasLocation($"Escaped with {GameData.AllCharacters.FirstOrDefault(n => n.internalName == self.name).name}") == ArchiData.LocationState.Unchecked
+                || ArchiData.HasLocation($"Escaped with Weapon {GameData.allWeapons.FirstOrDefault(n => n.saveName == self.name).prefabName}") == ArchiData.LocationState.Unchecked) {
+                var tkr = self.gameObject.AddComponent<SkillTreeIndexTracker>();
+                tkr.Unlock(true);
             }
         }
     }
@@ -102,11 +85,8 @@ public class AbilityUnlockItemizer {
         var origList = (Transform[])dict.WeaponList.Clone();
         for(int i = 0; i < origList.Length; i++) {
             if(origList[i] == null) continue;
-            var wname = origList[i].gameObject.name.Replace("(Clone)", "");
-            if(ArchiSaver.GetItemCount("Weapon: " + wname) == 0) {
-                Plugin.BepinLogger.LogDebug($"Blocked weapon {wname} from loot due to archilock");
+            if(!ArchiData.HasWeaponByPrefabName(origList[i].gameObject.name.Replace("(Clone)", "")))
                 dict.WeaponList[i] = null;
-            }
         }
         var retv = orig(self);
         dict.WeaponList = origList;
@@ -150,8 +130,7 @@ public class AbilityUnlockItemizer {
     private void CharaSelectScript_updateUnlockStatus(On.charaSelectScript.orig_updateUnlockStatus orig, charaSelectScript self) {
         orig(self);
         var isArchiLocked = false;
-        var targetChar = "Character: " + Enum.GetName(typeof(CharacterInIngameOrder), self.ID);
-        if(self.unlocked && ArchiSaver.GetItemCount(targetChar) == 0) {
+        if(self.unlocked && !ArchiData.HasCharacterById(self.ID)) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
             isArchiLocked = true;
@@ -166,8 +145,7 @@ public class AbilityUnlockItemizer {
     private void CharaSelectScript_selected(On.charaSelectScript.orig_selected orig, charaSelectScript self) {
         orig(self);
         var isArchiLocked = false;
-        var targetChar = "Character: " + Enum.GetName(typeof(CharacterInIngameOrder), self.ID);
-        if(self.unlocked && ArchiSaver.GetItemCount(targetChar) == 0) {
+        if(self.unlocked && !ArchiData.HasCharacterById(self.ID)) {
             self.unlocked = false;
             self.cadenas.SetActive(true);
             self.ls.charaUnlocked = false;
