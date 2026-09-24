@@ -89,7 +89,7 @@ public static partial class GameData {
         }
         var gridTsf = gridObj.transform;
         var avnUnsorted = GameObject.FindObjectsByType<skigillNode>(FindObjectsSortMode.InstanceID).Where(n => n.isActiveAndEnabled && !n.metaProg && n.transform.IsChildOf(gridTsf)).ToList();
-        var allValidNodes = avnUnsorted.OrderBy(n => n.transform.position.y).ThenBy(n => n.transform.position.x).ToList();
+        var allValidNodes = avnUnsorted.OrderBy(n => -n.transform.position.y).ThenBy(n => n.transform.position.x).ToList();
 
         List<string> outputPy = [];
         List<string> outputCs = [];
@@ -167,7 +167,7 @@ public static partial class GameData {
         var dir = Directory.GetCurrentDirectory();
         File.WriteAllText(Path.Join(dir, "scraped_game_data.py"),
             $$"""
-            from .skilltree import SkillNodeType, SkillNodeRegion, SkillNode
+            from .game_data import SkillNodeType, SkillNodeRegion, SkillNode
             from enum import Enum
 
             import re

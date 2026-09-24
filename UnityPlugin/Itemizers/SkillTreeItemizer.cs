@@ -30,7 +30,7 @@ public class SkillTreeItemizer {
     void ApplyTrackers() {
         var gridObj = GameObject.Find("gridHolder/grid")?.transform;
         if(gridObj == null) return;
-        var allValidNodes = GameObject.FindObjectsByType<skigillNode>(FindObjectsSortMode.InstanceID).Where(n => n.isActiveAndEnabled && !n.metaProg && n.transform.IsChildOf(gridObj)).OrderBy(n => n.transform.position.y).ThenBy(n => n.transform.position.x).ToList();
+        var allValidNodes = GameObject.FindObjectsByType<skigillNode>(FindObjectsSortMode.InstanceID).Where(n => n.isActiveAndEnabled && !n.metaProg && n.transform.IsChildOf(gridObj)).OrderBy(n => -n.transform.position.y).ThenBy(n => n.transform.position.x).ToList();
         for(var i = 0; i < allValidNodes.Count; i++) {
             if(!allValidNodes[i].gameObject.TryGetComponent<SkillTreeIndexTracker>(out var tkr))
                 tkr = allValidNodes[i].gameObject.AddComponent<SkillTreeIndexTracker>();
