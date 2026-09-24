@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Archskipelagill;
 
-public static partial class SkillTree {
+public static partial class GameData {
     public enum SkillNodeType { UNKNOWN, STAT, CHEST, PERK, BOSS, BOSS_FINAL };
     public enum SkillNodeRegion { MAGE, PROTOTYPE, DRAGON, STRONGMAN, FOX, DWARVES, BOSSES };
 
@@ -27,6 +27,19 @@ public static partial class SkillTree {
         "Fox",
         "Nain"
     ];
+
+    public struct Weapon(string _saveName, string _prefabName, int _id, bool _starter) {
+        public string saveName = _saveName;
+        public string prefabName = _prefabName;
+        public int id = _id;
+        public bool starter = _starter;
+    }
+
+    public struct Character(string _name, string _internalName, int _id) {
+        public string name = _name;
+        public string internalName = _internalName;
+        public int id = _id;
+    }
 
     static int FindNodeDistance(List<skigillNode> allValidNodes, skigillNode node1, skigillNode node2) {
         var ind1 = allValidNodes.IndexOf(node1);
@@ -126,12 +139,23 @@ public static partial class SkillTree {
 
         //Build weapon list
         var wd = GameObject.Find("WeaponDict").GetComponent<weaponDictionary>();
+        List<string> outputWpnCs = [];
+        for(var i = 0; i < wd.unlocksableSaveNames.Length; i++) {
+            var wpn = wd.unlockablePrefabs[i];
+            var wc = wpn.GetComponent<weaponStats>();
+            outputWpnCs.Add($"\t\tnew(\"{wd.unlocksableSaveNames[i]}\", \"{wpn.name.Replace("(Clone)", "")}\", {wc.ID}, false)");
+        }
+        foreach(var wpn in wd.WeaponList.Except(wd.unlockablePrefabs)) {
+            var wc = wpn.GetComponent<weaponStats>();
+            outputWpnCs.Add($"\t\tnew(null, \"{wpn.name.Replace("(Clone)", "")}\", {wc.ID}, true)");
+        }
         var wpnUnlockable = wd.unlockablePrefabs.Select(p => '"' + p.name.Replace("(Clone)", "") + '"');
         var wpnStarter = wd.WeaponList.Except(wd.unlockablePrefabs).Where(w => w != null).Select(p => '"' + p.name.Replace("(Clone)", "") + '"');
 
+
         //Write final output to game directory
         var dir = Directory.GetCurrentDirectory();
-        File.WriteAllText(Path.Join(dir, "skilltree_data.py"),
+        File.WriteAllText(Path.Join(dir, "scraped_game_data.py"),
             $$"""
             from .skilltree import SkillNodeType, SkillNodeRegion, SkillNode
             from enum import Enum
@@ -146,13 +170,16 @@ public static partial class SkillTree {
             {{string.Join("," + System.Environment.NewLine, outputPy)}}
             }
             """);
-        File.WriteAllText(Path.Join(dir, "SkillTreeData.cs"),
+        File.WriteAllText(Path.Join(dir, "ScrapedGameData.cs"),
             $$"""
             using System.Collections.Generic;
 
             namespace Archskipelagill;
 
             public static partial class SkillTree {
+                public static List<Weapon> allWeapons = [
+            {{string.Join("," + System.Environment.NewLine, outputWpnCs)}}
+                ];
                 public static List<SkillNode> skillTree = [
             {{string.Join("," + System.Environment.NewLine, outputCs)}}
                 ];

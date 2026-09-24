@@ -34,7 +34,7 @@ public class SkillTreeItemizer {
         for(var i = 0; i < allValidNodes.Count; i++) {
             if(!allValidNodes[i].gameObject.TryGetComponent<SkillTreeIndexTracker>(out var tkr))
                 tkr = allValidNodes[i].gameObject.AddComponent<SkillTreeIndexTracker>();
-            tkr.node = SkillTree.skillTree[i];
+            tkr.node = GameData.skillTree[i];
         }
     }
 
@@ -56,10 +56,10 @@ public class SkillTreeItemizer {
         orig(self);
         var tkr = self.GetComponent<SkillTreeIndexTracker>();
         if(!tkr) return;
-        var isChest = tkr.node.type == SkillTree.SkillNodeType.CHEST;
-        var isPerk = tkr.node.type == SkillTree.SkillNodeType.PERK;
+        var isChest = tkr.node.type == GameData.SkillNodeType.CHEST;
+        var isPerk = tkr.node.type == GameData.SkillNodeType.PERK;
         if(!isChest && !isPerk) return;
-        Plugin.ArchipelagoClient.CheckLocationsByName($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? tkr.node.chestIndex : tkr.node.perkIndex) + 1} ({Enum.GetName(typeof(SkillTree.SkillNodeRegion), tkr.node.region)})");
+        Plugin.ArchipelagoClient.CheckLocationsByName($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? tkr.node.chestIndex : tkr.node.perkIndex) + 1} ({Enum.GetName(typeof(GameData.SkillNodeRegion), tkr.node.region)})");
         tkr.Rescan();
     }
 
@@ -82,7 +82,7 @@ public class SkillTreeItemizer {
 }
 
 public class SkillTreeIndexTracker:MonoBehaviour {
-    public SkillTree.SkillNode node;
+    public GameData.SkillNode node;
     public bool isUnlocked { get; private set; } = false;
     bool hasCheck = false;
     Transform[] spinners;
@@ -140,13 +140,13 @@ public class SkillTreeIndexTracker:MonoBehaviour {
     public void Rescan() {
         if(!isActiveAndEnabled) return;
 
-        var hasRegion = ArchiSaver.GetItemCount($"Skigill Region: {Enum.GetName(typeof(SkillTree.SkillNodeRegion), node.region).ToTitleCase()}") > 0;
+        var hasRegion = ArchiSaver.GetItemCount($"Skigill Region: {Enum.GetName(typeof(GameData.SkillNodeRegion), node.region).ToTitleCase()}") > 0;
         var hasFBK = ArchiSaver.GetItemCount($"Final Boss Key") > 0;
 
         //lock boss region behind all others if option enabled
         var bossLast = Int64.Parse(ArchiSaver.instance.metaProg["archi_boss_last"]);
-        if(bossLast > 0 && node.region == SkillTree.SkillNodeRegion.BOSSES) {
-            foreach(var n in Enum.GetNames(typeof(SkillTree.SkillNodeRegion))) {
+        if(bossLast > 0 && node.region == GameData.SkillNodeRegion.BOSSES) {
+            foreach(var n in Enum.GetNames(typeof(GameData.SkillNodeRegion))) {
                 if(ArchiSaver.GetItemCount($"Skigill Region: {n.ToTitleCase()}") == 0) {
                     hasRegion = false;
                     break;
@@ -155,15 +155,15 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         }
 
         //lock unreachable regions
-        if(node.region == SkillTree.SkillNodeRegion.STRONGMAN
+        if(node.region == GameData.SkillNodeRegion.STRONGMAN
             && ArchiSaver.GetItemCount("Skigill Region: Prototype") == 0
             && ArchiSaver.GetItemCount("Character: Strongman") == 0)
             hasRegion = false;
-        if(node.region == SkillTree.SkillNodeRegion.FOX
+        if(node.region == GameData.SkillNodeRegion.FOX
             && ArchiSaver.GetItemCount("Skigill Region: Dragon") == 0
             && ArchiSaver.GetItemCount("Character: Fox") == 0)
             hasRegion = false;
-        if(node.region == SkillTree.SkillNodeRegion.DWARVES
+        if(node.region == GameData.SkillNodeRegion.DWARVES
             && ((ArchiSaver.GetItemCount("Skigill Region: Prototype") == 0 && ArchiSaver.GetItemCount("Character: Strongman") == 0)
                 || ArchiSaver.GetItemCount("Skigill Region: Strongman") == 0)
             && ((ArchiSaver.GetItemCount("Skigill Region: Dragon") == 0 && ArchiSaver.GetItemCount("Character: Fox") == 0)
@@ -172,14 +172,14 @@ public class SkillTreeIndexTracker:MonoBehaviour {
             hasRegion = false;
 
         hasCheck = false;
-        var isChest = node.type == SkillTree.SkillNodeType.CHEST;
-        var isPerk = node.type == SkillTree.SkillNodeType.PERK;
+        var isChest = node.type == GameData.SkillNodeType.CHEST;
+        var isPerk = node.type == GameData.SkillNodeType.PERK;
         if(isChest || isPerk) {
-            var checkStr = $"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? node.chestIndex : node.perkIndex) + 1} ({Enum.GetName(typeof(SkillTree.SkillNodeRegion), node.region)})";
+            var checkStr = $"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? node.chestIndex : node.perkIndex) + 1} ({Enum.GetName(typeof(GameData.SkillNodeRegion), node.region)})";
             hasCheck = !ArchiSaver.instance.sentChecks.Contains(checkStr) && !ArchiSaver.instance.unsentChecks.Contains(checkStr) && ArchiSaver.instance.allValidChecks.Contains(checkStr);
         }
 
-        if(hasRegion && (node.type != SkillTree.SkillNodeType.BOSS_FINAL || hasFBK))
+        if(hasRegion && (node.type != GameData.SkillNodeType.BOSS_FINAL || hasFBK))
             Unlock();
         else
             Lock();

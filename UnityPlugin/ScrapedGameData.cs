@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace Archskipelagill;
 
-public static partial class SkillTree {
+public static partial class GameData {
     public static List<SkillNode> skillTree = [
 		new SkillNode(SkillNodeType.STAT, [1, 8], SkillNodeRegion.DWARVES, 185, -1, -1),
 		new SkillNode(SkillNodeType.STAT, [0, 2, 9], SkillNodeRegion.DWARVES, 600, -1, -1),

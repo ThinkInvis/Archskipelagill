@@ -112,7 +112,7 @@ public class Plugin:BaseUnityPlugin {
 
         // a bunch of debug buttons
         if(GUI.Button(new Rect(16, 210, 200, 20), "DEBUG: Scrape Game Data")) {
-            SkillTree.ScrapeSkillTree();
+            GameData.ScrapeSkillTree();
         }
         if(GUI.Button(new Rect(16, 240, 200, 20), "DEBUG: Interrupt Connection")) {
             ArchipelagoClient.Disconnect();
