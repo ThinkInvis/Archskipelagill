@@ -146,6 +146,7 @@ public static partial class GameData {
             outputWpnCs.Add($"\t\tnew(\"{wd.unlocksableSaveNames[i]}\", \"{wpn.name.Replace("(Clone)", "")}\", {wc.ID}, false)");
         }
         foreach(var wpn in wd.WeaponList.Except(wd.unlockablePrefabs)) {
+            if(wpn == null) continue;
             var wc = wpn.GetComponent<weaponStats>();
             outputWpnCs.Add($"\t\tnew(null, \"{wpn.name.Replace("(Clone)", "")}\", {wc.ID}, true)");
         }
