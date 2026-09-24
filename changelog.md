@@ -1,6 +1,6 @@
 ## Changelog
 
-### Upcoming Release
+### 1.0.0-beta
 
 - Added a new Archipelago connection panel and a new submenu on the main menu and pause menu
 - Added a new Archipelago console, replacing the previous nonfunctional implementation
@@ -16,11 +16,14 @@
 - Added configurable directionality (off, send, receive, or both) to Death Link
 - Added configurable action to Death Link (can now end run with no reward or inflict a random trap)
 - Fixed a possible infinite loop and other similar edge cases in Death Link
+- Fixed some Archipelago weapon unlocks not working due to mismatched internal names
+- Fixed Skigill node location name numbering being y-inverted (intended order is LtR-then-TtB like a book)
 - Backend:
   - The client will no longer even attempt to send checks that aren't active/valid on the server
   - Fixed a probably harmless error that could sometimes occur because skill tree itemization was trying to activate on the meta tree
   - Client will no longer send all checks, including previously unsent checks twice, every single time it connects; now only previously unsent checks will be sent once
   - Slightly improved performance by replacing/caching some uses of GameObject.Find
+  - Improved internal naming and usability of the ingame data scraper
 
 ### 1.0.0-alpha3
 

@@ -4,7 +4,7 @@
         <TargetFramework>netstandard2.1</TargetFramework>
         <AssemblyName>Archskipelagill</AssemblyName>
         <Description>An Archipelago Multiworld Randomizer implementation for Skigill</Description>
-        <Version>1.0.0-alpha3</Version>
+        <Version>1.0.0-beta</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>latest</LangVersion>
         <!-- you may need this for getting the multiclient dll to output for .net 6 and netstandard 2.0 -->
