@@ -62,8 +62,14 @@ public class ArchiSaver:JSONsaver {
     float tSinceLastReceive = 0f;
     public new void Update() {
         base.Update();
-        while(itemsToProcess.Count > 0)
-            ProcessItem(itemsToProcess.Dequeue());
+        if(itemsToProcess.Count > 0) {
+            PreSave();
+            while(itemsToProcess.Count > 0)
+                ProcessItem(itemsToProcess.Dequeue());
+            metaProg["archi_savedItems"] = string.Join("|", receivedItemCounts.ToList().Select(kvp => kvp.Key + ";" + kvp.Value.ToString()));
+            metaProg["archi_lastIndex"] = lastSavedIndex.ToString();
+            PostSave();
+        }
 
         if(queuedSentChecks.Count > 0) {
             List<string> qscList = [];
@@ -131,7 +137,6 @@ public class ArchiSaver:JSONsaver {
                ))
             itemNotifsToProcess.Enqueue(item.ItemName);
 
-        PreSave();
         var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
 
         switch(item.ItemName) {
@@ -159,9 +164,6 @@ public class ArchiSaver:JSONsaver {
         }
 
         lastSavedIndex++;
-        metaProg["archi_savedItems"] = string.Join("|", receivedItemCounts.ToList().Select(kvp => kvp.Key + ";" + kvp.Value.ToString()));
-        metaProg["archi_lastIndex"] = (lastSavedIndex).ToString();
-        PostSave();
 
         Plugin.BepinLogger.LogMessage($"Received item {item.ItemName}, total count now {receivedItemCounts[item.ItemName]}");
     }
