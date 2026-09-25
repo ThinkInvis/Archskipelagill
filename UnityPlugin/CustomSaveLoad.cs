@@ -8,6 +8,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -63,39 +64,40 @@ public class ArchiSaver:JSONsaver {
     float tSinceLastReceive = 0f;
     public new void Update() {
         base.Update();
-        if(itemsToProcess.Count > 0) {
-            PreSave();
-            while(itemsToProcess.Count > 0)
-                ProcessItem(itemsToProcess.Dequeue());
-            metaProg["archi_savedItems"] = string.Join("|", receivedItemCounts.ToList().Select(kvp => kvp.Key + ";" + kvp.Value.ToString()));
-            metaProg["archi_lastIndex"] = lastSavedIndex.ToString();
-            PostSave();
-        }
 
-        if(queuedSentChecks.Count > 0) {
-            List<string> qscList = [];
-            while(queuedSentChecks.Count > 0) {
-                if(!queuedSentChecks.TryDequeue(out var qsc)) break;
-                qscList.Add(qsc);
+        if(itemsToProcess.Count > 0 || queuedSentChecks.Count > 0 || queuedUnsentChecks.Count > 0) {
+            PreSave();
+
+            if(itemsToProcess.Count > 0) {
+                while(itemsToProcess.Count > 0)
+                    ProcessItem(itemsToProcess.Dequeue());
+                metaProg["archi_savedItems"] = string.Join("|", receivedItemCounts.ToList().Select(kvp => kvp.Key + ";" + kvp.Value.ToString()));
+                metaProg["archi_lastIndex"] = lastSavedIndex.ToString();
             }
-            sentChecks.AddRange(qscList);
-            PreSave();
-            metaProg["archi_sentChecks"] = String.Join("|", sentChecks);
-            PostSave();
 
-            if(Plugin.instance.customSaveLoad.cfgSendNotifs.Value)
-                sendNotifsToProcess += qscList.Count;
-        }
+            if(queuedSentChecks.Count > 0) {
+                List<string> qscList = [];
+                while(queuedSentChecks.Count > 0) {
+                    if(!queuedSentChecks.TryDequeue(out var qsc)) break;
+                    qscList.Add(qsc);
+                }
+                sentChecks.AddRange(qscList);
+                metaProg["archi_sentChecks"] = String.Join("|", sentChecks);
 
-        if(queuedUnsentChecks.Count > 0) {
-            List<string> qucList = [];
-            while(queuedUnsentChecks.Count > 0) {
-                if(!queuedUnsentChecks.TryDequeue(out var qsc)) break;
-                qucList.Add(qsc);
+                if(Plugin.instance.customSaveLoad.cfgSendNotifs.Value)
+                    sendNotifsToProcess += qscList.Count;
             }
-            unsentChecks.AddRange(qucList.Except(unsentChecks.Distinct()));
-            PreSave();
-            metaProg["archi_unsentChecks"] = String.Join("|", unsentChecks);
+
+            if(queuedUnsentChecks.Count > 0) {
+                List<string> qucList = [];
+                while(queuedUnsentChecks.Count > 0) {
+                    if(!queuedUnsentChecks.TryDequeue(out var qsc)) break;
+                    qucList.Add(qsc);
+                }
+                unsentChecks.AddRange(qucList.Except(unsentChecks.Distinct()));
+                metaProg["archi_unsentChecks"] = String.Join("|", unsentChecks);
+            }
+
             PostSave();
         }
 
