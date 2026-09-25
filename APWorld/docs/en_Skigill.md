@@ -8,11 +8,11 @@ To configure and export a config file: install Archskipelagill's `.apworld` file
 
 [Skigill](https://store.steampowered.com/app/3657180/Skigill/) is a game released on Steam in early 2026 by Achromi. It's a Survivors-like -- a top-down single-stick shooter where aiming and shooting happens automatically, and enemies spawn in waves from the edges of the screen. What makes this game unique is that its map/playfield is a gigantic skill tree! Purchases are made by standing on nodes of the tree for a couple seconds (a possibly dangerous proposition when being constantly swarmed by enemies), granting you extra stats, weapons, and perks.
 
-Archskipelagill currently exists as a Custom implementation and must be installed to Archipelago manually.
-
 ## What does Archskipelagill do?
 
-[Archipelago](https://archipelago.gg/) is a program that coordinates randomizers across multiple games, letting players find and send each other items that have been scrambled throughout a cross-game Multiworld. This Archipelago implementation currently makes the following changes to its game:
+[Archipelago](https://archipelago.gg/) is a program that coordinates randomizers across multiple games, letting players find and send each other items that have been scrambled throughout a cross-game Multiworld.
+
+Archskipelagill currently exists as a Custom implementation and must be installed to Archipelago manually. It currently makes the following changes to Skigill once installed:
 
 ### Goals
 
