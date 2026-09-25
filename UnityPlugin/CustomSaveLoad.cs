@@ -86,6 +86,8 @@ public class ArchiSaver:JSONsaver {
 
                 if(Plugin.instance.customSaveLoad.cfgSendNotifs.Value)
                     sendNotifsToProcess += qscList.Count;
+
+                Plugin.instance.skillTreeItemizer.RescanAll();
             }
 
             if(queuedUnsentChecks.Count > 0) {
