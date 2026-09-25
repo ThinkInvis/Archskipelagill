@@ -150,6 +150,7 @@ public class ArchiSaver:JSONsaver {
             case "Skigill Region: Dragon":
             case "Skigill Region: Dwarves":
             case "Skigill Region: Bosses":
+            case "Final Boss Key":
                 Plugin.instance.skillTreeItemizer.RescanAll();
                 break;
             case string trapTest when trapTest.StartsWith("Trap: "):
