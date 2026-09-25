@@ -130,7 +130,7 @@ public class ArchiSaver:JSONsaver {
     public void ReceiveArchiItem(Archipelago.MultiClient.Net.Models.ItemInfo receivedItem) {
         Plugin.BepinLogger.LogDebug($"Received item {receivedItem.ItemName} at index {lastReceivedIndex}/{lastSavedIndex}");
 
-        lastReceivedIndex++;
+        Interlocked.Increment(ref lastReceivedIndex);
 
         if(lastReceivedIndex > lastSavedIndex) {
             //ReceiveArchiItem is called from a thread, which can cause issues with BepInEx error handling; queue and check everything on the next main thread update instead
