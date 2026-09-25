@@ -12,7 +12,7 @@ Archskipelagill currently exists as a Custom implementation and must be installe
 
 ## What does Archskipelagill do?
 
-This Archipelago mod currently implements the following changes to its game:
+[Archipelago](https://archipelago.gg/) is a program that coordinates randomizers across multiple games, letting players find and send each other items that have been scrambled throughout a cross-game Multiworld. This Archipelago implementation currently makes the following changes to its game:
 
 ### Goals
 
