@@ -22,6 +22,7 @@ public class ArchiSaver:JSONsaver {
     public readonly Dictionary<string, int> receivedItemCounts = [];
     public readonly List<string> unsentChecks = [];
     public readonly ConcurrentQueue<string> queuedSentChecks = [];
+    public readonly ConcurrentQueue<string> queuedUnsentChecks = [];
     public readonly List<string> sentChecks = [];
     public readonly List<string> allValidChecks = [];
     public readonly Queue<string> queuedTraps = [];
@@ -84,6 +85,18 @@ public class ArchiSaver:JSONsaver {
 
             if(Plugin.instance.customSaveLoad.cfgSendNotifs.Value)
                 sendNotifsToProcess += qscList.Count;
+        }
+
+        if(queuedUnsentChecks.Count > 0) {
+            List<string> qucList = [];
+            while(queuedUnsentChecks.Count > 0) {
+                if(!queuedUnsentChecks.TryDequeue(out var qsc)) break;
+                qucList.Add(qsc);
+            }
+            unsentChecks.AddRange(qucList.Except(unsentChecks.Distinct()));
+            PreSave();
+            metaProg["archi_unsentChecks"] = String.Join("|", unsentChecks);
+            PostSave();
         }
 
         bool doNotifs = false;
@@ -169,10 +182,8 @@ public class ArchiSaver:JSONsaver {
     }
 
     public void ReceiveUnsentChecks(params string[] checkNames) {
-        unsentChecks.AddRange(checkNames.Except(unsentChecks));
-        PreSave();
-        metaProg["archi_unsentChecks"] = String.Join("|", unsentChecks);
-        PostSave();
+        foreach(var n in checkNames)
+            queuedUnsentChecks.Enqueue(n);
     }
     public void ReceiveSentChecks(params string[] checkNames) {
         foreach(var n in checkNames)
