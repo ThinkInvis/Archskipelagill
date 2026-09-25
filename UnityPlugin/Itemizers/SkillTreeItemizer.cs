@@ -34,7 +34,7 @@ public class SkillTreeItemizer {
         for(var i = 0; i < allValidNodes.Count; i++) {
             if(!allValidNodes[i].gameObject.TryGetComponent<SkillTreeIndexTracker>(out var tkr))
                 tkr = allValidNodes[i].gameObject.AddComponent<SkillTreeIndexTracker>();
-            tkr.node = GameData.skillTree[i];
+            tkr.dataNode = GameData.skillTree[i];
         }
     }
 
@@ -55,10 +55,10 @@ public class SkillTreeItemizer {
         orig(self);
         var tkr = self.GetComponent<SkillTreeIndexTracker>();
         if(!tkr) return;
-        var isChest = tkr.node.type == GameData.SkillNodeType.CHEST;
-        var isPerk = tkr.node.type == GameData.SkillNodeType.PERK;
+        var isChest = tkr.dataNode.type == GameData.SkillNodeType.CHEST;
+        var isPerk = tkr.dataNode.type == GameData.SkillNodeType.PERK;
         if(!isChest && !isPerk) return;
-        Plugin.ArchipelagoClient.CheckLocationsByName($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? tkr.node.chestIndex : tkr.node.perkIndex) + 1} ({Enum.GetName(typeof(GameData.SkillNodeRegion), tkr.node.region)})");
+        Plugin.ArchipelagoClient.CheckLocationsByName($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? tkr.dataNode.chestIndex : tkr.dataNode.perkIndex) + 1} ({Enum.GetName(typeof(GameData.SkillNodeRegion), tkr.dataNode.region)})");
         tkr.Rescan();
     }
 
@@ -81,13 +81,15 @@ public class SkillTreeItemizer {
 }
 
 public class SkillTreeIndexTracker:MonoBehaviour {
-    public GameData.SkillNode node;
+    public skigillNode node;
+    public GameData.SkillNode dataNode;
     public bool isUnlocked { get; private set; } = false;
     bool hasCheck = false;
     Transform[] spinners;
     UnityEngine.UI.Image activateVfx;
     SpriteRenderer iconColor, nodeOcto;
     Color origIconColor;
+    instantiateBoss bossCpt;
 
 
 #pragma warning disable IDE0051 //Used by Unity Engine
@@ -108,10 +110,12 @@ public class SkillTreeIndexTracker:MonoBehaviour {
                 spinners[i].gameObject.SetActive(hasCheck);
             }
         }
+        node = GetComponent<skigillNode>();
         activateVfx = transform.Find("canvas/Activate").GetComponent<UnityEngine.UI.Image>();
         iconColor = transform.Find("IconColor").GetComponent<SpriteRenderer>();
         nodeOcto = transform.Find("nodeOcto").GetComponent<SpriteRenderer>();
         origIconColor = iconColor.color;
+        bossCpt = GetComponent<instantiateBoss>();
     }
 
     void Update() {
@@ -139,12 +143,12 @@ public class SkillTreeIndexTracker:MonoBehaviour {
     public void Rescan() {
         if(!isActiveAndEnabled) return;
 
-        var hasRegion = ArchiSaver.GetItemCount($"Skigill Region: {Enum.GetName(typeof(GameData.SkillNodeRegion), node.region).ToTitleCase()}") > 0;
+        var hasRegion = ArchiSaver.GetItemCount($"Skigill Region: {Enum.GetName(typeof(GameData.SkillNodeRegion), dataNode.region).ToTitleCase()}") > 0;
         var hasFBK = ArchiSaver.GetItemCount($"Final Boss Key") > 0;
 
         //lock boss region behind all others if option enabled
         var bossLast = Int64.Parse(ArchiSaver.instance.metaProg["archi_boss_last"]);
-        if(bossLast > 0 && node.region == GameData.SkillNodeRegion.BOSSES) {
+        if(bossLast > 0 && dataNode.region == GameData.SkillNodeRegion.BOSSES) {
             foreach(var n in Enum.GetNames(typeof(GameData.SkillNodeRegion))) {
                 if(ArchiSaver.GetItemCount($"Skigill Region: {n.ToTitleCase()}") == 0) {
                     hasRegion = false;
@@ -154,15 +158,15 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         }
 
         //lock unreachable regions
-        if(node.region == GameData.SkillNodeRegion.STRONGMAN
+        if(dataNode.region == GameData.SkillNodeRegion.STRONGMAN
             && ArchiSaver.GetItemCount("Skigill Region: Prototype") == 0
             && ArchiSaver.GetItemCount("Character: Strongman") == 0)
             hasRegion = false;
-        if(node.region == GameData.SkillNodeRegion.FOX
+        if(dataNode.region == GameData.SkillNodeRegion.FOX
             && ArchiSaver.GetItemCount("Skigill Region: Dragon") == 0
             && ArchiSaver.GetItemCount("Character: Fox") == 0)
             hasRegion = false;
-        if(node.region == GameData.SkillNodeRegion.DWARVES
+        if(dataNode.region == GameData.SkillNodeRegion.DWARVES
             && ((ArchiSaver.GetItemCount("Skigill Region: Prototype") == 0 && ArchiSaver.GetItemCount("Character: Strongman") == 0)
                 || ArchiSaver.GetItemCount("Skigill Region: Strongman") == 0)
             && ((ArchiSaver.GetItemCount("Skigill Region: Dragon") == 0 && ArchiSaver.GetItemCount("Character: Fox") == 0)
@@ -171,14 +175,28 @@ public class SkillTreeIndexTracker:MonoBehaviour {
             hasRegion = false;
 
         hasCheck = false;
-        var isChest = node.type == GameData.SkillNodeType.CHEST;
-        var isPerk = node.type == GameData.SkillNodeType.PERK;
+        var isChest = dataNode.type == GameData.SkillNodeType.CHEST;
+        var isPerk = dataNode.type == GameData.SkillNodeType.PERK;
+        var isBoss = dataNode.type == GameData.SkillNodeType.BOSS;
         if(isChest || isPerk) {
-            var checkStr = $"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? node.chestIndex : node.perkIndex) + 1} ({Enum.GetName(typeof(GameData.SkillNodeRegion), node.region)})";
-            hasCheck = ArchiData.HasLocation(checkStr) == ArchiData.LocationState.Unchecked;
+            hasCheck = ArchiData.HasLocation($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? dataNode.chestIndex : dataNode.perkIndex) + 1} ({Enum.GetName(typeof(GameData.SkillNodeRegion), dataNode.region)})") == ArchiData.LocationState.Unchecked;
+        } else if(isBoss && bossCpt != null) {
+            var targetBossName = bossCpt.bossPrefab.GetComponentInChildren<VieScript>().bossName switch {
+                "OVNI" => "Rosa",
+                "GRENOUILLE" => "Roger",
+                "SLIME" => "Jello",
+                "POULPE" => "Pilpou",
+                "BOULE" => "Bouboul",
+                "COCHON" => "Gari",
+                "FINAL" => "Final Boss",
+                _ => "N/A"
+            };
+            if(targetBossName != "N/A") {
+                hasCheck = ArchiData.HasLocation($"Defeated {targetBossName}") == ArchiData.LocationState.Unchecked;
+            }
         }
 
-        if(hasRegion && (node.type != GameData.SkillNodeType.BOSS_FINAL || hasFBK))
+        if(hasRegion && (dataNode.type != GameData.SkillNodeType.BOSS_FINAL || hasFBK))
             Unlock();
         else
             Lock();
