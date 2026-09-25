@@ -166,7 +166,7 @@ public class ArchiSaver:JSONsaver {
     }
 
     public void ReceiveUnsentChecks(params string[] checkNames) {
-        unsentChecks.AddRange(checkNames);
+        unsentChecks.AddRange(checkNames.Except(unsentChecks));
         PreSave();
         metaProg["archi_unsentChecks"] = String.Join("|", unsentChecks);
         PostSave();
