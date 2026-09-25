@@ -198,10 +198,18 @@ public class ArchipelagoClient {
             ArchiSaver.instance.ReceiveUnsentChecks([.. unsentNames]);
             return;
         }
-        unsentNames = [.. unsentNames.Where(n => session.Locations.AllMissingLocations.Contains(session.Locations.GetLocationIdFromName("Skigill", n)))];
-        session.Locations.CompleteLocationChecks([.. unsentNames.Select(n => session.Locations.GetLocationIdFromName("Skigill", n))]);
+        RunLocationCheck([.. unsentNames.Where(n => session.Locations.AllMissingLocations.Contains(session.Locations.GetLocationIdFromName("Skigill", n)))]);
+    }
+    private async void RunLocationCheck(params string[] unsentNames) {
+        try {
+            await session.Locations.CompleteLocationChecksAsync([.. unsentNames.Select(n => session.Locations.GetLocationIdFromName("Skigill", n))]);
+        } catch(Exception ex) {
+            Plugin.BepinLogger.LogError("Failed to send checks:");
+            Plugin.BepinLogger.LogError(ex);
+            ArchiSaver.instance.ReceiveUnsentChecks([.. unsentNames]);
+            return;
+        }
         ArchiSaver.instance.ReceiveSentChecks([.. unsentNames]);
-        var slotData = session.DataStorage.GetSlotData();
 
         var goalType = Int64.Parse(ArchiSaver.instance.metaProg["archi_goal"]);
         string[] validGoals = goalType switch {
@@ -212,7 +220,7 @@ public class ArchipelagoClient {
             5 => ["I'm The Boss Now on Difficulty 7"],
             _ => ["Defeated Final Boss"]
         };
-        if(names.Intersect(validGoals).Any()) {
+        if(unsentNames.Intersect(validGoals).Any()) {
             Plugin.BepinLogger.LogMessage("Goal!!!");
             session.SetGoalAchieved();
             ArchiSendController.CreateSend(true);

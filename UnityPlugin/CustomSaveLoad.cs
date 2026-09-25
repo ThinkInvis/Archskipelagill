@@ -5,6 +5,7 @@ using BepInEx.Configuration;
 using MonoMod.Cil;
 using MonoMod.Utils;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -20,6 +21,7 @@ public class ArchiSaver:JSONsaver {
 
     public readonly Dictionary<string, int> receivedItemCounts = [];
     public readonly List<string> unsentChecks = [];
+    public readonly ConcurrentQueue<string> queuedSentChecks = [];
     public readonly List<string> sentChecks = [];
     public readonly List<string> allValidChecks = [];
     public readonly Queue<string> queuedTraps = [];
@@ -62,6 +64,21 @@ public class ArchiSaver:JSONsaver {
         base.Update();
         while(itemsToProcess.Count > 0)
             ProcessItem(itemsToProcess.Dequeue());
+
+        if(queuedSentChecks.Count > 0) {
+            List<string> qscList = [];
+            while(queuedSentChecks.Count > 0) {
+                if(!queuedSentChecks.TryDequeue(out var qsc)) break;
+                qscList.Add(qsc);
+            }
+            sentChecks.AddRange(qscList);
+            PreSave();
+            metaProg["archi_sentChecks"] = String.Join("|", sentChecks);
+            PostSave();
+
+            if(Plugin.instance.customSaveLoad.cfgSendNotifs.Value)
+                sendNotifsToProcess += qscList.Count;
+        }
 
         bool doNotifs = false;
         var camObj = GameObject.FindGameObjectWithTag("MainCamera");
@@ -155,13 +172,8 @@ public class ArchiSaver:JSONsaver {
         PostSave();
     }
     public void ReceiveSentChecks(params string[] checkNames) {
-        sentChecks.AddRange(checkNames);
-        PreSave();
-        metaProg["archi_sentChecks"] = String.Join("|", sentChecks);
-        PostSave();
-
-        if(Plugin.instance.customSaveLoad.cfgSendNotifs.Value)
-            sendNotifsToProcess += checkNames.Length;
+        foreach(var n in checkNames)
+            queuedSentChecks.Enqueue(n);
     }
     public void ResendChecks() {
         if(unsentChecks.Count > 0) {
