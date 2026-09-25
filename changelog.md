@@ -1,5 +1,14 @@
 ## Changelog
 
+### 1.0.0-beta1
+
+- Added location tracker VFX to boss Skigill nodes (only indicates Defeat Once locations, not high-difficulty/ITBN)
+- Fixed Final Boss Key not immediately unlocking the relevant node if obtained mid-run
+- Fixed sending checks causing a brief freeze while connected to a non-local host (caused by synchronous wait for network tx/rx)
+- Made sending checks and receiving items much more thread-safe
+- Greatly reduced, and restricted to main thread, number of times the mod can cause file writes after receiving information batches from Archipelago, potentially fixing a rare file write error
+- Console now automatically scrolls to bottom when sending a message, instead of when receiving
+
 ### 1.0.0-beta
 
 - Added a new Archipelago connection panel and a new submenu on the main menu and pause menu
