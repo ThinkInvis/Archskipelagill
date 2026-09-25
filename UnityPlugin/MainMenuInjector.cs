@@ -237,7 +237,10 @@ public class MainMenuInjector {
 
         consoleField.onSubmit.AddListener(content => {
             Plugin.ArchipelagoClient.SendMessage(content);
+            consoleText.text += "\r\n" + content;
             consoleField.text = "";
+            LayoutRebuilder.ForceRebuildLayoutImmediate(consoleScroll.rectTransform);
+            consoleScroll.SetVerticalNormalizedPosition(0f);
         });
 
         _nextConsoleState = Plugin.ArchipelagoClient.session != null;
@@ -279,8 +282,6 @@ public class MainMenuInjector {
     void UpdateLog() {
         if(archiMenu == null) return;
         consoleText.text = string.Join("\r\n", logLines);
-        LayoutRebuilder.ForceRebuildLayoutImmediate(consoleScroll.rectTransform);
-        consoleScroll.SetVerticalNormalizedPosition(0f);
     }
 
     public class PauseMenuScrollHandler : MonoBehaviour {
