@@ -18,11 +18,13 @@ Archskipelagill currently exists as a Custom implementation and must be installe
 
 - Some nodes of the Skigill will be locked; these appear dimmer, and cannot be activated. These must be unlocked in batches by being sent corresponding Archipelago items.
 - Some items from the meta-tree (characters and weapons) will be locked; these display a custom lock icon, and can't be used even once purchased. These must be unlocked individually by being sent corresponding Archipelago items.
+- The alternate maps are unsupported and will be permanently locked for as long as the mod is installed.
 - A Location will be placed at each Chest and Perk on the Skigill, as well as after escaping with each character and weapon and defeating each boss.
 - Not much extra randomization is added, as Skigill is a decently random roguelite already. The primary source is which extra Item is attached to each Location, and in which order regions/weapons/characters get unlocked.
 - The Goal is to defeat the final boss.
 - Built-in Location Tracker effects will highlight unchecked locations with spinning orbs and blinking minimap dots, and cause comets to fall/rise whenever you receive or send items.
 - A new button and submenu will be added to the main and pause menus, containing a connection panel and console for the Archipelago client.
+- A separate save file will be used by the mod, leaving the base game save file untouched. The mod's save file can be wiped from a button on the Archipelago submenu while disconnected.
 
 ### Goals
 
