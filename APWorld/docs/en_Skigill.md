@@ -8,16 +8,28 @@ To configure and export a config file: install Archskipelagill's `.apworld` file
 
 [Skigill](https://store.steampowered.com/app/3657180/Skigill/) is a game released on Steam in early 2026 by Achromi. It's a Survivors-like -- a top-down single-stick shooter where aiming and shooting happens automatically, and enemies spawn in waves from the edges of the screen. What makes this game unique is that its map/playfield is a gigantic skill tree! Purchases are made by standing on nodes of the tree for a couple seconds (a possibly dangerous proposition when being constantly swarmed by enemies), granting you extra stats, weapons, and perks.
 
-Archskipelagill currently exists as a Custom implementation and must be installed to Archipelago manually.
-
 ## What does Archskipelagill do?
 
-This Archipelago mod currently implements the following changes to its game:
+[Archipelago](https://archipelago.gg/) is a program that coordinates randomizers across multiple games, letting players find and send each other items that have been scrambled throughout a cross-game Multiworld.
+
+Archskipelagill currently exists as a Custom implementation and must be installed to Archipelago manually. It currently makes the following changes to Skigill once installed:
+
+### Summary of Effects (on Default Settings)
+
+- Some nodes of the Skigill will be locked; these appear dimmer, and cannot be activated. These must be unlocked in batches by being sent corresponding Archipelago items.
+- Some items from the meta-tree (characters and weapons) will be locked; these display a custom lock icon, and can't be used even once purchased. These must be unlocked individually by being sent corresponding Archipelago items.
+- The alternate maps are unsupported and will be permanently locked for as long as the mod is installed.
+- A Location will be placed at each Chest and Perk on the Skigill, as well as after escaping with each character and weapon and defeating each boss.
+- Not much extra randomization is added, as Skigill is a decently random roguelite already. The primary source is which extra Item is attached to each Location, and in which order regions/weapons/characters get unlocked.
+- The Goal is to defeat the final boss.
+- Built-in Location Tracker effects will highlight unchecked locations with spinning orbs and blinking minimap dots, and cause comets to fall/rise whenever you receive or send items.
+- A new button and submenu will be added to the main and pause menus, containing a connection panel and console for the Archipelago client.
+- A separate save file will be used by the mod, leaving the base game save file untouched. The mod's save file can be wiped from a button on the Archipelago submenu while disconnected.
 
 ### Goals
 
+- Defeat the final boss (default)
 - Defeat any boss once, excluding the final boss
-- Defeat the final boss
 - Defeat all bosses in one run ("I'm the boss now" achievement)
 - Any of the above goals with an added Difficulty 7 requirement
 
