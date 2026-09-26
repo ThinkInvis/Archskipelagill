@@ -265,16 +265,16 @@ public class CustomSaveLoad {
         cfgNoStartingInventory = Plugin.instance.config.Bind<bool>(new ConfigDefinition("Special Effects", "Item Notifications: Ignore Starting Inventory"), true, new ConfigDescription("If true, starting inventory items will not generate notifications."));
         cfgMuteNotifs = Plugin.instance.config.Bind<bool>(new ConfigDefinition("Special Effects", "Item Notifications: Mute"), false, new ConfigDescription("If true, item notifications will not play sound."));
 
-        IL.JSONsaver.save += JSONsaver_save;
-        IL.JSONsaver.load += JSONsaver_load;
-        On.MoneyBagScript.addMoneyToBag += MoneyBagScript_addMoneyToBag;
-        On.JSONsaver.save += JSONsaver_save1;
+        IL.JSONsaver.save += IL_JSONsaver_save;
+        IL.JSONsaver.load += IL_JSONsaver_load;
+        On.MoneyBagScript.addMoneyToBag += On_MoneyBagScript_addMoneyToBag;
+        On.JSONsaver.save += On_JSONsaver_save;
         var cslGO = new GameObject(); //main menu JSONSaver uses a tag for ident/finding, so this should be safe from intercepting MoneyBagScript et al.
         UnityEngine.Object.DontDestroyOnLoad(cslGO);
         cslGO.AddComponent<ArchiSaver>();
     }
 
-    private void JSONsaver_save1(On.JSONsaver.orig_save orig, JSONsaver self) {
+    private void On_JSONsaver_save(On.JSONsaver.orig_save orig, JSONsaver self) {
         orig(self);
         if(self != ArchiSaver.instance) {
             ArchiSaver.instance.metaProg.Clear();
@@ -282,7 +282,7 @@ public class CustomSaveLoad {
         }
     }
 
-    private void MoneyBagScript_addMoneyToBag(On.MoneyBagScript.orig_addMoneyToBag orig, MoneyBagScript self) {
+    private void On_MoneyBagScript_addMoneyToBag(On.MoneyBagScript.orig_addMoneyToBag orig, MoneyBagScript self) {
         var mpo = GameObject.FindGameObjectWithTag("MetaProg");
         if(mpo != null && mpo.TryGetComponent<JSONsaver>(out var saver)) {
             if(!saver.metaProg.TryGetValue("archi_manualMetaMoney", out var manualMoneyStr))
@@ -292,7 +292,7 @@ public class CustomSaveLoad {
         orig(self);
     }
 
-    private void JSONsaver_load(ILContext il) {
+    private void IL_JSONsaver_load(ILContext il) {
         ILCursor c = new(il);
         c.GotoNext(MoveType.After, x => x.MatchLdstr("/save.json"));
         c.EmitDelegate<Func<string, string>>((origStr) => $"/archi-save-{cfgRunSuffix.Value}.json");
@@ -300,7 +300,7 @@ public class CustomSaveLoad {
         c.EmitDelegate<Func<string, string>>((origStr) => $"/archi-save-{cfgRunSuffix.Value}.json");
     }
 
-    private void JSONsaver_save(ILContext il) {
+    private void IL_JSONsaver_save(ILContext il) {
         ILCursor c = new(il);
         c.GotoNext(MoveType.After, x => x.MatchLdstr("/save.json"));
         c.EmitDelegate<Func<string, string>>((origStr) => $"/archi-save-{cfgRunSuffix.Value}.json");

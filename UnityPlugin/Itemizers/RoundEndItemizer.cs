@@ -4,17 +4,17 @@ namespace Archskipelagill.Itemizers;
 
 public class RoundEndItemizer {
     public RoundEndItemizer() {
-        On.mainCameraScript.playerWin += MainCameraScript_playerWin;
-        On.VieScript.dies += VieScript_dies;
-        On.mainCameraScript.cancelWinVortex += MainCameraScript_cancelWinVortex;
+        On.mainCameraScript.playerWin += On_MainCameraScript_playerWin;
+        On.VieScript.dies += On_VieScript_dies;
+        On.mainCameraScript.cancelWinVortex += On_MainCameraScript_cancelWinVortex;
     }
 
-    private void MainCameraScript_cancelWinVortex(On.mainCameraScript.orig_cancelWinVortex orig, mainCameraScript self) {
+    private void On_MainCameraScript_cancelWinVortex(On.mainCameraScript.orig_cancelWinVortex orig, mainCameraScript self) {
         if(ArchiSaver.GetItemCount("Endless Mode") < 1) return;
         orig(self);
     }
 
-    private void VieScript_dies(On.VieScript.orig_dies orig, VieScript self) {
+    private void On_VieScript_dies(On.VieScript.orig_dies orig, VieScript self) {
         orig(self);
         var stats = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
         if(self.isBoss) {
@@ -42,7 +42,7 @@ public class RoundEndItemizer {
         }
     }
 
-    private void MainCameraScript_playerWin(On.mainCameraScript.orig_playerWin orig, mainCameraScript self) {
+    private void On_MainCameraScript_playerWin(On.mainCameraScript.orig_playerWin orig, mainCameraScript self) {
         orig(self);
 
         var charaStats = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();

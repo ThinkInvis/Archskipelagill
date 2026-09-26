@@ -25,11 +25,11 @@ public class MainMenuInjector {
 
     public MainMenuInjector() {
         //for pause menu button: look for [#MainCamera]/Canvas/pauseMenu, /Quit, remove/replace EventTrigger and replace Button.onClick.PersistentCall[1]
-        On.mainCameraScript.Start += MainCameraScript_Start;
-        On.mainCameraScript.Update += MainCameraScript_Update;
-        On.mainMenuCamScript.Start += MainMenuCamScript_Start;
-        On.mainMenuCamScript.Update += MainMenuCamScript_Update;
-        On.mainCameraScript.setQuitPause += MainCameraScript_setQuitPause;
+        On.mainCameraScript.Start += On_MainCameraScript_Start;
+        On.mainCameraScript.Update += On_MainCameraScript_Update;
+        On.mainMenuCamScript.Start += On_MainMenuCamScript_Start;
+        On.mainMenuCamScript.Update += On_MainMenuCamScript_Update;
+        On.mainCameraScript.setQuitPause += On_MainCameraScript_setQuitPause;
         archiBtnDcState = new SpriteState {
             highlightedSprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-button-dc-selected.png"),
             selectedSprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/archi-button-dc-selected.png"),
@@ -42,7 +42,7 @@ public class MainMenuInjector {
         };
     }
 
-    private void MainCameraScript_setQuitPause(On.mainCameraScript.orig_setQuitPause orig, mainCameraScript self) {
+    private void On_MainCameraScript_setQuitPause(On.mainCameraScript.orig_setQuitPause orig, mainCameraScript self) {
         orig(self);
         if(self.canPause && !self.paused) {
             pauseMenuState = false;
@@ -50,7 +50,7 @@ public class MainMenuInjector {
         } else pauseMenuLeaving = false;
     }
 
-    private void MainCameraScript_Update(On.mainCameraScript.orig_Update orig, mainCameraScript self) {
+    private void On_MainCameraScript_Update(On.mainCameraScript.orig_Update orig, mainCameraScript self) {
         orig(self);
         if(self.ended) {
             pauseMenu.SetActive(false);
@@ -94,7 +94,7 @@ public class MainMenuInjector {
         }
     }
 
-    private void MainCameraScript_Start(On.mainCameraScript.orig_Start orig, mainCameraScript self) {
+    private void On_MainCameraScript_Start(On.mainCameraScript.orig_Start orig, mainCameraScript self) {
         orig(self);
         SetupMenu();
 
@@ -128,7 +128,7 @@ public class MainMenuInjector {
         UpdateLog();
     }
 
-    private void MainMenuCamScript_Update(On.mainMenuCamScript.orig_Update orig, mainMenuCamScript self) {
+    private void On_MainMenuCamScript_Update(On.mainMenuCamScript.orig_Update orig, mainMenuCamScript self) {
         orig(self);
         if(self.menuMode == "archiMenu") {
             archiMenu.SetActive(true);
@@ -174,7 +174,7 @@ public class MainMenuInjector {
         }
     }
 
-    private void MainMenuCamScript_Start(On.mainMenuCamScript.orig_Start orig, mainMenuCamScript self) {
+    private void On_MainMenuCamScript_Start(On.mainMenuCamScript.orig_Start orig, mainMenuCamScript self) {
         orig(self);
         SetupMenu();
 

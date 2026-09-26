@@ -17,9 +17,9 @@ public class TrapHandler {
     public ConfigEntry<float> cfgSpawnTimeTrapStrength;
 
     public TrapHandler() {
-        On.timerScript.Update += TimerScript_Update;
-        On.timerScript.Start += TimerScript_Start;
-        On.CharaStats.Update += CharaStats_Update;
+        On.timerScript.Update += On_TimerScript_Update;
+        On.timerScript.Start += On_TimerScript_Start;
+        On.CharaStats.Update += On_CharaStats_Update;
 
         cfgTrapInterval = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Trap Interval"), 15f, new ConfigDescription("How much mid-run time to wait between activating queued traps. Traps will not activate while the game is paused or on the menu.", new AcceptableValueRange<float>(0f, 300f)));
         cfgDamageTrapStrength = Plugin.instance.config.Bind<float>(new ConfigDefinition("Difficulty", "Damage Trap Strength"), 0.5f, new ConfigDescription("Fraction of health in damage dealt by Trap: Damage.", new AcceptableValueRange<float>(0f, 1f)));
@@ -128,12 +128,12 @@ public class TrapHandler {
         CreateTrapNotif(trapSpriteName, lifetime);
     }
 
-    private void TimerScript_Start(On.timerScript.orig_Start orig, timerScript self) {
+    private void On_TimerScript_Start(On.timerScript.orig_Start orig, timerScript self) {
         orig(self);
         lastTrapTime = 0f;
     }
 
-    private void TimerScript_Update(On.timerScript.orig_Update orig, timerScript self) {
+    private void On_TimerScript_Update(On.timerScript.orig_Update orig, timerScript self) {
         orig(self);
         if(ArchiSaver.instance.queuedTraps.Count == 0) return;
         if((self.t - lastTrapTime) > cfgTrapInterval.Value) {
@@ -142,7 +142,7 @@ public class TrapHandler {
         }
     }
 
-    private void CharaStats_Update(On.CharaStats.orig_Update orig, CharaStats self) {
+    private void On_CharaStats_Update(On.CharaStats.orig_Update orig, CharaStats self) {
         orig(self);
         if(self.GetComponent<WeaponJamTrap>())
             self.effectiveATKSPEED = -99f;

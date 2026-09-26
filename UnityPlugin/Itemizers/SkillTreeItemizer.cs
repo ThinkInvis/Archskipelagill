@@ -9,15 +9,15 @@ public class SkillTreeItemizer {
     public ConfigEntry<bool> cfgSkillTreeLocationTracker;
 
     public SkillTreeItemizer() {
-        On.skigillNode.activate += SkigillNode_activate;
-        On.skigillNode.OnTriggerStay2D += SkigillNode_OnTriggerStay2D;
-        On.CharaStats.Start += CharaStats_Start;
-        On.skigillNode.showConnex += SkigillNode_showConnex;
+        On.skigillNode.activate += On_SkigillNode_activate;
+        On.skigillNode.OnTriggerStay2D += On_SkigillNode_OnTriggerStay2D;
+        On.CharaStats.Start += On_CharaStats_Start;
+        On.skigillNode.showConnex += On_SkigillNode_showConnex;
 
         cfgSkillTreeLocationTracker = Plugin.instance.config.Bind<bool>(new ConfigDefinition("Special Effects", "Skigill Location Tracker"), true, new ConfigDescription("If true, unchecked locations on the Skigill will be marked."));
     }
 
-    private void CharaStats_Start(On.CharaStats.orig_Start orig, CharaStats self) {
+    private void On_CharaStats_Start(On.CharaStats.orig_Start orig, CharaStats self) {
         orig(self);
 
         if(self.metaMenu) return;
@@ -46,12 +46,12 @@ public class SkillTreeItemizer {
         }
     }
 
-    private void SkigillNode_OnTriggerStay2D(On.skigillNode.orig_OnTriggerStay2D orig, skigillNode self, UnityEngine.Collider2D collision) {
+    private void On_SkigillNode_OnTriggerStay2D(On.skigillNode.orig_OnTriggerStay2D orig, skigillNode self, UnityEngine.Collider2D collision) {
         if(!self.TryGetComponent<SkillTreeIndexTracker>(out var tkr) || tkr.isUnlocked)
             orig(self, collision);
     }
 
-    private void SkigillNode_activate(On.skigillNode.orig_activate orig, skigillNode self) {
+    private void On_SkigillNode_activate(On.skigillNode.orig_activate orig, skigillNode self) {
         orig(self);
         var tkr = self.GetComponent<SkillTreeIndexTracker>();
         if(!tkr) return;
@@ -62,7 +62,7 @@ public class SkillTreeItemizer {
         tkr.Rescan();
     }
 
-    private void SkigillNode_showConnex(On.skigillNode.orig_showConnex orig, skigillNode self) {
+    private void On_SkigillNode_showConnex(On.skigillNode.orig_showConnex orig, skigillNode self) {
         orig(self);
         if(self.TryGetComponent<SkillTreeIndexTracker>(out var tkr)) {
             for(var j = 0; j < self.transform.childCount; j++) {

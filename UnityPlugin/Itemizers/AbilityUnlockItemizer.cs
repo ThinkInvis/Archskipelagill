@@ -11,23 +11,23 @@ public class AbilityUnlockItemizer {
     public ConfigEntry<bool> cfgAbilityLocationTracker;
 
     public AbilityUnlockItemizer() {
-        On.charaSelectScript.selected += CharaSelectScript_selected;
-        On.charaSelectScript.updateUnlockStatus += CharaSelectScript_updateUnlockStatus;
-        On.diffSelectScript.updateUnlockStatus += DiffSelectScript_updateUnlockStatus;
-        On.modeSelectScript.updateUnlockStatus += ModeSelectScript_updateUnlockStatus;
-        On.chestLootScript.loote += ChestLootScript_loote;
-        On.skigillNode.Update += SkigillNode_Update;
-        On.skigillNode.Start += SkigillNode_Start;
-        On.weaponDisplayer.Start += WeaponDisplayer_Start;
-        On.charaSelectScript.Start += CharaSelectScript_Start;
-        On.endMenuManager.Start += EndMenuManager_Start;
+        On.charaSelectScript.selected += On_CharaSelectScript_selected;
+        On.charaSelectScript.updateUnlockStatus += On_CharaSelectScript_updateUnlockStatus;
+        On.diffSelectScript.updateUnlockStatus += On_DiffSelectScript_updateUnlockStatus;
+        On.modeSelectScript.updateUnlockStatus += On_ModeSelectScript_updateUnlockStatus;
+        On.chestLootScript.loote += On_ChestLootScript_loote;
+        On.skigillNode.Update += On_SkigillNode_Update;
+        On.skigillNode.Start += On_SkigillNode_Start;
+        On.weaponDisplayer.Start += On_WeaponDisplayer_Start;
+        On.charaSelectScript.Start += On_CharaSelectScript_Start;
+        On.endMenuManager.Start += On_EndMenuManager_Start;
 
         customLockSprite = Plugin.resources.LoadAsset<Sprite>("Assets/Textures/locked-archi.png");
 
         cfgAbilityLocationTracker = Plugin.instance.config.Bind<bool>(new ConfigDefinition("Special Effects", "Ability Location Tracker"), true, new ConfigDescription("If true, unchecked locations corresponding to weapons and characters will be marked."));
     }
 
-    private void EndMenuManager_Start(On.endMenuManager.orig_Start orig, endMenuManager self) {
+    private void On_EndMenuManager_Start(On.endMenuManager.orig_Start orig, endMenuManager self) {
         orig(self);
         var checkStr = $"Escaped with {GameData.AllCharacters.First(n => n.id == self.st.chara).name}";
         if(self.st.won && ArchiData.HasLocation(checkStr) == ArchiData.LocationState.Unchecked) {
@@ -38,7 +38,7 @@ public class AbilityUnlockItemizer {
         }
     }
 
-    private void CharaSelectScript_Start(On.charaSelectScript.orig_Start orig, charaSelectScript self) {
+    private void On_CharaSelectScript_Start(On.charaSelectScript.orig_Start orig, charaSelectScript self) {
         orig(self);
         var checkStr = $"Escaped with {GameData.AllCharacters.First(n => n.id == self.ID).name}";
         if(cfgAbilityLocationTracker.Value && ArchiData.HasLocation(checkStr) == ArchiData.LocationState.Unchecked) {
@@ -47,14 +47,14 @@ public class AbilityUnlockItemizer {
         }
     }
 
-    private void WeaponDisplayer_Start(On.weaponDisplayer.orig_Start orig, weaponDisplayer self) {
+    private void On_WeaponDisplayer_Start(On.weaponDisplayer.orig_Start orig, weaponDisplayer self) {
         orig(self);
         var checkStr = $"Escaped with Weapon {self.GetComponent<weaponDisplayer>().source.name.Replace("(Clone)", "")}";
         if(cfgAbilityLocationTracker.Value && self.levelToDisplay == 0 && ArchiData.HasLocation(checkStr) == ArchiData.LocationState.Unchecked)
             self.gameObject.AddComponent<AbilityDisplayerCheckInd>();
     }
 
-    private void SkigillNode_Update(On.skigillNode.orig_Update orig, skigillNode self) {
+    private void On_SkigillNode_Update(On.skigillNode.orig_Update orig, skigillNode self) {
         orig(self);
         if(!self.metaProg) return;
         if(self.type == 20) {
@@ -69,7 +69,7 @@ public class AbilityUnlockItemizer {
         }
     }
 
-    private void SkigillNode_Start(On.skigillNode.orig_Start orig, skigillNode self) {
+    private void On_SkigillNode_Start(On.skigillNode.orig_Start orig, skigillNode self) {
         orig(self);
         if(self.metaProg && self.type == 20) {
             if(ArchiData.HasLocation($"Escaped with {GameData.AllCharacters.FirstOrDefault(n => n.internalName == self.name).name}") == ArchiData.LocationState.Unchecked
@@ -80,7 +80,7 @@ public class AbilityUnlockItemizer {
         }
     }
 
-    private int ChestLootScript_loote(On.chestLootScript.orig_loote orig, chestLootScript self) {
+    private int On_ChestLootScript_loote(On.chestLootScript.orig_loote orig, chestLootScript self) {
         var dict = GameObject.FindGameObjectWithTag("Dict").GetComponent<weaponDictionary>();
         var origList = (Transform[])dict.WeaponList.Clone();
         for(int i = 0; i < origList.Length; i++) {
@@ -93,7 +93,7 @@ public class AbilityUnlockItemizer {
         return retv;
     }
 
-    private void ModeSelectScript_updateUnlockStatus(On.modeSelectScript.orig_updateUnlockStatus orig, modeSelectScript self) {
+    private void On_ModeSelectScript_updateUnlockStatus(On.modeSelectScript.orig_updateUnlockStatus orig, modeSelectScript self) {
         orig(self);
         var isArchiLocked = false;
         if(self.mode != "normal") {
@@ -112,7 +112,7 @@ public class AbilityUnlockItemizer {
         lir.UpdateIcon();
     }
 
-    private void DiffSelectScript_updateUnlockStatus(On.diffSelectScript.orig_updateUnlockStatus orig, diffSelectScript self) {
+    private void On_DiffSelectScript_updateUnlockStatus(On.diffSelectScript.orig_updateUnlockStatus orig, diffSelectScript self) {
         orig(self);
         var isArchiLocked = false;
         if(ArchiSaver.GetItemCount("Progressive Difficulty") < self.difficulty && self.unlocked) {
@@ -127,7 +127,7 @@ public class AbilityUnlockItemizer {
         lir.UpdateIcon();
     }
 
-    private void CharaSelectScript_updateUnlockStatus(On.charaSelectScript.orig_updateUnlockStatus orig, charaSelectScript self) {
+    private void On_CharaSelectScript_updateUnlockStatus(On.charaSelectScript.orig_updateUnlockStatus orig, charaSelectScript self) {
         orig(self);
         var isArchiLocked = false;
         if(self.unlocked && !ArchiData.HasCharacterById(self.ID)) {
@@ -142,7 +142,7 @@ public class AbilityUnlockItemizer {
         lir.UpdateIcon();
     }
 
-    private void CharaSelectScript_selected(On.charaSelectScript.orig_selected orig, charaSelectScript self) {
+    private void On_CharaSelectScript_selected(On.charaSelectScript.orig_selected orig, charaSelectScript self) {
         orig(self);
         var isArchiLocked = false;
         if(self.unlocked && !ArchiData.HasCharacterById(self.ID)) {

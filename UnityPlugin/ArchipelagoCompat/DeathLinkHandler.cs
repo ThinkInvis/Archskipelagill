@@ -25,9 +25,9 @@ public class DeathLinkHandler : IDisposable {
     public DeathLinkHandler(DeathLinkService deathLinkService, string name, bool enableDeathLink = false) {
         service = deathLinkService;
         service.OnDeathLinkReceived += DeathLinkReceived;
-        On.CharaStats.Update += CharaStats_Update;
-        On.mainCameraScript.playerDeath += MainCameraScript_playerDeath;
-        On.endMenuManager.returnToMenu += EndMenuManager_returnToMenu;
+        On.CharaStats.Update += On_CharaStats_Update;
+        On.mainCameraScript.playerDeath += On_MainCameraScript_playerDeath;
+        On.endMenuManager.returnToMenu += On_EndMenuManager_returnToMenu;
         slotName = name;
         deathLinkEnabled = enableDeathLink;
 
@@ -36,7 +36,7 @@ public class DeathLinkHandler : IDisposable {
         }
     }
 
-    private void EndMenuManager_returnToMenu(On.endMenuManager.orig_returnToMenu orig, endMenuManager self) {
+    private void On_EndMenuManager_returnToMenu(On.endMenuManager.orig_returnToMenu orig, endMenuManager self) {
         orig(self);
 
         if(Plugin.instance.cfgDeathLinkQuitIsDeath.Value && (Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Send || Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Both)) {
@@ -46,7 +46,7 @@ public class DeathLinkHandler : IDisposable {
         }
     }
 
-    private void MainCameraScript_playerDeath(On.mainCameraScript.orig_playerDeath orig, mainCameraScript self) {
+    private void On_MainCameraScript_playerDeath(On.mainCameraScript.orig_playerDeath orig, mainCameraScript self) {
         orig(self);
         if(Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Send || Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Both) {
             var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
@@ -81,7 +81,7 @@ public class DeathLinkHandler : IDisposable {
             : deathLink.Cause);
     }
 
-    private void CharaStats_Update(On.CharaStats.orig_Update orig, CharaStats self) {
+    private void On_CharaStats_Update(On.CharaStats.orig_Update orig, CharaStats self) {
         orig(self);
 
         if(self.metaMenu) return;
@@ -158,7 +158,7 @@ public class DeathLinkHandler : IDisposable {
 
     public void Dispose() {
         service.OnDeathLinkReceived -= DeathLinkReceived;
-        On.CharaStats.Update -= CharaStats_Update;
-        On.mainCameraScript.playerDeath -= MainCameraScript_playerDeath;
+        On.CharaStats.Update -= On_CharaStats_Update;
+        On.mainCameraScript.playerDeath -= On_MainCameraScript_playerDeath;
     }
 }
