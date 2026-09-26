@@ -4,7 +4,7 @@ using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.MessageLog.Messages;
 using Archipelago.MultiClient.Net.Packets;
-using Archskipelagill.EffectComponents;
+using Archskipelagill.UX;
 using BepInEx.Configuration;
 using System;
 using System.Linq;
@@ -12,31 +12,43 @@ using System.Threading;
 
 namespace Archskipelagill.ArchipelagoCompat;
 
-public class ArchipelagoClient {
-    public const string APVersion = "0.6.7";
-    private const string Game = "Skigill";
+public class ArchipelagoClient : Module<ArchipelagoClient> {
 
-    public static bool Authenticated;
-    private bool attemptingConnection;
-    public static float lastConnectTime = 0f;
+    ////// Initializer/Fields/Properties //////
+    
+    public const string AP_VERSION = "0.6.7";
+    private const string _GAME_NAME = "Skigill";
 
-    public static ArchipelagoData ServerData = new();
-    private DeathLinkHandler DeathLinkHandler;
-    internal ArchipelagoSession session;
+    public bool Authenticated {get; private set;} = false;
+    public float LastConnectTime {get; private set;} = 0f;
+    public string AutoConnectHostname => _cfgAutoConnectHostname.Value;
+    public string AutoConnectSlot => _cfgAutoConnectSlot.Value;
+    public string AutoConnectPassword => _cfgAutoConnectPassword.Value;
 
-    public ConfigEntry<string> cfgAutoConnectHostname;
-    public ConfigEntry<string> cfgAutoConnectSlot;
-    public ConfigEntry<string> cfgAutoConnectPassword;
+    private ArchipelagoSession _session = null;
+    private DeathLinkHandler _deathLinkHandler = null;
+    private ArchipelagoConnectionInfo _serverData = new();
+    private bool _attemptingConnection = false;
+    private bool _disconnecting = false;
+    private ArchipelagoConnectionInfo? _lastSlotDataReceived = null;
+    private string _seed = null;
+    private ConfigEntry<string> _cfgAutoConnectHostname;
+    private ConfigEntry<string> _cfgAutoConnectSlot;
+    private ConfigEntry<string> _cfgAutoConnectPassword;
 
+
+    ////// Public API //////
+    
     /// <summary>
-    /// call to connect to an Archipelago session. Connection info should already be set up on ServerData
+    /// Call to connect to an Archipelago session with the given connection info.
     /// </summary>
     /// <returns></returns>
-    public void Connect() {
-        if(Authenticated || attemptingConnection) return;
+    public void Connect(string hostname, string slot, string password) {
+        if(Authenticated || _attemptingConnection) return;
 
         try {
-            session = ArchipelagoSessionFactory.CreateSession(ServerData.Uri);
+            _serverData = new(hostname, slot, password);
+            _session = ArchipelagoSessionFactory.CreateSession(_serverData.uri);
             SetupSession();
         } catch(Exception e) {
             Plugin.BepinLogger.LogError(e);
@@ -46,26 +58,61 @@ public class ArchipelagoClient {
     }
 
     public void AutoConnect() {
-        cfgAutoConnectHostname = Plugin.instance.config.Bind<string>(new ConfigDefinition("Autoconnect", "Hostname"), "", new ConfigDescription("Which hostname to use when attempting autoconnect on game launch. Autoconnect will only be attempted if this setting is not a blank string."));
-        cfgAutoConnectSlot = Plugin.instance.config.Bind<string>(new ConfigDefinition("Autoconnect", "Slot name"), "", new ConfigDescription("Which slot name to use when attempting autoconnect on game launch. Autoconnect will only be attempted if this setting is not a blank string."));
-        cfgAutoConnectPassword = Plugin.instance.config.Bind<string>(new ConfigDefinition("Autoconnect", "Password"), "", new ConfigDescription("Which password to use when attempting autoconnect on game launch."));
+        _cfgAutoConnectHostname = Plugin.Instance.MainConfig.Bind<string>(new ConfigDefinition("Autoconnect", "Hostname"), "", new ConfigDescription("Which hostname to use when attempting autoconnect on game launch. Autoconnect will only be attempted if this setting is not a blank string."));
+        _cfgAutoConnectSlot = Plugin.Instance.MainConfig.Bind<string>(new ConfigDefinition("Autoconnect", "Slot name"), "", new ConfigDescription("Which slot name to use when attempting autoconnect on game launch. Autoconnect will only be attempted if this setting is not a blank string."));
+        _cfgAutoConnectPassword = Plugin.Instance.MainConfig.Bind<string>(new ConfigDefinition("Autoconnect", "Password"), "", new ConfigDescription("Which password to use when attempting autoconnect on game launch."));
 
-        if(cfgAutoConnectHostname.Value != "" && cfgAutoConnectSlot.Value != "") {
-            ServerData.Uri = cfgAutoConnectHostname.Value;
-            ServerData.SlotName = cfgAutoConnectSlot.Value;
-            ServerData.Password = cfgAutoConnectPassword.Value;
-            Connect();
+        if(AutoConnectHostname != "" && AutoConnectSlot != "") {
+            Connect(AutoConnectHostname, AutoConnectSlot, AutoConnectPassword);
         }
     }
 
     /// <summary>
-    /// add handlers for Archipelago events
+    /// Something went wrong, or we need to properly disconnect from the server; cleanup and re-null session.
+    /// </summary>
+    public void Disconnect() {
+        if(_disconnecting) return;
+        _disconnecting = true;
+        Plugin.BepinLogger.LogDebug("disconnecting from server...");
+        var task = _session?.Socket.DisconnectAsync();
+        _session.Socket.SocketClosed -= OnSessionSocketClosed;
+        _session.MessageLog.OnMessageReceived -= OnMessageReceived;
+        _session.Items.ItemReceived -= OnItemReceived;
+        _session.Socket.ErrorReceived -= OnSessionErrorReceived;
+        _deathLinkHandler?.Dispose();
+        _session = null;
+        Authenticated = false;
+        _disconnecting = false;
+        MainMenuInjector.Instance.OnDisconnect();
+    }
+
+    public void SendMessage(string message) {
+        _session.Socket.SendPacketAsync(new SayPacket { Text = message });
+    }
+
+    public void CheckLocationsByName(params string[] names) {
+        var unsentNames = names.Except(ArchipelagoSaver.Instance.SentChecks).Distinct().ToList();
+        if(unsentNames.Count() == 0) return;
+        Plugin.BepinLogger.LogMessage($"Attempting checks: {string.Join(", ", unsentNames.Select(n => '"' + n + '"'))}");
+        if(_session == null) {
+            Plugin.BepinLogger.LogWarning($"Offline, can't send; queueing");
+            ArchipelagoSaver.Instance.ReceiveUnsentChecks([.. unsentNames]);
+            return;
+        }
+        RunLocationCheck([.. unsentNames.Where(n => _session.Locations.AllMissingLocations.Contains(_session.Locations.GetLocationIdFromName("Skigill", n)))]);
+    }
+
+
+    ////// Private API //////
+    
+    /// <summary>
+    /// Add handlers for Archipelago events.
     /// </summary>
     private void SetupSession() {
-        session.MessageLog.OnMessageReceived += OnMessageReceived;
-        session.Items.ItemReceived += OnItemReceived;
-        session.Socket.ErrorReceived += OnSessionErrorReceived;
-        session.Socket.SocketClosed += OnSessionSocketClosed;
+        _session.MessageLog.OnMessageReceived += OnMessageReceived;
+        _session.Items.ItemReceived += OnItemReceived;
+        _session.Socket.ErrorReceived += OnSessionErrorReceived;
+        _session.Socket.SocketClosed += OnSessionSocketClosed;
     }
 
     /// <summary>
@@ -76,23 +123,23 @@ public class ArchipelagoClient {
             // it's safe to thread this function call but unity notoriously hates threading so do not use excessively
             ThreadPool.QueueUserWorkItem(
                 _ => HandleConnectResult(
-                    session.TryConnectAndLogin(
-                        Game,
-                        ServerData.SlotName,
+                    _session.TryConnectAndLogin(
+                        _GAME_NAME,
+                        _serverData.slotName,
                         ItemsHandlingFlags.AllItems,
-                        new Version(APVersion),
-                        password: ServerData.Password,
-                        requestSlotData: ServerData.NeedSlotData
+                        new Version(AP_VERSION),
+                        password: _serverData.password,
+                        requestSlotData: !_lastSlotDataReceived.HasValue || !_lastSlotDataReceived.Value.Equals(_serverData)
                     )));
         } catch(Exception e) {
             Plugin.BepinLogger.LogError(e);
             HandleConnectResult(new LoginFailure(e.ToString()));
-            attemptingConnection = false;
+            _attemptingConnection = false;
         }
     }
 
     /// <summary>
-    /// handle the connection result and do things
+    /// Handle the connection result and do things.
     /// </summary>
     /// <param name="result"></param>
     private void HandleConnectResult(LoginResult result) {
@@ -100,62 +147,38 @@ public class ArchipelagoClient {
         if(result.Successful) {
             var success = (LoginSuccessful)result;
 
-            ServerData.SetupSession(success.SlotData, session.RoomState.Seed);
+            _seed = _session.RoomState.Seed;
             Authenticated = true;
 
-            outText = $"Successfully connected to {ServerData.Uri} as {ServerData.SlotName}!";
+            outText = $"Successfully connected to {_serverData.uri} as {_serverData.slotName}!";
 
-            lastConnectTime = UnityEngine.Time.unscaledTime;
+            LastConnectTime = UnityEngine.Time.unscaledTime;
 
-            Plugin.instance.mainMenuInjector.OnConnect();
-            Plugin.instance.mainMenuInjector.ReceiveMessage(outText);
+            MainMenuInjector.Instance.OnConnect();
+            MainMenuInjector.Instance.ReceiveMessage(outText);
 
-            Plugin.BepinLogger.LogMessage($"Pre begin SSD on {ArchiSaver.instance}");
-            ArchiSaver.instance.StoreSlotData(session.DataStorage.GetSlotData(), session);
-            DeathLinkHandler = new(session.CreateDeathLinkService(), ServerData.SlotName, Plugin.instance.cfgDeathLinkTx.Value != DeathLinkHandler.DeathLinkTx.Off);
-            ArchiSaver.instance.ResendChecks();
+            ArchipelagoSaver.Instance.StoreSlotData(success.SlotData, _session);
+            _lastSlotDataReceived = _serverData;
+            _deathLinkHandler = new(_session.CreateDeathLinkService(), _serverData.slotName, Plugin.Instance.DeathLinkTx != DeathLinkHandler.DeathLinkTx.Off);
+            ArchipelagoSaver.Instance.ResendChecks();
         } else {
             var failure = (LoginFailure)result;
-            outText = $"Failed to connect to {ServerData.Uri} as {ServerData.SlotName}.";
+            outText = $"Failed to connect to {_serverData.uri} as {_serverData.slotName}.";
             outText = failure.Errors.Aggregate(outText, (current, error) => current + $"\n    {error}");
 
             Plugin.BepinLogger.LogError(outText);
 
             Authenticated = false;
             Disconnect();
-            Plugin.instance.mainMenuInjector.OnDisconnect();
+            MainMenuInjector.Instance.OnDisconnect();
         }
 
-        Plugin.instance.mainMenuInjector.ReceiveMessage(outText);
-        attemptingConnection = false;
-    }
-
-    bool disconnecting = false;
-    /// <summary>
-    /// something went wrong, or we need to properly disconnect from the server. cleanup and re null our session
-    /// </summary>
-    public void Disconnect() {
-        if(disconnecting) return;
-        disconnecting = true;
-        Plugin.BepinLogger.LogDebug("disconnecting from server...");
-        var task = session?.Socket.DisconnectAsync();
-        session.Socket.SocketClosed -= OnSessionSocketClosed;
-        session.MessageLog.OnMessageReceived -= OnMessageReceived;
-        session.Items.ItemReceived -= OnItemReceived;
-        session.Socket.ErrorReceived -= OnSessionErrorReceived;
-        DeathLinkHandler?.Dispose();
-        session = null;
-        Authenticated = false;
-        disconnecting = false;
-        Plugin.instance.mainMenuInjector.OnDisconnect();
-    }
-
-    public void SendMessage(string message) {
-        session.Socket.SendPacketAsync(new SayPacket { Text = message });
+        MainMenuInjector.Instance.ReceiveMessage(outText);
+        _attemptingConnection = false;
     }
 
     private void OnMessageReceived(LogMessage message) {
-        Plugin.instance.mainMenuInjector.ReceiveMessage(message.ToString());
+        MainMenuInjector.Instance.ReceiveMessage(message.ToString());
     }
 
     /// <summary>
@@ -165,9 +188,7 @@ public class ArchipelagoClient {
     private void OnItemReceived(ReceivedItemsHelper helper) {
         var receivedItem = helper.DequeueItem();
 
-        if(helper.Index <= ArchiSaver.instance.lastReceivedIndex) return;
-
-        ArchiSaver.instance.ReceiveArchiItem(receivedItem);
+        ArchipelagoSaver.Instance.ReceiveArchiItem(receivedItem, helper.Index);
     }
 
     /// <summary>
@@ -177,7 +198,7 @@ public class ArchipelagoClient {
     /// <param name="message">message received from the server</param>
     private void OnSessionErrorReceived(Exception e, string message) {
         Plugin.BepinLogger.LogError(e);
-        Plugin.instance.mainMenuInjector.ReceiveMessage(message);
+        MainMenuInjector.Instance.ReceiveMessage(message);
     }
 
     /// <summary>
@@ -188,30 +209,19 @@ public class ArchipelagoClient {
         Plugin.BepinLogger.LogError($"Connection to Archipelago lost: {reason}");
         Disconnect();
     }
-
-    public void CheckLocationsByName(params string[] names) {
-        var unsentNames = names.Except(ArchiSaver.instance.sentChecks).Distinct().ToList();
-        if(unsentNames.Count() == 0) return;
-        Plugin.BepinLogger.LogMessage($"Attempting checks: {string.Join(", ", unsentNames.Select(n => '"' + n + '"'))}");
-        if(session == null) {
-            Plugin.BepinLogger.LogWarning($"Offline, can't send; queueing");
-            ArchiSaver.instance.ReceiveUnsentChecks([.. unsentNames]);
-            return;
-        }
-        RunLocationCheck([.. unsentNames.Where(n => session.Locations.AllMissingLocations.Contains(session.Locations.GetLocationIdFromName("Skigill", n)))]);
-    }
+    
     private async void RunLocationCheck(params string[] unsentNames) {
         try {
-            await session.Locations.CompleteLocationChecksAsync([.. unsentNames.Select(n => session.Locations.GetLocationIdFromName("Skigill", n))]);
+            await _session.Locations.CompleteLocationChecksAsync([.. unsentNames.Select(n => _session.Locations.GetLocationIdFromName("Skigill", n))]);
         } catch(Exception ex) {
             Plugin.BepinLogger.LogError("Failed to send checks:");
             Plugin.BepinLogger.LogError(ex);
-            ArchiSaver.instance.ReceiveUnsentChecks([.. unsentNames]);
+            ArchipelagoSaver.Instance.ReceiveUnsentChecks([.. unsentNames]);
             return;
         }
-        ArchiSaver.instance.ReceiveSentChecks([.. unsentNames]);
+        ArchipelagoSaver.Instance.ReceiveSentChecks([.. unsentNames]);
 
-        var goalType = Int64.Parse(ArchiSaver.instance.metaProg["archi_goal"]);
+        var goalType = Int64.Parse(ArchipelagoSaver.Instance.metaProg["archi_goal"]);
         string[] validGoals = goalType switch {
             0 => ["Defeated Gari", "Defeated Bouboul", "Defeated Jello", "Defeated Roger", "Defeated Pilpou", "Defeated Rosa"],
             2 => ["I'm The Boss Now"],
@@ -222,7 +232,7 @@ public class ArchipelagoClient {
         };
         if(unsentNames.Intersect(validGoals).Any()) {
             Plugin.BepinLogger.LogMessage("Goal!!!");
-            session.SetGoalAchieved();
+            _session.SetGoalAchieved();
             ArchiSendController.CreateSend(true);
         }
     }

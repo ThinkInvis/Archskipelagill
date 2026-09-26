@@ -4,9 +4,11 @@ using System.IO;
 using System.Linq;
 using UnityEngine;
 
-namespace Archskipelagill;
+namespace Archskipelagill.GameDataAccess;
 
 public static partial class GameData {
+
+    ////// Nested Data Types //////
     public enum SkillNodeType { UNKNOWN, STAT, CHEST, PERK, BOSS, BOSS_FINAL };
     public enum SkillNodeRegion { MAGE, PROTOTYPE, DRAGON, STRONGMAN, FOX, DWARVES, BOSSES };
 
@@ -18,15 +20,6 @@ public static partial class GameData {
         public int chestIndex = _chestIndex;
         public int perkIndex = _perkIndex;
     }
-
-    static readonly string[] SPAWN_TARGET_NAMES = [
-        "Mage",
-        "Jugger",
-        "Dragon",
-        "Baldo",
-        "Fox",
-        "Nain"
-    ];
 
     public struct Weapon(string _saveName, string _prefabName, int _id, bool _starter) {
         public string saveName = _saveName;
@@ -41,7 +34,19 @@ public static partial class GameData {
         public int id = _id;
     }
 
-    public static List<Character> AllCharacters = [
+
+    ////// Initializer/Fields/Properties //////
+
+    static readonly string[] _SPAWN_TARGET_NAMES = [
+        "Mage",
+        "Jugger",
+        "Dragon",
+        "Baldo",
+        "Fox",
+        "Nain"
+    ];
+
+    public static readonly List<Character> allCharacters = [
         new("Mage", "Mage", 1),
         new("Strongman", "Baldo", 2),
         new("Fox", "Fox", 3),
@@ -50,35 +55,8 @@ public static partial class GameData {
         new("Dwarves", "Nain", 6)
         ];
 
-    static int FindNodeDistance(List<skigillNode> allValidNodes, skigillNode node1, skigillNode node2) {
-        var ind1 = allValidNodes.IndexOf(node1);
-        var ind2 = allValidNodes.IndexOf(node2);
 
-        var finalBossNode = allValidNodes.Find(n => n.adjacent.Count == 0 && n.type == 22);
-
-        var dist = new int[allValidNodes.Count()];
-        Array.Fill(dist, -1);
-        Queue<int> q = new();
-        dist[ind1] = 0;
-        q.Enqueue(ind1);
-        while(q.Count > 0) {
-            var indHere = q.Dequeue();
-            if(indHere == ind2)
-                return dist[ind2];
-            var adj = allValidNodes[indHere].adjacent.ToList();
-            if(allValidNodes[indHere].type == 22) adj.Add(finalBossNode.gameObject);
-            foreach(var nxgo in adj) {
-                var nxsn = nxgo.GetComponent<skigillNode>();
-                var indNext = allValidNodes.IndexOf(nxsn);
-                if(dist[indNext] == -1) {
-                    dist[indNext] = dist[indHere] + 1;
-                    q.Enqueue(indNext);
-                }
-            }
-        }
-
-        return -1;
-    }
+    ////// Public API //////
 
     public static void ScrapeSkillTree() {
         //Setup
@@ -126,8 +104,8 @@ public static partial class GameData {
             }
 
             var spawnDistances = new List<int>();
-            for(var j = 0; j < SPAWN_TARGET_NAMES.Length; j++) {
-                var targetNode = GameObject.Find("gridHolder/grid/Perks/" + SPAWN_TARGET_NAMES[j]).GetComponent<skigillNode>();
+            for(var j = 0; j < _SPAWN_TARGET_NAMES.Length; j++) {
+                var targetNode = GameObject.Find("gridHolder/grid/Perks/" + _SPAWN_TARGET_NAMES[j]).GetComponent<skigillNode>();
                 spawnDistances.Add(FindNodeDistance(allValidNodes, targetNode, node));
             }
             spawnDistances.Add(FindNodeDistance(allValidNodes, node, finalBossNode));
@@ -184,7 +162,7 @@ public static partial class GameData {
             $$"""
             using System.Collections.Generic;
 
-            namespace Archskipelagill;
+            namespace Archskipelagill.GameDataAccess;
 
             public static partial class GameData {
                 public static List<Weapon> allWeapons = [
@@ -196,6 +174,39 @@ public static partial class GameData {
             }
             """);
         Plugin.BepinLogger.LogMessage("Successfully saved scraped data to game root directory as skilltree_data.py, SkillTreeData.cs");
+    }
+
+
+    ////// Private API //////
+    
+    static int FindNodeDistance(List<skigillNode> allValidNodes, skigillNode node1, skigillNode node2) {
+        var ind1 = allValidNodes.IndexOf(node1);
+        var ind2 = allValidNodes.IndexOf(node2);
+
+        var finalBossNode = allValidNodes.Find(n => n.adjacent.Count == 0 && n.type == 22);
+
+        var dist = new int[allValidNodes.Count()];
+        Array.Fill(dist, -1);
+        Queue<int> q = new();
+        dist[ind1] = 0;
+        q.Enqueue(ind1);
+        while(q.Count > 0) {
+            var indHere = q.Dequeue();
+            if(indHere == ind2)
+                return dist[ind2];
+            var adj = allValidNodes[indHere].adjacent.ToList();
+            if(allValidNodes[indHere].type == 22) adj.Add(finalBossNode.gameObject);
+            foreach(var nxgo in adj) {
+                var nxsn = nxgo.GetComponent<skigillNode>();
+                var indNext = allValidNodes.IndexOf(nxsn);
+                if(dist[indNext] == -1) {
+                    dist[indNext] = dist[indHere] + 1;
+                    q.Enqueue(indNext);
+                }
+            }
+        }
+
+        return -1;
     }
 }
 

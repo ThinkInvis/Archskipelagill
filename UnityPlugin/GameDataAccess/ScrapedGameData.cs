@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Archskipelagill;
+namespace Archskipelagill.GameDataAccess;
 
 public static partial class GameData {
     public static List<Weapon> allWeapons = [

@@ -1,5 +1,11 @@
 ## Changelog
 
+### Upcoming Release
+
+- Fixed Damage Trap health fraction client config setting not applying
+- Backend:
+  - Major refactor to entire codebase to make it less of a huge mess in general
+
 ### 1.0.0-beta1
 
 - Added location tracker VFX to boss Skigill nodes (only indicates Defeat Once locations, not high-difficulty/ITBN)

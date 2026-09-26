@@ -1,16 +1,23 @@
-﻿using UnityEngine;
+﻿using Archskipelagill.ArchipelagoCompat;
+using UnityEngine;
 
-namespace Archskipelagill.Itemizers;
+namespace Archskipelagill.ItemsAndLocations;
 
 public class RoundEndItemizer {
-    public RoundEndItemizer() {
+
+	////// Initializer/Fields/Properties //////
+    
+	public RoundEndItemizer() {
         On.mainCameraScript.playerWin += On_MainCameraScript_playerWin;
         On.VieScript.dies += On_VieScript_dies;
         On.mainCameraScript.cancelWinVortex += On_MainCameraScript_cancelWinVortex;
     }
 
-    private void On_MainCameraScript_cancelWinVortex(On.mainCameraScript.orig_cancelWinVortex orig, mainCameraScript self) {
-        if(ArchiSaver.GetItemCount("Endless Mode") < 1) return;
+
+	////// MonoMod Hooks //////
+	#region MonoMod Hooks
+	private void On_MainCameraScript_cancelWinVortex(On.mainCameraScript.orig_cancelWinVortex orig, mainCameraScript self) {
+        if(ArchipelagoSaver.GetItemCount("Endless Mode") < 1) return;
         orig(self);
     }
 
@@ -29,14 +36,14 @@ public class RoundEndItemizer {
                 _ => "N/A"
             };
             if(targetBossName != "N/A") {
-                Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated {targetBossName}");
+                ArchipelagoClient.Instance.CheckLocationsByName($"Defeated {targetBossName}");
                 if(stats.difficulty > 6)
-                    Plugin.ArchipelagoClient.CheckLocationsByName($"Defeated {targetBossName} on Difficulty 7");
+                    ArchipelagoClient.Instance.CheckLocationsByName($"Defeated {targetBossName} on Difficulty 7");
             }
             if(stats.bossesKilled >= 6) {
-                Plugin.ArchipelagoClient.CheckLocationsByName("I'm The Boss Now");
+                ArchipelagoClient.Instance.CheckLocationsByName("I'm The Boss Now");
                 if(stats.difficulty > 6) {
-                    Plugin.ArchipelagoClient.CheckLocationsByName("I'm The Boss Now on Difficulty 7");
+                    ArchipelagoClient.Instance.CheckLocationsByName("I'm The Boss Now on Difficulty 7");
                 }
             }
         }
@@ -52,7 +59,8 @@ public class RoundEndItemizer {
             var ch = itemsObj.GetChild(i);
             var chn = ch.name.Replace("(Clone)", "");
             if(int.TryParse(chn[..3], out var n) && n >= 1 && n <= 60)
-                Plugin.ArchipelagoClient.CheckLocationsByName($"Escaped with Weapon {chn}");
+                ArchipelagoClient.Instance.CheckLocationsByName($"Escaped with Weapon {chn}");
         }
     }
+    #endregion
 }

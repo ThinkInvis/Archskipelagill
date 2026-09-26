@@ -1,5 +1,5 @@
 ﻿using Archipelago.MultiClient.Net.BounceFeatures.DeathLink;
-using Archskipelagill.Itemizers;
+using Archskipelagill.ItemsAndLocations;
 using BepInEx;
 using System;
 using System.Collections.Generic;
@@ -8,13 +8,20 @@ using UnityEngine;
 namespace Archskipelagill.ArchipelagoCompat;
 
 public class DeathLinkHandler : IDisposable {
-    private static bool deathLinkEnabled;
-    private readonly string slotName;
-    private readonly DeathLinkService service;
-    bool _responding = false;
-    private readonly Queue<DeathLink> deathLinks = new();
+
+    ////// Nested Data Types //////
+
     public enum DeathLinkTx { Off, Receive, Send, Both }
     public enum DeathLinkType { RandomTrap, Kill, EndRun }
+
+
+    ////// Initializer/Fields/Properties //////
+
+    private static bool _deathLinkEnabled;
+    private readonly string _slotName;
+    private readonly DeathLinkService _service;
+    private bool _responding = false;
+    private readonly Queue<DeathLink> _deathLinks = new();
 
     /// <summary>
     /// instantiates our death link handler, sets up the hook for receiving death links, and enables death link if needed
@@ -23,23 +30,25 @@ public class DeathLinkHandler : IDisposable {
     /// receive death links</param>
     /// <param name="enableDeathLink">Whether we should enable death link or not on startup</param>
     public DeathLinkHandler(DeathLinkService deathLinkService, string name, bool enableDeathLink = false) {
-        service = deathLinkService;
-        service.OnDeathLinkReceived += DeathLinkReceived;
+        _service = deathLinkService;
+        _service.OnDeathLinkReceived += DeathLinkReceived;
         On.CharaStats.Update += On_CharaStats_Update;
         On.mainCameraScript.playerDeath += On_MainCameraScript_playerDeath;
         On.endMenuManager.returnToMenu += On_EndMenuManager_returnToMenu;
-        slotName = name;
-        deathLinkEnabled = enableDeathLink;
+        _slotName = name;
+        _deathLinkEnabled = enableDeathLink;
 
-        if(deathLinkEnabled) {
-            service.EnableDeathLink();
+        if(_deathLinkEnabled) {
+            _service.EnableDeathLink();
         }
     }
 
+    ////// MonoMod Hooks //////
+    #region MonoMod Hooks
     private void On_EndMenuManager_returnToMenu(On.endMenuManager.orig_returnToMenu orig, endMenuManager self) {
         orig(self);
 
-        if(Plugin.instance.cfgDeathLinkQuitIsDeath.Value && (Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Send || Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Both)) {
+        if(Plugin.Instance.DeathLinkQuitIsDeath && (Plugin.Instance.DeathLinkTx == DeathLinkTx.Send || Plugin.Instance.DeathLinkTx == DeathLinkTx.Both)) {
             var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
             if(!cs.won && !cs.dead)
                 SendDeathLink();
@@ -48,37 +57,11 @@ public class DeathLinkHandler : IDisposable {
 
     private void On_MainCameraScript_playerDeath(On.mainCameraScript.orig_playerDeath orig, mainCameraScript self) {
         orig(self);
-        if(Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Send || Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Both) {
+        if(Plugin.Instance.DeathLinkTx == DeathLinkTx.Send || Plugin.Instance.DeathLinkTx == DeathLinkTx.Both) {
             var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
             if(!cs.won && cs.dead)
                 SendDeathLink();
         }
-    }
-
-    /// <summary>
-    /// enables/disables death link
-    /// </summary>
-    public void ToggleDeathLink() {
-        deathLinkEnabled = !deathLinkEnabled;
-
-        if(deathLinkEnabled) {
-            service.EnableDeathLink();
-        } else {
-            service.DisableDeathLink();
-        }
-    }
-
-    /// <summary>
-    /// what happens when we receive a deathLink
-    /// </summary>
-    /// <param name="deathLink">Received Death Link object to handle</param>
-    private void DeathLinkReceived(DeathLink deathLink) {
-        if(Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Receive || Plugin.instance.cfgDeathLinkTx.Value == DeathLinkTx.Both)
-            deathLinks.Enqueue(deathLink);
-
-        Plugin.BepinLogger.LogDebug(deathLink.Cause.IsNullOrWhiteSpace()
-            ? $"Received Death Link from: {deathLink.Source}"
-            : deathLink.Cause);
     }
 
     private void On_CharaStats_Update(On.CharaStats.orig_Update orig, CharaStats self) {
@@ -91,6 +74,23 @@ public class DeathLinkHandler : IDisposable {
         else
             KillPlayer(self);
     }
+    #endregion
+
+
+    ////// Public API //////
+
+    /// <summary>
+    /// enables/disables death link
+    /// </summary>
+    public void ToggleDeathLink() {
+        _deathLinkEnabled = !_deathLinkEnabled;
+
+        if(_deathLinkEnabled) {
+            _service.EnableDeathLink();
+        } else {
+            _service.DisableDeathLink();
+        }
+    }
 
     /// <summary>
     /// can be called when in a valid state to kill the player, dequeueing and immediately killing the player with a
@@ -98,22 +98,22 @@ public class DeathLinkHandler : IDisposable {
     /// </summary>
     public void KillPlayer(CharaStats targetPlayer) {
         try {
-            if(_responding || deathLinks.Count < 1) return;
+            if(_responding || _deathLinks.Count < 1) return;
 
             _responding = true;
 
-            var deathLink = deathLinks.Dequeue();
+            var deathLink = _deathLinks.Dequeue();
             var cause = deathLink.Cause.IsNullOrWhiteSpace() ? GetDeathLinkCause(deathLink) : deathLink.Cause;
 
-            Plugin.instance.trapHandler.CreateTrapNotif("trap-deathlink", 10f);
+            TrapHandler.Instance.CreateTrapNotif("trap-deathlink", 10f);
 
-            switch(Plugin.instance.cfgDeathLinkType.Value) {
+            switch(Plugin.Instance.DeathLinkType) {
                 case DeathLinkType.EndRun:
                     GameObject.Find("PlayerCharacter/Main Camera/Canvas/endMenu").GetComponent<endMenuManager>().returnToMenu();
                     _responding = false;
                     break;
                 case DeathLinkType.RandomTrap:
-                    Plugin.instance.trapHandler.TriggerTrap(new string[] { "Damage", "Pull Enemies", "Weapon Jam", "Drain Ski", "Scramble Stats", "Flash Mob", "Stronger Enemies" }[UnityEngine.Random.Range(0, 7)] );
+                    TrapHandler.Instance.TriggerTrap(new string[] { "Damage", "Pull Enemies", "Weapon Jam", "Drain Ski", "Scramble Stats", "Flash Mob", "Stronger Enemies" }[UnityEngine.Random.Range(0, 7)]);
                     _responding = false;
                     break;
                 default:
@@ -130,35 +130,51 @@ public class DeathLinkHandler : IDisposable {
     }
 
     /// <summary>
-    /// returns message for the player to see when a death link is received without a cause
-    /// </summary>
-    /// <param name="deathLink">death link object to get relevant info from</param>
-    /// <returns></returns>
-    private string GetDeathLinkCause(DeathLink deathLink) {
-        return $"Received death from {deathLink.Source}";
-    }
-
-    /// <summary>
     /// called to send a death link to the multiworld
     /// </summary>
     public void SendDeathLink() {
         try {
-            if(_responding || !deathLinkEnabled) return;
+            if(_responding || !_deathLinkEnabled) return;
 
-            Plugin.BepinLogger.LogMessage("sharing your death...");
+            Plugin.BepinLogger.LogMessage("Sharing your death...");
 
             // add the cause here
-            var linkToSend = new DeathLink(slotName);
+            var linkToSend = new DeathLink(_slotName);
 
-            service.SendDeathLink(linkToSend);
+            _service.SendDeathLink(linkToSend);
         } catch(Exception e) {
             Plugin.BepinLogger.LogError(e);
         }
     }
 
     public void Dispose() {
-        service.OnDeathLinkReceived -= DeathLinkReceived;
+        _service.OnDeathLinkReceived -= DeathLinkReceived;
         On.CharaStats.Update -= On_CharaStats_Update;
         On.mainCameraScript.playerDeath -= On_MainCameraScript_playerDeath;
+    }
+
+
+    ////// Private API //////
+
+    /// <summary>
+    /// what happens when we receive a deathLink
+    /// </summary>
+    /// <param name="deathLink">Received Death Link object to handle</param>
+    private void DeathLinkReceived(DeathLink deathLink) {
+        if(Plugin.Instance.DeathLinkTx == DeathLinkTx.Receive || Plugin.Instance.DeathLinkTx == DeathLinkTx.Both)
+            _deathLinks.Enqueue(deathLink);
+
+        Plugin.BepinLogger.LogDebug(deathLink.Cause.IsNullOrWhiteSpace()
+            ? $"Received Death Link from: {deathLink.Source}"
+            : deathLink.Cause);
+    }
+
+    /// <summary>
+    /// returns message for the player to see when a death link is received without a cause
+    /// </summary>
+    /// <param name="deathLink">death link object to get relevant info from</param>
+    /// <returns></returns>
+    private string GetDeathLinkCause(DeathLink deathLink) {
+        return $"Received death from {deathLink.Source}";
     }
 }
