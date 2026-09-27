@@ -194,6 +194,7 @@ public class ArchipelagoSaver:JSONsaver {
             PreSave();
             metaProg["archi_goal"] = ((Int64)slotData["goal_type"]).ToString();
             metaProg["archi_boss_last"] = ((Int64)slotData["boss_region_last"]).ToString();
+            Plugin.BepinLogger.LogMessage($"Storing slot data: ABL is {(Int64)slotData["boss_region_last"]}");
             if(metaProg.ContainsKey("archi_uuid") && metaProg["archi_uuid"] != (string)slotData["world_uuid"] && metaProg["archi_uuid"] != "") {
                 MainMenuInjector.Instance.ReceiveMessage(" !!! WARNING !!!  Your saved world UUID doesn't match with the server's. Please make sure you've RESET YOUR SAVE FILE before proceeding if this is a new run.");
             }

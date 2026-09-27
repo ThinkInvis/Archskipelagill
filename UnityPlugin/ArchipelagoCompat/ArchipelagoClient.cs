@@ -102,6 +102,7 @@ public class ArchipelagoClient : Module<ArchipelagoClient> {
             return;
         }
         RunLocationCheck([.. unsentNames.Where(n => _session.Locations.AllMissingLocations.Contains(_session.Locations.GetLocationIdFromName("Skigill", n)))]);
+        RunGoalCheck([.. unsentNames]);
     }
 
     public void OnQuit() {
@@ -233,7 +234,9 @@ public class ArchipelagoClient : Module<ArchipelagoClient> {
             return;
         }
         ArchipelagoSaver.Instance.ReceiveSentChecks([.. unsentNames]);
+    }
 
+    private async void RunGoalCheck(params string[] unsentNames) {
         var goalType = Int64.Parse(ArchipelagoSaver.Instance.metaProg["archi_goal"]);
         string[] validGoals = goalType switch {
             0 => ["Defeated Gari", "Defeated Bouboul", "Defeated Jello", "Defeated Roger", "Defeated Pilpou", "Defeated Rosa"],
@@ -243,6 +246,7 @@ public class ArchipelagoClient : Module<ArchipelagoClient> {
             5 => ["I'm The Boss Now on Difficulty 7"],
             _ => ["Defeated Final Boss"]
         };
+        Plugin.BepinLogger.LogDebug($"  Valid goals: {string.Join(", ", validGoals.Select(n => '"' + n + '"'))}");
         if(unsentNames.Intersect(validGoals).Any()) {
             Plugin.BepinLogger.LogMessage("Goal!!!");
             _session.SetGoalAchieved();

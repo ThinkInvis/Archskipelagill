@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Archskipelagill.ItemsAndLocations;
 
-public class RoundEndItemizer {
+public class RoundEndItemizer : Module<RoundEndItemizer> {
 
 	////// Initializer/Fields/Properties //////
     
