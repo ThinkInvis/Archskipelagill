@@ -2,6 +2,7 @@
 using Archskipelagill.GameDataAccess;
 using Archskipelagill.ItemsAndLocations;
 using Archskipelagill.UX;
+using BepInEx.Configuration;
 using MonoMod.Utils;
 using System;
 using System.Collections.Concurrent;
@@ -21,6 +22,7 @@ public class ArchipelagoSaver:JSONsaver {
     public ReadOnlyCollection<string> AllValidChecks { get; private set; }
     public ReadOnlyCollection<string> SentChecks { get; private set; }
     public ReadOnlyCollection<string> UnsentChecks { get; private set; }
+    public float BonusGillAmount => _cfgBonusGillAmount.Value;
 
     private readonly Dictionary<string, int> _receivedItemCounts = [];
     private readonly ConcurrentQueue<string> _queuedSentChecks = [];
@@ -35,6 +37,7 @@ public class ArchipelagoSaver:JSONsaver {
     private int _lastSavedIndex = 0;
     private float _tSinceLastSend = 0f;
     private float _tSinceLastReceive = 0f;
+    private ConfigEntry<float> _cfgBonusGillAmount;
 
 
     ////// Unity Engine API //////
@@ -46,6 +49,8 @@ public class ArchipelagoSaver:JSONsaver {
             return;
         }
         Instance = this;
+
+        _cfgBonusGillAmount = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Bonus Gill Amount"), 80f, new ConfigDescription("Amount of Gill the Bonus Gill filler item will add.", new AcceptableValueRange<float>(0f, 200f)));
 
         AllValidChecks = new(_allValidChecks);
         SentChecks = new(_sentChecks);
@@ -230,10 +235,10 @@ public class ArchipelagoSaver:JSONsaver {
 
         switch(item.ItemName) {
             case "Bonus Gill":
-                metaProg["totalMetaMoney"] = (int.Parse(metaProg.GetValueOrDefault("totalMetaMoney", "0")) + 50).ToString();
+                metaProg["totalMetaMoney"] = ((float)int.Parse(metaProg.GetValueOrDefault("totalMetaMoney", "0")) + BonusGillAmount).ToString();
                 if(cs.metaMenu) {
-                    cs.XP += 50;
-                    cs.XPtoDisplay += 50;
+                    cs.XP += BonusGillAmount;
+                    cs.XPtoDisplay += BonusGillAmount;
                     cs.updateXPtoDisplay();
                 }
                 break;
