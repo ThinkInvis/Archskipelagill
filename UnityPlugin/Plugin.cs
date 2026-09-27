@@ -68,6 +68,7 @@ public class Plugin:BaseUnityPlugin {
     }
 
     private void OnApplicationQuit() {
+        ArchipelagoClient.Instance.OnQuit();
         ArchipelagoClient.Instance.Disconnect();
     }
 

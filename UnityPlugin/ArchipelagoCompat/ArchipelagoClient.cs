@@ -9,6 +9,8 @@ using BepInEx.Configuration;
 using System;
 using System.Linq;
 using System.Threading;
+using UnityEngine;
+using static Archskipelagill.ArchipelagoCompat.DeathLinkHandler;
 
 namespace Archskipelagill.ArchipelagoCompat;
 
@@ -71,9 +73,9 @@ public class ArchipelagoClient : Module<ArchipelagoClient> {
     /// Something went wrong, or we need to properly disconnect from the server; cleanup and re-null session.
     /// </summary>
     public void Disconnect() {
-        if(_disconnecting) return;
+        if(_disconnecting || _session == null) return;
         _disconnecting = true;
-        Plugin.BepinLogger.LogDebug("disconnecting from server...");
+        Plugin.BepinLogger.LogDebug("Disconnecting from server...");
         var task = _session?.Socket.DisconnectAsync();
         _session.Socket.SocketClosed -= OnSessionSocketClosed;
         _session.MessageLog.OnMessageReceived -= OnMessageReceived;
@@ -100,6 +102,17 @@ public class ArchipelagoClient : Module<ArchipelagoClient> {
             return;
         }
         RunLocationCheck([.. unsentNames.Where(n => _session.Locations.AllMissingLocations.Contains(_session.Locations.GetLocationIdFromName("Skigill", n)))]);
+    }
+
+    public void OnQuit() {
+        if(_deathLinkHandler != null && Plugin.Instance.DeathLinkQuitIsDeath && (Plugin.Instance.DeathLinkTx == DeathLinkTx.Send || Plugin.Instance.DeathLinkTx == DeathLinkTx.Both)) {
+            var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
+            if(!cs.won && !cs.dead) {
+                _deathLinkHandler.SendDeathLink("Closed the game mid-run");
+            }
+        }
+        if(Authenticated)
+            Disconnect();
     }
 
 

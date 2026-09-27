@@ -51,7 +51,7 @@ public class DeathLinkHandler : IDisposable {
         if(Plugin.Instance.DeathLinkQuitIsDeath && (Plugin.Instance.DeathLinkTx == DeathLinkTx.Send || Plugin.Instance.DeathLinkTx == DeathLinkTx.Both)) {
             var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
             if(!cs.won && !cs.dead)
-                SendDeathLink();
+                SendDeathLink("Quit the run");
         }
     }
 
@@ -60,7 +60,7 @@ public class DeathLinkHandler : IDisposable {
         if(Plugin.Instance.DeathLinkTx == DeathLinkTx.Send || Plugin.Instance.DeathLinkTx == DeathLinkTx.Both) {
             var cs = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
             if(!cs.won && cs.dead)
-                SendDeathLink();
+                SendDeathLink($"Ran out of HP");
         }
     }
 
@@ -132,14 +132,14 @@ public class DeathLinkHandler : IDisposable {
     /// <summary>
     /// called to send a death link to the multiworld
     /// </summary>
-    public void SendDeathLink() {
+    public void SendDeathLink(string cause) {
         try {
             if(_responding || !_deathLinkEnabled) return;
 
             Plugin.BepinLogger.LogMessage("Sharing your death...");
 
             // add the cause here
-            var linkToSend = new DeathLink(_slotName);
+            var linkToSend = new DeathLink(_slotName, cause);
 
             _service.SendDeathLink(linkToSend);
         } catch(Exception e) {
