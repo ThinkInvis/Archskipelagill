@@ -291,7 +291,12 @@ public class MainMenuInjector : Module<MainMenuInjector> {
 
     private void UpdateLog() {
         if(_archiMenu == null) return;
+        var isAtBottom = _consoleScroll.verticalNormalizedPosition <= 0f;
         _consoleText.text = string.Join("\r\n", _logLines);
+        if(isAtBottom) {
+            LayoutRebuilder.ForceRebuildLayoutImmediate(_consoleScroll.rectTransform);
+            _consoleScroll.SetVerticalNormalizedPosition(0f);
+        }
     }
 
     private class PauseMenuScrollHandler : MonoBehaviour {
