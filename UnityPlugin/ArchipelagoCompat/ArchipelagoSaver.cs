@@ -27,6 +27,8 @@ public class ArchipelagoSaver:JSONsaver {
     private readonly Dictionary<string, int> _receivedItemCounts = [];
     private readonly ConcurrentQueue<string> _queuedSentChecks = [];
     private readonly ConcurrentQueue<string> _queuedUnsentChecks = [];
+    private readonly ConcurrentDictionary<string, object> _queuedSlotData = [];
+    private readonly ConcurrentQueue<string> _queuedValidLocationNames = [];
     private readonly List<string> _sentChecks = [];
     private readonly List<string> _unsentChecks = [];
     private readonly List<string> _allValidChecks = [];
@@ -82,7 +84,8 @@ public class ArchipelagoSaver:JSONsaver {
     public new void Update() {
         base.Update();
 
-        if(_itemsToProcess.Count > 0 || _queuedSentChecks.Count > 0 || _queuedUnsentChecks.Count > 0) {
+        if(_itemsToProcess.Count > 0 || _queuedSentChecks.Count > 0 || _queuedUnsentChecks.Count > 0 || _queuedSlotData.Count > 0 || _queuedValidLocationNames.Count > 0) {
+            Plugin.BepinLogger.LogDebug("Performing custom save...");
             PreSave();
 
             if(_itemsToProcess.Count > 0) {
@@ -117,7 +120,28 @@ public class ArchipelagoSaver:JSONsaver {
                 metaProg["archi_unsentChecks"] = String.Join("|", _unsentChecks);
             }
 
+            if(_queuedSlotData.Count > 0) {
+                metaProg["archi_goal"] = ((Int64)_queuedSlotData["goal_type"]).ToString();
+                metaProg["archi_boss_last"] = ((Int64)_queuedSlotData["boss_region_last"]).ToString();
+                if(metaProg.ContainsKey("archi_uuid") && metaProg["archi_uuid"] != (string)_queuedSlotData["world_uuid"] && metaProg["archi_uuid"] != "") {
+                    MainMenuInjector.Instance.ReceiveMessage(" !!! WARNING !!!  Your saved world UUID doesn't match with the server's. Please make sure you've RESET YOUR SAVE FILE before proceeding if this is a new run.");
+                }
+                metaProg["archi_uuid"] = (string)_queuedSlotData["world_uuid"];
+                Plugin.BepinLogger.LogMessage($"  {metaProg["archi_uuid"]}");
+                _queuedSlotData.Clear();
+            }
+
+            if(_queuedValidLocationNames.Count > 0) {
+                _allValidChecks.Clear();
+                while(_queuedValidLocationNames.Count > 0) {
+                    if(!_queuedValidLocationNames.TryDequeue(out var vlc)) break;
+                    _allValidChecks.Add(vlc);
+                }
+                metaProg["archi_validChecks"] = string.Join('|', _allValidChecks);
+            }
+
             PostSave();
+            Plugin.BepinLogger.LogDebug("Custom save complete");
         }
 
         bool doNotifs = false;
@@ -194,24 +218,13 @@ public class ArchipelagoSaver:JSONsaver {
         _lastSavedIndex = 0;
     }
 
-    public void StoreSlotData(Dictionary<string, object> slotData, Archipelago.MultiClient.Net.ArchipelagoSession session) {
-        try {
-            PreSave();
-            metaProg["archi_goal"] = ((Int64)slotData["goal_type"]).ToString();
-            metaProg["archi_boss_last"] = ((Int64)slotData["boss_region_last"]).ToString();
-            Plugin.BepinLogger.LogMessage($"Storing slot data: ABL is {(Int64)slotData["boss_region_last"]}");
-            if(metaProg.ContainsKey("archi_uuid") && metaProg["archi_uuid"] != (string)slotData["world_uuid"] && metaProg["archi_uuid"] != "") {
-                MainMenuInjector.Instance.ReceiveMessage(" !!! WARNING !!!  Your saved world UUID doesn't match with the server's. Please make sure you've RESET YOUR SAVE FILE before proceeding if this is a new run.");
-            }
-            metaProg["archi_uuid"] = (string)slotData["world_uuid"];
-            var locNames = session.Locations.AllLocations.Select(l => session.Locations.GetLocationNameFromId(l));
-            metaProg["archi_validChecks"] = string.Join('|', locNames);
-            _allValidChecks.Clear();
-            _allValidChecks.AddRange(locNames);
-            PostSave();
-        } catch(Exception e) {
-            Plugin.BepinLogger.LogError(e);
-        }
+    public void StoreSlotData(Dictionary<string, object> slotData, IEnumerable<string> locNames) {
+        Plugin.BepinLogger.LogDebug($"Storing {slotData.Count} SD/{locNames.Count()} VLN");
+        foreach(var item in slotData.ToList())
+            _queuedSlotData.AddOrUpdate(item.Key, item.Value, (ok,ov)=>item.Value);
+        foreach(var item in locNames)
+            _queuedValidLocationNames.Enqueue(item);
+        Plugin.BepinLogger.LogDebug($"Store complete, len {_queuedSlotData.Count}/{_queuedValidLocationNames.Count}");
     }
 
 

@@ -171,8 +171,11 @@ public class ArchipelagoClient : Module<ArchipelagoClient> {
             MainMenuInjector.Instance.OnConnect();
             MainMenuInjector.Instance.ReceiveMessage(outText);
 
-            ArchipelagoSaver.Instance.StoreSlotData(success.SlotData, _session);
-            _lastSlotDataReceived = _serverData;
+            var locNames = _session.Locations.AllLocations.Select(l => _session.Locations.GetLocationNameFromId(l));
+            if(success.SlotData != null) {
+                ArchipelagoSaver.Instance.StoreSlotData(success.SlotData, locNames);
+                _lastSlotDataReceived = _serverData;
+            }
             _deathLinkHandler = new(_session.CreateDeathLinkService(), _serverData.slotName, Plugin.Instance.DeathLinkTx != DeathLinkHandler.DeathLinkTx.Off);
             ArchipelagoSaver.Instance.ResendChecks();
         } else {
