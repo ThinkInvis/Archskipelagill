@@ -43,7 +43,7 @@ public class TrapHandler : Module<TrapHandler> {
         _cfgSpeedTrapDuration = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Pull Enemies Trap Duration"), 5f, new ConfigDescription("Duration of Trap: Pull Enemies in seconds.", new AcceptableValueRange<float>(0f, 300f)));
         _cfgSpeedTrapStrength = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Pull Enemies Trap Strength"), 2f, new ConfigDescription("Strength of Trap: Pull Enemies as an added multiplier to base speed.", new AcceptableValueRange<float>(0f, 100f)));
         _cfgJamTrapDuration = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Weapon Jam Trap Duration"), 10f, new ConfigDescription("Duration of Trap: Weapon Jam in seconds.", new AcceptableValueRange<float>(0f, 180f)));
-        _cfgDrainSkiTrapStrength = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Drain Ski Trap Strength"), 0.5f, new ConfigDescription("Fraction of current Ski removed by Trap: Drain Ski.", new AcceptableValueRange<float>(0f, 1f)));
+        _cfgDrainSkiTrapStrength = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Drain Ski Trap Strength"), 1.5f, new ConfigDescription("Fraction of current Ski removed by Trap: Drain Ski.", new AcceptableValueRange<float>(0f, 1f)));
         _cfgRandomStatsTrapStrength = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Random Stats Trap Strength"), 0.75f, new ConfigDescription("Fraction of each base stat to send to another on Trap: Random Stats trigger.", new AcceptableValueRange<float>(0f, 1f)));
         _cfgMobTrapStrength = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Flash Mob Trap Strength"), 30f, new ConfigDescription("Additional enemies spawned by Trap: Flash Mob.", new AcceptableValueRange<float>(0f, 1000f)));
         _cfgSpawnTimeTrapStrength = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Stronger Enemies Trap Strength"), 60f, new ConfigDescription("Time added to the monster wave strength timer by Trap: Stronger Enemies.", new AcceptableValueRange<float>(0f, 300f)));
@@ -142,7 +142,7 @@ public class TrapHandler : Module<TrapHandler> {
                 trapSpriteName = "trap-jam";
                 break;
             case "Drain Ski":
-                var penalty = cs.XP * DrainSkiTrapStrength;
+                var penalty = cs.nodeCost * DrainSkiTrapStrength;
                 cs.XP -= penalty;
                 cs.totalXP -= penalty;
                 trapSpriteName = "trap-drainski";
