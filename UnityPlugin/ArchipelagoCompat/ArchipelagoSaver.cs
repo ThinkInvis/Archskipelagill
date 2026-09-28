@@ -88,6 +88,26 @@ public class ArchipelagoSaver:JSONsaver {
             Plugin.BepinLogger.LogDebug("Performing custom save...");
             PreSave();
 
+            if(_queuedSlotData.Count > 0) {
+                metaProg["archi_goal"] = ((Int64)_queuedSlotData["goal_type"]).ToString();
+                metaProg["archi_boss_last"] = ((Int64)_queuedSlotData["boss_region_last"]).ToString();
+                if(metaProg.ContainsKey("archi_uuid") && metaProg["archi_uuid"] != (string)_queuedSlotData["world_uuid"] && metaProg["archi_uuid"] != "") {
+                    MainMenuInjector.Instance.ReceiveMessage(" !!! WARNING !!!  Your saved world UUID doesn't match with the server's. Please make sure you've RESET YOUR SAVE FILE before proceeding if this is a new run.");
+                }
+                metaProg["archi_uuid"] = (string)_queuedSlotData["world_uuid"];
+                Plugin.BepinLogger.LogMessage($"  {metaProg["archi_uuid"]}");
+                _queuedSlotData.Clear();
+            }
+
+            if(_queuedValidLocationNames.Count > 0) {
+                _allValidChecks.Clear();
+                while(_queuedValidLocationNames.Count > 0) {
+                    if(!_queuedValidLocationNames.TryDequeue(out var vlc)) break;
+                    _allValidChecks.Add(vlc);
+                }
+                metaProg["archi_validChecks"] = string.Join('|', _allValidChecks);
+            }
+
             if(_itemsToProcess.Count > 0) {
                 while(_itemsToProcess.Count > 0)
                     ProcessItem(_itemsToProcess.Dequeue());
@@ -118,26 +138,6 @@ public class ArchipelagoSaver:JSONsaver {
                 }
                 _unsentChecks.AddRange(qucList.Except(_unsentChecks.Distinct()));
                 metaProg["archi_unsentChecks"] = String.Join("|", _unsentChecks);
-            }
-
-            if(_queuedSlotData.Count > 0) {
-                metaProg["archi_goal"] = ((Int64)_queuedSlotData["goal_type"]).ToString();
-                metaProg["archi_boss_last"] = ((Int64)_queuedSlotData["boss_region_last"]).ToString();
-                if(metaProg.ContainsKey("archi_uuid") && metaProg["archi_uuid"] != (string)_queuedSlotData["world_uuid"] && metaProg["archi_uuid"] != "") {
-                    MainMenuInjector.Instance.ReceiveMessage(" !!! WARNING !!!  Your saved world UUID doesn't match with the server's. Please make sure you've RESET YOUR SAVE FILE before proceeding if this is a new run.");
-                }
-                metaProg["archi_uuid"] = (string)_queuedSlotData["world_uuid"];
-                Plugin.BepinLogger.LogMessage($"  {metaProg["archi_uuid"]}");
-                _queuedSlotData.Clear();
-            }
-
-            if(_queuedValidLocationNames.Count > 0) {
-                _allValidChecks.Clear();
-                while(_queuedValidLocationNames.Count > 0) {
-                    if(!_queuedValidLocationNames.TryDequeue(out var vlc)) break;
-                    _allValidChecks.Add(vlc);
-                }
-                metaProg["archi_validChecks"] = string.Join('|', _allValidChecks);
             }
 
             PostSave();
