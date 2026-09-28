@@ -33,10 +33,12 @@ public class Plugin:BaseUnityPlugin {
     public DeathLinkTx DeathLinkTx => _cfgDeathLinkTx.Value;
     public DeathLinkType DeathLinkType => _cfgDeathLinkType.Value;
     public bool DeathLinkQuitIsDeath => _cfgDeathLinkQuitIsDeath.Value;
+    public bool RunInBackground => _cfgRunInBackground.Value;
 
     private ConfigEntry<DeathLinkTx> _cfgDeathLinkTx;
     private ConfigEntry<DeathLinkType> _cfgDeathLinkType;
     private ConfigEntry<bool> _cfgDeathLinkQuitIsDeath;
+    private ConfigEntry<bool> _cfgRunInBackground;
 
 
     ////// Unity Engine API //////
@@ -61,10 +63,13 @@ public class Plugin:BaseUnityPlugin {
         _cfgDeathLinkTx = MainConfig.Bind<DeathLinkTx>(new ConfigDefinition("Death Link", "Channel"), DeathLinkTx.Off, new ConfigDescription("Whether to receive and/or transmit Death Link to other players in the Archipelago run."));
         _cfgDeathLinkType = MainConfig.Bind<DeathLinkType>(new ConfigDefinition("Death Link", "Type"), DeathLinkType.Kill, new ConfigDescription("What to do when a Death Link is received. Note that End Run is more punishing than Kill: no Gill reward will be received."));
         _cfgDeathLinkQuitIsDeath = MainConfig.Bind<bool>(new ConfigDefinition("Death Link", "Death on Quit"), true, new ConfigDescription("If true, ending a run from the pause menu will count as a death for Death Link purposes."));
+        _cfgRunInBackground = MainConfig.Bind<bool>(new ConfigDefinition("Misc.", "Run in Background"), true, new ConfigDescription("If true, the game will continue running while unfocused. Defaults to false in base game."));
 
         MainMenuInjector.Instance.ReceiveMessage($"{MOD_DISPLAY_INFO} loaded!");
 
         ArchipelagoClient.Instance.AutoConnect();
+
+        Application.runInBackground = RunInBackground;
     }
 
     private void OnApplicationQuit() {
