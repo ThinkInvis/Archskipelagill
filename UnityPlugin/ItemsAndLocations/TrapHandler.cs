@@ -16,6 +16,7 @@ public class TrapHandler : Module<TrapHandler> {
     public float SpeedTrapStrength => _cfgSpeedTrapStrength.Value;
     public float JamTrapDuration => _cfgJamTrapDuration.Value;
     public float DrainSkiTrapStrength => _cfgDrainSkiTrapStrength.Value;
+    public float RandomStatsTrapStrength => _cfgRandomStatsTrapStrength.Value;
     public float MobTrapStrength => _cfgMobTrapStrength.Value;
     public float SpawnTimeTrapStrength => _cfgSpawnTimeTrapStrength.Value;
 
@@ -25,6 +26,7 @@ public class TrapHandler : Module<TrapHandler> {
     private readonly ConfigEntry<float> _cfgSpeedTrapStrength;
     private readonly ConfigEntry<float> _cfgJamTrapDuration;
     private readonly ConfigEntry<float> _cfgDrainSkiTrapStrength;
+    private readonly ConfigEntry<float> _cfgRandomStatsTrapStrength;
     private readonly ConfigEntry<float> _cfgMobTrapStrength;
     private readonly ConfigEntry<float> _cfgSpawnTimeTrapStrength;
 
@@ -42,6 +44,7 @@ public class TrapHandler : Module<TrapHandler> {
         _cfgSpeedTrapStrength = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Pull Enemies Trap Strength"), 2f, new ConfigDescription("Strength of Trap: Pull Enemies as an added multiplier to base speed.", new AcceptableValueRange<float>(0f, 100f)));
         _cfgJamTrapDuration = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Weapon Jam Trap Duration"), 10f, new ConfigDescription("Duration of Trap: Weapon Jam in seconds.", new AcceptableValueRange<float>(0f, 180f)));
         _cfgDrainSkiTrapStrength = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Drain Ski Trap Strength"), 0.5f, new ConfigDescription("Fraction of current Ski removed by Trap: Drain Ski.", new AcceptableValueRange<float>(0f, 1f)));
+        _cfgRandomStatsTrapStrength = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Random Stats Trap Strength"), 0.75f, new ConfigDescription("Fraction of each base stat to send to another on Trap: Random Stats trigger.", new AcceptableValueRange<float>(0f, 1f)));
         _cfgMobTrapStrength = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Flash Mob Trap Strength"), 30f, new ConfigDescription("Additional enemies spawned by Trap: Flash Mob.", new AcceptableValueRange<float>(0f, 1000f)));
         _cfgSpawnTimeTrapStrength = Plugin.Instance.MainConfig.Bind<float>(new ConfigDefinition("Difficulty", "Stronger Enemies Trap Strength"), 60f, new ConfigDescription("Time added to the monster wave strength timer by Trap: Stronger Enemies.", new AcceptableValueRange<float>(0f, 300f)));
     }
@@ -145,7 +148,19 @@ public class TrapHandler : Module<TrapHandler> {
                 trapSpriteName = "trap-drainski";
                 break;
             case "Scramble Stats":
-                (cs.INT, cs.STR, cs.DEX) = (cs.STR, cs.DEX, cs.INT);
+                var intPenalty = cs.INT * RandomStatsTrapStrength;
+                var strPenalty = cs.STR * RandomStatsTrapStrength;
+                var dexPenalty = cs.DEX * RandomStatsTrapStrength;
+                var intRemaining = cs.INT - intPenalty;
+                var strRemaining = cs.STR - strPenalty;
+                var dexRemaining = cs.DEX - dexPenalty;
+                (cs.INT, cs.STR, cs.DEX) = UnityEngine.Random.Range(0, 5) switch {
+                    0 => (intRemaining + strPenalty, strRemaining + dexPenalty, dexRemaining + intPenalty),
+                    1 => (intRemaining + dexPenalty, strRemaining + strPenalty, dexRemaining + intPenalty),
+                    2 => (intRemaining + intPenalty, strRemaining + dexPenalty, dexRemaining + strPenalty),
+                    3 => (intRemaining + strPenalty, strRemaining + intPenalty, dexRemaining + dexPenalty),
+                    _ => (intRemaining + dexPenalty, strRemaining + intPenalty, dexRemaining + strPenalty),
+                };
                 cs.statsUI.transform.GetChild(0).GetChild(0).GetComponent<numberDisplayer>()
 .display((int)cs.STR);
                 cs.statsUI.transform.GetChild(1).GetChild(0).GetComponent<numberDisplayer>()
