@@ -2,9 +2,13 @@
 
 ### Upcoming Release
 
+- Death Link now sends a death when closing the application mid-run if Quit Is Death setting is on (previously only applied to ingame 'end run' button)
+- Made Bonus Gill item configurable, and buffed the default amount (50 --> 80)
 - Fixed Damage Trap health fraction client config setting not applying
+- Ingame AP console now autoscrolls to bottom if it's already there
 - Backend:
   - Major refactor to entire codebase to make it less of a huge mess in general
+  - Made slot data saving also thread-safe
 
 ### 1.0.0-beta1
 
