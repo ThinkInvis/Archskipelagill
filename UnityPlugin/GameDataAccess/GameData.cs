@@ -28,6 +28,10 @@ public static partial class GameData {
         public bool starter = _starter;
     }
 
+    public class WeaponGameData(Sprite _sprite) {
+        public Sprite sprite = _sprite;
+    }
+
     public struct Character(string _name, string _internalName, int _id):IEquatable<Character> {
         public string name = _name;
         public string internalName = _internalName;
@@ -118,8 +122,18 @@ public static partial class GameData {
         new("Bosses", "Final", null, [0, 1, 2, 3, 4, 5])
         ];
 
+    public static readonly Dictionary<Weapon, Sprite> weaponSprites = [];
+
 
     ////// Public API //////
+
+    public static void PopulateWeaponSprites(weaponDictionary wd) {
+        var wpnUnlockable = wd.unlockablePrefabs;
+        var wpnStarter = wd.WeaponList.Except(wd.unlockablePrefabs).Where(w => w != null);
+        foreach(var wpn in wpnUnlockable.Union(wpnStarter)) {
+            weaponSprites[allWeapons.First(n => n.prefabName == wpn.name.Replace("(Clone)", ""))] = wpn.GetComponent<weaponStats>().icon;
+        }
+    }
 
     public static void ScrapeSkillTree() {
         //Setup

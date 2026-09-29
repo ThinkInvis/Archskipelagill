@@ -30,7 +30,7 @@ public class SkillTreeItemizer : Module<SkillTreeItemizer> {
     private void On_CharaStats_Start(On.CharaStats.orig_Start orig, CharaStats self) {
         orig(self);
 
-        if(self.metaMenu) return;
+        if(self.metaMenu || ResourceGrabber.Instance.GridSceneDuringLoading) return;
 
         ApplyTrackers();
         RescanAll();
