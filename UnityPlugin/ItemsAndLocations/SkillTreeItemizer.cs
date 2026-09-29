@@ -71,6 +71,9 @@ public class SkillTreeItemizer : Module<SkillTreeItemizer> {
     public void RescanAll() {
         var chara = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
         var spawnChar = GameData.allCharacters.First(n => n.id == chara.chara);
+        if(!ArchipelagoDataUtils.HasRegionItem(spawnChar)) {
+            spawnChar = GameData.allCharacters.First(n => n.name == ArchipelagoSaver.Instance.metaProg["archi_startChar"]);
+        }
         var spawnRegion = GameData.allRegions.First(n => n.originCharacter.HasValue && n.originCharacter.Value == spawnChar);
         foreach(var tkr in GameObject.FindObjectsByType<SkillTreeIndexTracker>(FindObjectsSortMode.InstanceID)) {
             tkr.Rescan(spawnRegion);
