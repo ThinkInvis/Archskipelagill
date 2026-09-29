@@ -2,6 +2,7 @@
 
 ### Upcoming Release
 
+- Starting character and region are now randomized (can be disabled)
 - Added an on-by-default option to disable achievements
 - Added an on-by-default option to run game in background
 - Death Link now sends a death when closing the application mid-run if Quit Is Death setting is on (previously only applied to ingame 'end run' button)
