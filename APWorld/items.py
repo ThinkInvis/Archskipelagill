@@ -89,11 +89,11 @@ def create_item_with_correct_classification(world: SkigillWorld, name: str) -> S
 
     return SkigillItem(name, classification, ITEM_NAME_TO_ID[name], world.player)
 
-StartingCharacterName = "Mage"
 
 def create_all_items(world: SkigillWorld) -> None:
+    world.starting_character_name = "Mage"
     if world.options.random_start_char:
-        StartingCharacterName = world.random.choice(["Mage", "Strongman", "Fox", "Prototype", "Dragon", "Dwarves"])
+        world.starting_character_name = world.random.choice(["Mage", "Strongman", "Fox", "Prototype", "Dragon", "Dwarves"])
     
     reglist = [
         world.create_item("Skigill Region: Mage"),
@@ -117,13 +117,13 @@ def create_all_items(world: SkigillWorld) -> None:
     ]
     
     for item in reglist:
-        if StartingCharacterName in item.name:
+        if world.starting_character_name in item.name:
             world.push_precollected(item)
         else:
             itempool.extend([item])
     
     for item in charlist:
-        if not world.options.itemize_characters or StartingCharacterName in item.name:
+        if not world.options.itemize_characters or world.starting_character_name in item.name:
             world.push_precollected(item)
         else:
             itempool.extend([item])

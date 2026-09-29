@@ -7,7 +7,6 @@ from worlds.AutoWorld import World
 
 from . import items, locations, regions, rules, web_world
 from . import options as skigill_options  # rename due to a name conflict with World.options
-from .items import StartingCharacterName
 
 class SkigillWorld(World):
     game = "Skigill"
@@ -39,6 +38,6 @@ class SkigillWorld(World):
 
     def fill_slot_data(self) -> Mapping[str, Any]:
         retv = self.options.as_dict("goal_type", "boss_region_last")
-        retv["start_char"] = StartingCharacterName
+        retv["start_char"] = self.starting_character_name
         retv["world_uuid"] = str(uuid.uuid4())
         return retv
