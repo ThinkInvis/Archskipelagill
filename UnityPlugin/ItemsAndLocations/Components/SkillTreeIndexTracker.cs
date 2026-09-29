@@ -74,14 +74,14 @@ public class SkillTreeIndexTracker:MonoBehaviour {
     public void Rescan() {
         if(!isActiveAndEnabled) return;
 
-        var hasRegion = ArchipelagoSaver.GetItemCount($"Skigill Region: {Enum.GetName(typeof(GameData.SkillNodeRegion), DataNode.region).ToTitleCase()}") > 0;
+        var hasRegion = ArchipelagoSaver.GetItemCount($"Skigill Region: {DataNode.region.name}") > 0;
         var hasFBK = ArchipelagoSaver.GetItemCount($"Final Boss Key") > 0;
 
         //lock boss region behind all others if option enabled
         var bossLast = Int64.Parse(ArchipelagoSaver.Instance.metaProg["archi_boss_last"]);
-        if(bossLast > 0 && DataNode.region == GameData.SkillNodeRegion.BOSSES) {
-            foreach(var n in Enum.GetNames(typeof(GameData.SkillNodeRegion))) {
-                if(ArchipelagoSaver.GetItemCount($"Skigill Region: {n.ToTitleCase()}") == 0) {
+        if(bossLast > 0 && DataNode.region.name == "Bosses") {
+            foreach(var r in GameData.allRegions) {
+                if(ArchipelagoSaver.GetItemCount($"Skigill Region: {r.name}") == 0) {
                     hasRegion = false;
                     break;
                 }
@@ -89,15 +89,15 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         }
 
         //lock unreachable regions
-        if(DataNode.region == GameData.SkillNodeRegion.STRONGMAN
+        if(DataNode.region.name == "Strongman"
             && ArchipelagoSaver.GetItemCount("Skigill Region: Prototype") == 0
             && ArchipelagoSaver.GetItemCount("Character: Strongman") == 0)
             hasRegion = false;
-        if(DataNode.region == GameData.SkillNodeRegion.FOX
+        if(DataNode.region.name == "Fox"
             && ArchipelagoSaver.GetItemCount("Skigill Region: Dragon") == 0
             && ArchipelagoSaver.GetItemCount("Character: Fox") == 0)
             hasRegion = false;
-        if(DataNode.region == GameData.SkillNodeRegion.DWARVES
+        if(DataNode.region.name == "Dwarves"
             && ((ArchipelagoSaver.GetItemCount("Skigill Region: Prototype") == 0 && ArchipelagoSaver.GetItemCount("Character: Strongman") == 0)
                 || ArchipelagoSaver.GetItemCount("Skigill Region: Strongman") == 0)
             && ((ArchipelagoSaver.GetItemCount("Skigill Region: Dragon") == 0 && ArchipelagoSaver.GetItemCount("Character: Fox") == 0)
@@ -110,7 +110,7 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         var isPerk = DataNode.type == GameData.SkillNodeType.PERK;
         var isBoss = DataNode.type == GameData.SkillNodeType.BOSS;
         if(isChest || isPerk) {
-            _hasCheck = ArchipelagoDataUtils.HasLocation($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? DataNode.chestIndex : DataNode.perkIndex) + 1} ({Enum.GetName(typeof(GameData.SkillNodeRegion), DataNode.region)})") == ArchipelagoDataUtils.LocationState.Unchecked;
+            _hasCheck = ArchipelagoDataUtils.HasLocation($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? DataNode.chestIndex : DataNode.perkIndex) + 1} ({DataNode.region.name.ToUpper()})") == ArchipelagoDataUtils.LocationState.Unchecked;
         } else if(isBoss && _bossCpt != null) {
             var targetBossName = _bossCpt.bossPrefab.GetComponentInChildren<VieScript>().bossName switch {
                 "OVNI" => "Rosa",

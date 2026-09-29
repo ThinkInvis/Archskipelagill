@@ -10,12 +10,11 @@ public static partial class GameData {
 
     ////// Nested Data Types //////
     public enum SkillNodeType { UNKNOWN, STAT, CHEST, PERK, BOSS, BOSS_FINAL };
-    public enum SkillNodeRegion { MAGE, PROTOTYPE, DRAGON, STRONGMAN, FOX, DWARVES, BOSSES };
 
-    public struct SkillNode(SkillNodeType _type, int[] _neighbors, SkillNodeRegion _region, int _originalIndex, int _chestIndex, int _perkIndex) {
+    public struct SkillNode(SkillNodeType _type, int[] _neighbors, Region _region, int _originalIndex, int _chestIndex, int _perkIndex) {
         public SkillNodeType type = _type;
         public int[] neighbors = _neighbors;
-        public SkillNodeRegion region = _region;
+        public Region region = _region;
         public int originalIndex = _originalIndex;
         public int chestIndex = _chestIndex;
         public int perkIndex = _perkIndex;
@@ -34,17 +33,15 @@ public static partial class GameData {
         public int id = _id;
     }
 
+    public struct Region(string _name, string _nodeName, Character? _originCharacter, int[] _neighbors) {
+        public string name = _name;
+        public string nodeName = _nodeName;
+        public Character? originCharacter = _originCharacter;
+        public int[] neighbors = _neighbors;
+    }
+
 
     ////// Initializer/Fields/Properties //////
-
-    static readonly string[] _SPAWN_TARGET_NAMES = [
-        "Mage",
-        "Jugger",
-        "Dragon",
-        "Baldo",
-        "Fox",
-        "Nain"
-    ];
 
     public static readonly List<Character> allCharacters = [
         new("Mage", "Mage", 1),
@@ -53,6 +50,16 @@ public static partial class GameData {
         new("Dragon", "Dragon", 4),
         new("Prototype", "Jugger", 5),
         new("Dwarves", "Nain", 6)
+        ];
+
+    public static readonly List<Region> allRegions = [
+        new("Mage", "Mage", allCharacters.First(c => c.name == "Mage"), [3, 4, 6]),
+        new("Strongman", "Baldo", allCharacters.First(c => c.name == "Strongman"), [4, 5, 6]),
+        new("Fox", "Fox", allCharacters.First(c => c.name == "Fox"), [3, 5, 6]),
+        new("Dragon", "Dragon", allCharacters.First(c => c.name == "Dragon"), [0, 2, 6]),
+        new("Prototype", "Jugger", allCharacters.First(c => c.name == "Prototype"), [0, 1, 6]),
+        new("Dwarves", "Nain", allCharacters.First(c => c.name == "Dwarves"), [1, 2, 6]),
+        new("Bosses", "Final", null, [0, 1, 2, 3, 4, 5])
         ];
 
 
@@ -104,11 +111,11 @@ public static partial class GameData {
             }
 
             var spawnDistances = new List<int>();
-            for(var j = 0; j < _SPAWN_TARGET_NAMES.Length; j++) {
-                var targetNode = GameObject.Find("gridHolder/grid/Perks/" + _SPAWN_TARGET_NAMES[j]).GetComponent<skigillNode>();
+            var grid = GameObject.FindGameObjectWithTag("gridHolder");
+            for(var j = 0; j < allRegions.Count; j++) {
+                var targetNode = grid.transform.Find(allRegions[j].nodeName).GetComponent<skigillNode>();
                 spawnDistances.Add(FindNodeDistance(allValidNodes, targetNode, node));
             }
-            spawnDistances.Add(FindNodeDistance(allValidNodes, node, finalBossNode));
             var closestDist = spawnDistances.Where(n => n >= 0).Min();
             var regions = spawnDistances.Select((d, i) => (d, i)).Where(n => n.d == closestDist).Select(n => n.i);
             var highestRegion = regions.OrderBy(n => n).Last();
@@ -120,8 +127,8 @@ public static partial class GameData {
             node.transform.Find("IconColor").GetComponent<SpriteRenderer>().color = regionColor;
             node.transform.Find("nodeOcto").GetComponent<SpriteRenderer>().color = regionColor;
 
-            outputPy.Add($"\tSkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
-            outputCs.Add($"\t\tnew SkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{Enum.GetName(typeof(SkillNodeRegion), highestRegion)}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
+            outputPy.Add($"\tSkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{allRegions[highestRegion].name.ToUpper()}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
+            outputCs.Add($"\t\tnew SkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], allRegions[{highestRegion}], {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
         }
 
         //Build weapon list

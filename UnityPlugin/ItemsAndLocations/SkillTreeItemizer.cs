@@ -49,7 +49,7 @@ public class SkillTreeItemizer : Module<SkillTreeItemizer> {
         var isChest = tkr.DataNode.type == GameData.SkillNodeType.CHEST;
         var isPerk = tkr.DataNode.type == GameData.SkillNodeType.PERK;
         if(!isChest && !isPerk) return;
-        ArchipelagoClient.Instance.CheckLocationsByName($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? tkr.DataNode.chestIndex : tkr.DataNode.perkIndex) + 1} ({Enum.GetName(typeof(GameData.SkillNodeRegion), tkr.DataNode.region)})");
+        ArchipelagoClient.Instance.CheckLocationsByName($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? tkr.DataNode.chestIndex : tkr.DataNode.perkIndex) + 1} ({tkr.DataNode.region.name.ToUpper()})");
         tkr.Rescan();
     }
 
