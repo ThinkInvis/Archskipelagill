@@ -15,6 +15,7 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
     public bool AbilityLocationTracker => _cfgAbilityLocationTracker.Value;
 
     private readonly ConfigEntry<bool> _cfgAbilityLocationTracker;
+    private bool _doneStartingCharSwap = false;
 
     public AbilityUnlockItemizer() {
         On.charaSelectScript.selected += On_CharaSelectScript_selected;
@@ -27,11 +28,13 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
         On.weaponDisplayer.Start += On_WeaponDisplayer_Start;
         On.charaSelectScript.Start += On_CharaSelectScript_Start;
         On.endMenuManager.Start += On_EndMenuManager_Start;
+        On.gridResetter.Start += On_GridResetter_Start;
 
         CustomLockSprite = Plugin.Resources.LoadAsset<Sprite>("Assets/Textures/locked-archi.png");
 
         _cfgAbilityLocationTracker = Plugin.Instance.MainConfig.Bind<bool>(new ConfigDefinition("Special Effects", "Ability Location Tracker"), true, new ConfigDescription("If true, unchecked locations corresponding to weapons and characters will be marked."));
     }
+
 
     ////// MonoMod Hooks //////
     #region MonoMod Hooks
@@ -164,6 +167,13 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
             lir = lockObj.gameObject.AddComponent<LockIconReplacer>();
         lir.IsArchiLocked = isArchiLocked;
         lir.UpdateIcon();
+    }
+
+    private void On_GridResetter_Start(On.gridResetter.orig_Start orig, gridResetter self) {
+        orig(self);
+        if(ArchipelagoSaver.Instance.metaProg.TryGetValue("archi_startChar", out var startChar)) {
+            self.root = GameObject.Find($"metaGrid/{GameData.allCharacters.First(n => n.name == startChar).internalName}").GetComponent<skigillNode>();
+        }
     }
     #endregion
 }

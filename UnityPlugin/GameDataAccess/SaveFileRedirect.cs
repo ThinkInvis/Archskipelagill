@@ -101,6 +101,8 @@ public class SaveFileRedirect : Module<SaveFileRedirect> {
 
         ArchipelagoSaver.Instance.Wipe();
 
-        GameObject.FindFirstObjectByType<gridResetter>().resetMetaProg(); //also saves save file
+        var gr = GameObject.FindFirstObjectByType<gridResetter>();
+        gr.root = GameObject.Find("metaGrid/Mage").GetComponent<skigillNode>();
+        gr.resetMetaProg(); //also saves save file
     }
 }

@@ -39,6 +39,7 @@ public class ArchipelagoSaver:JSONsaver {
     private int _lastSavedIndex = 0;
     private float _tSinceLastSend = 0f;
     private float _tSinceLastReceive = 0f;
+    private bool _startCharDirty = false;
     private ConfigEntry<float> _cfgBonusGillAmount;
 
 
@@ -90,13 +91,15 @@ public class ArchipelagoSaver:JSONsaver {
 
             if(_queuedSlotData.Count > 0) {
                 metaProg["archi_goal"] = ((Int64)_queuedSlotData["goal_type"]).ToString();
-                metaProg["archi_start_char"] = ((Int64)_queuedSlotData["start_char"]).ToString();
+                bool hadStartChar = metaProg.TryGetValue("archi_startChar", out var oldStartChar);
+                metaProg["archi_startChar"] = (string)_queuedSlotData["start_char"];
+                if(!hadStartChar || oldStartChar != metaProg["archi_startChar"])
+                    _startCharDirty = true;
                 metaProg["archi_boss_last"] = ((Int64)_queuedSlotData["boss_region_last"]).ToString();
                 if(metaProg.ContainsKey("archi_uuid") && metaProg["archi_uuid"] != (string)_queuedSlotData["world_uuid"] && metaProg["archi_uuid"] != "") {
                     MainMenuInjector.Instance.ReceiveMessage(" !!! WARNING !!!  Your saved world UUID doesn't match with the server's. Please make sure you've RESET YOUR SAVE FILE before proceeding if this is a new run.");
                 }
                 metaProg["archi_uuid"] = (string)_queuedSlotData["world_uuid"];
-                Plugin.BepinLogger.LogMessage($"  {metaProg["archi_uuid"]}");
                 _queuedSlotData.Clear();
             }
 
@@ -143,6 +146,15 @@ public class ArchipelagoSaver:JSONsaver {
 
             PostSave();
             Plugin.BepinLogger.LogDebug("Custom save complete");
+        }
+
+        if(_startCharDirty) {
+            var gr = GameObject.FindFirstObjectByType<gridResetter>();
+            if(gr != null) {
+                gr.root = GameObject.Find($"metaGrid/{GameDataAccess.GameData.allCharacters.First(n => n.name == metaProg["archi_startChar"]).internalName}").GetComponent<skigillNode>();
+                gr.resetMetaProg();
+                _startCharDirty = false;
+            }
         }
 
         bool doNotifs = false;
