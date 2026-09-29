@@ -93,8 +93,8 @@ public class SkillTreeItemizer : Module<SkillTreeItemizer> {
 
     void EnsureSafeSpawn(CharaStats self) {
         if(!ArchipelagoDataUtils.HasRegionByCharacterId(self.chara)) {
-            //spawn region is locked, teleport to and activate mage region which for now is guaranteed unlocked
-            var mgo = GameObject.Find("gridHolder/grid/Perks/Mage");
+            //spawn region is locked, teleport to and activate starter region
+            var mgo = GameObject.Find($"gridHolder/grid/Perks/{GameData.allCharacters.First(n => n.name == ArchipelagoSaver.Instance.metaProg["archi_startChar"]).internalName}");
             mgo.GetComponent<skigillNode>().autoActivate();
             self.transform.position = new(mgo.transform.position.x, mgo.transform.position.y, 0);
         }
