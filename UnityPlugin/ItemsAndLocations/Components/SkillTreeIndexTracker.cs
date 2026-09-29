@@ -71,7 +71,7 @@ public class SkillTreeIndexTracker:MonoBehaviour {
 
     ////// Public API //////
 
-    public void Rescan() {
+    public void Rescan(GameData.Region spawnRegion) {
         if(!isActiveAndEnabled) return;
 
         var hasRegion = ArchipelagoSaver.GetItemCount($"Skigill Region: {DataNode.region.name}") > 0;
@@ -89,21 +89,7 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         }
 
         //lock unreachable regions
-        if(DataNode.region.name == "Strongman"
-            && ArchipelagoSaver.GetItemCount("Skigill Region: Prototype") == 0
-            && ArchipelagoSaver.GetItemCount("Character: Strongman") == 0)
-            hasRegion = false;
-        if(DataNode.region.name == "Fox"
-            && ArchipelagoSaver.GetItemCount("Skigill Region: Dragon") == 0
-            && ArchipelagoSaver.GetItemCount("Character: Fox") == 0)
-            hasRegion = false;
-        if(DataNode.region.name == "Dwarves"
-            && ((ArchipelagoSaver.GetItemCount("Skigill Region: Prototype") == 0 && ArchipelagoSaver.GetItemCount("Character: Strongman") == 0)
-                || ArchipelagoSaver.GetItemCount("Skigill Region: Strongman") == 0)
-            && ((ArchipelagoSaver.GetItemCount("Skigill Region: Dragon") == 0 && ArchipelagoSaver.GetItemCount("Character: Fox") == 0)
-                || ArchipelagoSaver.GetItemCount("Skigill Region: Fox") == 0)
-            )
-            hasRegion = false;
+        if(!DataNode.region.CanReach(spawnRegion)) hasRegion = false;
 
         _hasCheck = false;
         var isChest = DataNode.type == GameData.SkillNodeType.CHEST;
@@ -138,7 +124,7 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         }
     }
 
-    public void Unlock(bool forceHasCheck = false) {
+    public void Unlock(bool? forceHasCheck = null) {
         isUnlocked = true;
         GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f, 1f);
         _activateVfx.color = new(1f, 1f, 1f, 1f);
@@ -148,8 +134,8 @@ public class SkillTreeIndexTracker:MonoBehaviour {
             sr.color = new(1f, 1f, 1f, 1f);
         }
 
-        if(forceHasCheck) {
-            _hasCheck = true;
+        if(forceHasCheck.HasValue) {
+            _hasCheck = forceHasCheck.Value;
             foreach(var s in _spinners) {
                 s.gameObject.SetActive(_hasCheck);
                 s.GetComponent<SpriteRenderer>().color = new(1f, 1f, 1f);

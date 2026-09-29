@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Archskipelagill.ArchipelagoCompat;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -27,17 +28,72 @@ public static partial class GameData {
         public bool starter = _starter;
     }
 
-    public struct Character(string _name, string _internalName, int _id) {
+    public struct Character(string _name, string _internalName, int _id):IEquatable<Character> {
         public string name = _name;
         public string internalName = _internalName;
         public int id = _id;
+
+        public override readonly bool Equals(object obj) {
+            return obj is Character character && Equals(character);
+        }
+
+        public readonly bool Equals(Character other) {
+            return id == other.id;
+        }
+
+        public override readonly int GetHashCode() {
+            return HashCode.Combine(id);
+        }
+
+        public static bool operator ==(Character left, Character right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Character left, Character right) {
+            return !(left == right);
+        }
     }
 
-    public struct Region(string _name, string _nodeName, Character? _originCharacter, int[] _neighbors) {
+    public struct Region(string _name, string _nodeName, Character? _originCharacter, int[] _neighbors):IEquatable<Region> {
         public string name = _name;
         public string nodeName = _nodeName;
         public Character? originCharacter = _originCharacter;
         public int[] neighbors = _neighbors;
+
+        public readonly bool CanReach(Region other, params Region[] visited) {
+            if(!ArchipelagoDataUtils.HasItem(other) || !ArchipelagoDataUtils.HasItem(this)) return false;
+            if(other == this || (other.originCharacter.HasValue && ArchipelagoDataUtils.HasItem(other.originCharacter.Value))) return true;
+            foreach(var ni in other.neighbors) {
+                var n = allRegions[ni];
+                if(visited.Contains(n)) continue;
+                visited.Append(n);
+                if(n.CanReach(this, visited)) return true;
+            }
+            return false;
+        }
+
+        public override readonly bool Equals(object obj) {
+            return obj is Region region && Equals(region);
+        }
+
+        public readonly bool Equals(Region other) {
+            return name == other.name &&
+                   nodeName == other.nodeName &&
+                   EqualityComparer<Character?>.Default.Equals(originCharacter, other.originCharacter) &&
+                   EqualityComparer<int[]>.Default.Equals(neighbors, other.neighbors);
+        }
+
+        public override readonly int GetHashCode() {
+            return HashCode.Combine(name);
+        }
+
+        public static bool operator ==(Region left, Region right) {
+            return left.Equals(right);
+        }
+
+        public static bool operator !=(Region left, Region right) {
+            return !(left == right);
+        }
     }
 
 

@@ -50,7 +50,7 @@ public class SkillTreeItemizer : Module<SkillTreeItemizer> {
         var isPerk = tkr.DataNode.type == GameData.SkillNodeType.PERK;
         if(!isChest && !isPerk) return;
         ArchipelagoClient.Instance.CheckLocationsByName($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? tkr.DataNode.chestIndex : tkr.DataNode.perkIndex) + 1} ({tkr.DataNode.region.name.ToUpper()})");
-        tkr.Rescan();
+        tkr.Unlock(false);
     }
 
     private void On_SkigillNode_showConnex(On.skigillNode.orig_showConnex orig, skigillNode self) {
@@ -69,8 +69,11 @@ public class SkillTreeItemizer : Module<SkillTreeItemizer> {
     ////// Public API //////
     
     public void RescanAll() {
+        var chara = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
+        var spawnChar = GameData.allCharacters.First(n => n.id == chara.chara);
+        var spawnRegion = GameData.allRegions.First(n => n.originCharacter.HasValue && n.originCharacter.Value == spawnChar);
         foreach(var tkr in GameObject.FindObjectsByType<SkillTreeIndexTracker>(FindObjectsSortMode.InstanceID)) {
-            tkr.Rescan();
+            tkr.Rescan(spawnRegion);
         }
     }
 

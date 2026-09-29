@@ -25,6 +25,10 @@ internal static class ArchipelagoDataUtils {
         return HasItem($"Weapon: {weapon.prefabName}");
     }
 
+    public static bool HasItem(GameData.Region region) {
+        return HasItem($"Skigill Region: {region.name}");
+    }
+
     public static bool HasItem(CharaStats stats) {
         return HasItem(GameData.allCharacters.FirstOrDefault(n => n.id == stats.chara));
     }

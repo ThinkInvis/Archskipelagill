@@ -30,6 +30,13 @@ class ItemizeEndlessMode(Toggle):
     
     display_name = "Items: Endless Mode"
 
+class RandomStartChar(DefaultOnToggle):
+    """
+    If enabled, the starting character/region will be randomized. If disabled, the starting character/region will always be Mage.
+    """
+    
+    display_name = "Random Starting Character"
+
 class CheckChests(DefaultOnToggle):
     """
     If enabled, a location will be added for activating each Chest-type Skigill node for the first time; 51 total.
@@ -105,6 +112,7 @@ class SkigillOptions(PerGameCommonOptions):
     itemize_weapons: ItemizeWeapons
     itemize_difficulty: ItemizeDifficulty
     itemize_endless_mode: ItemizeEndlessMode
+    random_start_char: RandomStartChar
     check_chests: CheckChests
     check_perks: CheckPerks
     check_weapon_escapes: CheckWeaponEscapes
@@ -126,7 +134,7 @@ option_groups = [
     ),
     OptionGroup(
         "Logic and Goals",
-        [RegionChecksNeedCharacter, BossRegionLast, GoalType],
+        [GoalType, RandomStartChar, RegionChecksNeedCharacter, BossRegionLast],
     ),
 ]
 
@@ -136,6 +144,7 @@ option_presets = {
         "itemize_weapons": True,
         "itemize_difficulty": False,
         "itemize_endless_mode": False,
+        "random_start_char": True,
         "check_chests": True,
         "check_perks": True,
         "check_weapon_escapes": True,

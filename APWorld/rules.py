@@ -32,6 +32,13 @@ def set_all_entrance_rules(world: SkigillWorld) -> None:
     has_r_dwarves = Has("Skigill Region: Dwarves")
     has_r_boss = Has("Skigill Region: Bosses")
     
+    world.set_rule(world.get_entrance("Menu to Mage"), has_r_mage & has_mage)
+    world.set_rule(world.get_entrance("Menu to Strongman"), has_r_strongman & has_strongman)
+    world.set_rule(world.get_entrance("Menu to Fox"), has_r_fox & has_fox)
+    world.set_rule(world.get_entrance("Menu to Prototype"), has_r_prototype & has_prototype)
+    world.set_rule(world.get_entrance("Menu to Dragon"), has_r_dragon & has_dragon)
+    world.set_rule(world.get_entrance("Menu to Dwarves"), has_r_dwarves & has_dwarves)
+    
     if world.options.region_checks_need_character:
         has_r_mage &= has_mage
         has_r_strongman &= has_strongman
@@ -46,12 +53,19 @@ def set_all_entrance_rules(world: SkigillWorld) -> None:
     world.set_rule(world.get_entrance("Mage to Prototype"), has_r_mage & has_r_prototype)
     
     world.set_rule(world.get_entrance("Prototype to Strongman"), has_r_prototype & has_r_strongman)
+    world.set_rule(world.get_entrance("Prototype to Mage"), has_r_prototype & has_r_mage)
 
     world.set_rule(world.get_entrance("Dragon to Fox"), has_r_dragon & has_r_fox)
+    world.set_rule(world.get_entrance("Dragon to Mage"), has_r_dragon & has_r_mage)
     
     world.set_rule(world.get_entrance("Strongman to Dwarves"), has_r_strongman & has_r_dwarves)
+    world.set_rule(world.get_entrance("Strongman to Prototype"), has_r_strongman & has_r_prototype)
     
     world.set_rule(world.get_entrance("Fox to Dwarves"), has_r_fox & has_r_dwarves)
+    world.set_rule(world.get_entrance("Fox to Dragon"), has_r_fox & has_r_dragon)
+    
+    world.set_rule(world.get_entrance("Dwarves to Strongman"), has_r_dwarves & has_r_strongman)
+    world.set_rule(world.get_entrance("Dwarves to Fox"), has_r_dwarves & has_r_fox)
     
     if world.options.boss_region_last:
         world.set_rule(world.get_entrance("Mage to Bosses"), has_r_all & has_r_boss)
@@ -67,6 +81,13 @@ def set_all_entrance_rules(world: SkigillWorld) -> None:
         world.set_rule(world.get_entrance("Strongman to Bosses"), has_r_strongman & has_r_boss)
         world.set_rule(world.get_entrance("Fox to Bosses"), has_r_fox & has_r_boss)
         world.set_rule(world.get_entrance("Dwarves to Bosses"), has_r_dwarves & has_r_boss)
+        
+    world.set_rule(world.get_entrance("Bosses to Mage"), has_r_mage & has_r_boss)
+    world.set_rule(world.get_entrance("Bosses to Prototype"), has_r_prototype & has_r_boss)
+    world.set_rule(world.get_entrance("Bosses to Dragon"), has_r_dragon & has_r_boss)
+    world.set_rule(world.get_entrance("Bosses to Strongman"), has_r_strongman & has_r_boss)
+    world.set_rule(world.get_entrance("Bosses to Fox"), has_r_fox & has_r_boss)
+    world.set_rule(world.get_entrance("Bosses to Dwarves"), has_r_dwarves & has_r_boss)
 
 def set_all_location_rules(world: SkigillWorld) -> None:
     if world.options.check_weapon_escapes:

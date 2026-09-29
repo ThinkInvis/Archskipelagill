@@ -89,17 +89,44 @@ def create_item_with_correct_classification(world: SkigillWorld, name: str) -> S
 
     return SkigillItem(name, classification, ITEM_NAME_TO_ID[name], world.player)
 
+StartingCharacterName = "Mage"
 
 def create_all_items(world: SkigillWorld) -> None:
-    itempool: list[Item] = [
+    if world.options.random_start_char:
+        StartingCharacterName = world.random.choice(["Mage", "Strongman", "Fox", "Prototype", "Dragon", "Dwarves"])
+    
+    reglist = [
+        world.create_item("Skigill Region: Mage"),
         world.create_item("Skigill Region: Strongman"),
         world.create_item("Skigill Region: Fox"),
         world.create_item("Skigill Region: Prototype"),
         world.create_item("Skigill Region: Dwarves"),
-        world.create_item("Skigill Region: Dragon"),
+        world.create_item("Skigill Region: Dragon")];
+        
+    charlist = [
+        world.create_item("Character: Mage"),
+        world.create_item("Character: Strongman"),
+        world.create_item("Character: Fox"),
+        world.create_item("Character: Prototype"),
+        world.create_item("Character: Dwarves"),
+        world.create_item("Character: Dragon")];
+        
+    itempool: list[Item] = [
         world.create_item("Skigill Region: Bosses"),
         world.create_item("Final Boss Key")
     ]
+    
+    for item in reglist:
+        if StartingCharacterName in item.name:
+            world.push_precollected(item)
+        else:
+            itempool.extend([item])
+    
+    for item in charlist:
+        if not world.options.itemize_characters or StartingCharacterName in item.name:
+            world.push_precollected(item)
+        else:
+            itempool.extend([item])
     
     if world.options.itemize_endless_mode:
         itempool.extend([world.create_item("Endless Mode")])
@@ -134,22 +161,6 @@ def create_all_items(world: SkigillWorld) -> None:
         itempool.extend(weaponlist)
     else:
         for item in weaponlist:
-            world.push_precollected(item)
-        
-    charlist = [
-        world.create_item("Character: Strongman"),
-        world.create_item("Character: Fox"),
-        world.create_item("Character: Prototype"),
-        world.create_item("Character: Dwarves"),
-        world.create_item("Character: Dragon")];
-        
-    world.push_precollected(world.create_item("Character: Mage"))
-    world.push_precollected(world.create_item("Skigill Region: Mage"))
-    
-    if world.options.itemize_characters:
-        itempool.extend(charlist)
-    else:
-        for item in charlist:
             world.push_precollected(item)
             
     number_of_items = len(itempool)
