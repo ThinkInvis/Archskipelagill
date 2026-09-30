@@ -7,6 +7,7 @@
 - Traps now have individually configurable weights in yaml
 - Added an on-by-default client option to disable achievements
 - Added an on-by-default client option to run game in background
+- Skigill node tooltips on the mid-run pause menu now display location number for chests and perks
 - Death Link now sends a death when closing the application mid-run if Quit Is Death setting is on (previously only applied to ingame 'end run' button)
 - Made Bonus Gill item configurable, and buffed the default amount (50 --> 80)
 - Fixed Damage Trap health fraction client config setting not applying
