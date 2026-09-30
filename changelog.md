@@ -4,6 +4,7 @@
 
 - Starting character and region are now randomized (can be disabled in yaml)
 - Starting weapon pool and character starting weapons are now randomized (can be disabled in yaml)
+- Traps now have individually configurable weights in yaml
 - Added an on-by-default client option to disable achievements
 - Added an on-by-default client option to run game in background
 - Death Link now sends a death when closing the application mid-run if Quit Is Death setting is on (previously only applied to ingame 'end run' button)
