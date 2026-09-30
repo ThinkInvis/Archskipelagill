@@ -5,6 +5,7 @@ using BepInEx.Configuration;
 using System;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Archskipelagill.ItemsAndLocations;
 
@@ -20,6 +21,7 @@ public class SkillTreeItemizer : Module<SkillTreeItemizer> {
         On.skigillNode.OnTriggerStay2D += On_SkigillNode_OnTriggerStay2D;
         On.CharaStats.Start += On_CharaStats_Start;
         On.skigillNode.showConnex += On_SkigillNode_showConnex;
+        On.nodeContentDisplayerUI.OnPointerEnter += On_NodeContentDisplayerUI_OnPointerEnter;
 
         _cfgSkillTreeLocationTracker = Plugin.Instance.MainConfig.Bind<bool>(new ConfigDefinition("Special Effects", "Skigill Location Tracker"), true, new ConfigDescription("If true, unchecked locations on the Skigill will be marked."));
     }
@@ -63,11 +65,41 @@ public class SkillTreeItemizer : Module<SkillTreeItemizer> {
             }
         }
     }
+
+
+    private void On_NodeContentDisplayerUI_OnPointerEnter(On.nodeContentDisplayerUI.orig_OnPointerEnter orig, nodeContentDisplayerUI self, UnityEngine.EventSystems.PointerEventData pointerEventData) {
+        orig(self, pointerEventData);
+        if(self.instanceDisplayer == null) return;
+        var tkr = self.source.GetComponent<SkillTreeIndexTracker>();
+        if(tkr == null) return;
+        var isChest = tkr.DataNode.type == GameData.SkillNodeType.CHEST;
+        var isPerk = tkr.DataNode.type == GameData.SkillNodeType.PERK;
+        if(!isChest && !isPerk) return;
+        var idx = isChest ? tkr.DataNode.chestIndex : tkr.DataNode.perkIndex;
+        var textObj = new GameObject("Index Label") {
+            layer = 9
+        };
+        var cvs = textObj.AddComponent<Canvas>();
+        cvs.worldCamera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        cvs.pixelPerfect = true;
+        cvs.scaleFactor = 16;
+        var textCpt = textObj.AddComponent<Text>();
+        textCpt.font = Plugin.Resources.LoadAsset<Font>("Assets/Fonts/PerfectDOSVGA437.ttf");
+        textCpt.fontSize = 16;
+        textCpt.text = $"#{idx+1}";
+        textCpt.alignment = TextAnchor.MiddleCenter;
+        textObj.transform.SetParent(self.instanceDisplayer.transform);
+        textObj.transform.localScale = new(0.0625f, 0.0625f, 0.0625f);
+        textObj.transform.localPosition = new Vector3(0.75f, -0.75f, 0f);
+        var o1 = textObj.AddComponent<Outline>();
+        o1.effectDistance = new(0.5f, 0.5f);
+        o1.effectColor = new(0f, 0f, 0f, 1f);
+    }
     #endregion
 
 
     ////// Public API //////
-    
+
     public void RescanAll() {
         var chara = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
         var spawnChar = GameData.allCharacters.First(n => n.id == chara.chara);
