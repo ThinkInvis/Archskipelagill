@@ -15,7 +15,6 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
     public bool AbilityLocationTracker => _cfgAbilityLocationTracker.Value;
 
     private readonly ConfigEntry<bool> _cfgAbilityLocationTracker;
-    private bool _doneStartingCharSwap = false;
 
     public AbilityUnlockItemizer() {
         On.charaSelectScript.selected += On_CharaSelectScript_selected;
