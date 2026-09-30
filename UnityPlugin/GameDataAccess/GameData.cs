@@ -123,15 +123,18 @@ public static partial class GameData {
         ];
 
     public static readonly Dictionary<Weapon, Sprite> weaponSprites = [];
+    public static readonly Dictionary<Weapon, GameObject> weaponPrefabs = [];
 
 
     ////// Public API //////
 
-    public static void PopulateWeaponSprites(weaponDictionary wd) {
+    public static void PopulateWeapons(weaponDictionary wd) {
         var wpnUnlockable = wd.unlockablePrefabs;
         var wpnStarter = wd.WeaponList.Except(wd.unlockablePrefabs).Where(w => w != null);
         foreach(var wpn in wpnUnlockable.Union(wpnStarter)) {
-            weaponSprites[allWeapons.First(n => n.prefabName == wpn.name.Replace("(Clone)", ""))] = wpn.GetComponent<weaponStats>().icon;
+            var targetWeapon = allWeapons.First(n => n.prefabName == wpn.name.Replace("(Clone)", ""));
+            weaponSprites[targetWeapon] = wpn.GetComponent<weaponStats>().icon;
+            weaponPrefabs[targetWeapon] = wpn.gameObject;
         }
     }
 

@@ -23,6 +23,7 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
         On.diffSelectScript.updateUnlockStatus += On_DiffSelectScript_updateUnlockStatus;
         On.modeSelectScript.updateUnlockStatus += On_ModeSelectScript_updateUnlockStatus;
         On.chestLootScript.loote += On_ChestLootScript_loote;
+        On.weaponDictionary.Start += On_WeaponDictionary_Start;
         On.skigillNode.Update += On_SkigillNode_Update;
         On.skigillNode.Start += On_SkigillNode_Start;
         On.weaponDisplayer.Start += On_WeaponDisplayer_Start;
@@ -56,6 +57,7 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
             var adci = self.gameObject.AddComponent<AbilityLocationTrackerDisplay>();
             adci.IsLocked = !ArchipelagoSaver.Instance.metaProg.TryGetValue(self.unlockKey, out var ulStr) || ulStr != "unlocked" || !ArchipelagoDataUtils.HasCharacterById(self.ID);
         }
+        self.startWeapon = GameData.allWeapons.First(w => w.prefabName == ArchipelagoSaver.Instance.StartingWeaponNames[self.ID - 1]).id;
     }
 
     private void On_WeaponDisplayer_Start(On.weaponDisplayer.orig_Start orig, weaponDisplayer self) {
@@ -81,10 +83,21 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
     }
 
     private void On_SkigillNode_Start(On.skigillNode.orig_Start orig, skigillNode self) {
+        if(self.metaProg && self.type == 20 && self.transform.parent.name == "ARMES") {
+            var unlockables = GameData.allWeapons.Where(w => !ArchipelagoSaver.Instance.StartingWeaponNames.Contains(w.prefabName)).ToList();
+            var wpnIndex = self.transform.GetSiblingIndex();
+            if(wpnIndex >= unlockables.Count) {
+                self.icon.sprite = Plugin.Resources.LoadAsset<Sprite>("Assets/Textures/item-unknown.png");
+                self.name = "UnknownWeapon";
+            } else {
+                self.icon.sprite = GameDataAccess.GameData.weaponSprites[unlockables[wpnIndex]];
+                self.name = unlockables[wpnIndex].prefabName;
+            }
+        }
         orig(self);
         if(self.metaProg && self.type == 20) {
             if(ArchipelagoDataUtils.HasLocation($"Escaped with {GameData.allCharacters.FirstOrDefault(n => n.internalName == self.name).name}") == ArchipelagoDataUtils.LocationState.Unchecked
-                || ArchipelagoDataUtils.HasLocation($"Escaped with Weapon {GameData.allWeapons.FirstOrDefault(n => n.saveName == self.name).prefabName}") == ArchipelagoDataUtils.LocationState.Unchecked) {
+                || ArchipelagoDataUtils.HasLocation($"Escaped with Weapon {GameData.allWeapons.FirstOrDefault(n => n.prefabName == self.name).prefabName}") == ArchipelagoDataUtils.LocationState.Unchecked) {
                 var tkr = self.gameObject.AddComponent<SkillTreeIndexTracker>();
                 tkr.Unlock(true);
             }
@@ -151,6 +164,9 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
             lir = lockObj.gameObject.AddComponent<LockIconReplacer>();
         lir.IsArchiLocked = isArchiLocked;
         lir.UpdateIcon();
+        var adci = self.gameObject.GetComponent<AbilityLocationTrackerDisplay>();
+        adci.IsLocked = !ArchipelagoSaver.Instance.metaProg.TryGetValue(self.unlockKey, out var ulStr) || ulStr != "unlocked" || !ArchipelagoDataUtils.HasCharacterById(self.ID);
+        self.startWeapon = GameData.allWeapons.First(w => w.prefabName == ArchipelagoSaver.Instance.StartingWeaponNames[self.ID - 1]).id;
     }
 
     private void On_CharaSelectScript_selected(On.charaSelectScript.orig_selected orig, charaSelectScript self) {
@@ -171,9 +187,47 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
 
     private void On_GridResetter_Start(On.gridResetter.orig_Start orig, gridResetter self) {
         orig(self);
-        if(ArchipelagoSaver.Instance.metaProg.TryGetValue("archi_startChar", out var startChar)) {
-            self.root = GameObject.Find($"metaGrid/{GameData.allCharacters.First(n => n.name == startChar).internalName}").GetComponent<skigillNode>();
+        ResetMetaTreeCharacter(self);
+    }
+
+    private void On_WeaponDictionary_Start(On.weaponDictionary.orig_Start orig, weaponDictionary self) {
+        if(!ResourceGrabber.Instance.GridSceneDuringLoading) {
+            self.unlocksableSaveNames = [.. GameData.allWeapons.Where(w => !ArchipelagoSaver.Instance.StartingWeaponNames.Contains(w.prefabName)).Select(w => w.prefabName)];
+            int ui = 0;
+            for(var i = 0; i < self.WeaponList.Length; i++) {
+                var wpnStatsId = GameData.weaponPrefabs[GameData.allWeapons[i]].GetComponent<weaponStats>().ID;
+                if(ArchipelagoSaver.Instance.StartingWeaponNames.Contains(GameData.allWeapons[i].prefabName)) {
+                    self.WeaponList[wpnStatsId - 1] = GameData.weaponPrefabs[GameData.allWeapons[i]].transform;
+                } else {
+                    self.WeaponList[wpnStatsId - 1] = null;
+                    self.unlockablePrefabs[ui] = GameData.weaponPrefabs[GameData.allWeapons[i]].transform;
+                    ui++;
+                }
+            }
         }
+        orig(self);
     }
     #endregion
+
+    ////// Public API //////
+
+    public void ResetMetaTreeCharacter(gridResetter resetter) {
+        int startCharInd = 0;
+        if(ArchipelagoSaver.Instance.metaProg.TryGetValue("archi_startChar", out var startChar)) {
+            var startCharObj = GameData.allCharacters.First(n => n.name == startChar);
+            resetter.root = GameObject.Find($"metaGrid/{startCharObj.internalName}").GetComponent<skigillNode>();
+            startCharInd = startCharObj.id - 1;
+        } else
+            resetter.root = GameObject.Find($"metaGrid/Mage").GetComponent<skigillNode>();
+        var chara = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
+        chara.transform.position = resetter.root.transform.position;
+        foreach(var sk in chara.skins)
+            GameObject.Destroy(sk);
+        var skinsObj = chara.transform.Find("Skins");
+        if(skinsObj != null)
+            GameObject.Destroy(skinsObj.gameObject);
+        chara.skins = [GameObject.Instantiate(ResourceGrabber.Instance.playerSkinsPrefabs[startCharInd].gameObject, chara.transform)];
+        chara.skins[0].SetActive(true);
+        chara.GetComponent<CharaMove>().anim = chara.skins[0].GetComponent<Animator>();
+    }
 }

@@ -149,19 +149,34 @@ def create_all_items(world: SkigillWorld) -> None:
         world.push_precollected(world.create_item("Progressive Difficulty"))
         world.push_precollected(world.create_item("Progressive Difficulty"))
         
-    for wn in STARTER_WEAPON_NAMES:
-        world.push_precollected(world.create_item(f"Weapon: {wn}"))
-            
-    weaponlist = []
-    
-    for wn in UNLOCK_WEAPON_NAMES:
-        weaponlist.append(world.create_item(f"Weapon: {wn}"))
-        
-    if world.options.itemize_weapons:
-        itempool.extend(weaponlist)
+    if world.options.random_start_weapon:
+        i = 0
+        rwnames = WEAPON_NAMES.copy()
+        world.random.shuffle(rwnames)
+        for wn in rwnames:
+            if i >= 30 or not world.options.itemize_weapons:
+                world.push_precollected(world.create_item(f"Weapon: {wn}"))
+            else:
+                itempool.extend([world.create_item(f"Weapon: {wn}")])
+            i += 1
     else:
-        for item in weaponlist:
-            world.push_precollected(item)
+        for wn in DEFAULT_STARTER_WEAPON_BY_CHARACTER: # first 6 are used to replace character starter weapons by client
+            world.push_precollected(world.create_item(f"Weapon: {wn}"))
+        for wn in STARTER_WEAPON_NAMES:
+            if wn in DEFAULT_STARTER_WEAPON_BY_CHARACTER:
+                continue
+            world.push_precollected(world.create_item(f"Weapon: {wn}"))
+                
+        weaponlist = []
+        
+        for wn in UNLOCK_WEAPON_NAMES:
+            weaponlist.append(world.create_item(f"Weapon: {wn}"))
+            
+        if world.options.itemize_weapons:
+            itempool.extend(weaponlist)
+        else:
+            for item in weaponlist:
+                world.push_precollected(item)
             
     number_of_items = len(itempool)
     number_of_unfilled_locations = len(world.multiworld.get_unfilled_locations(world.player))

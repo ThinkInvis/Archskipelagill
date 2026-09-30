@@ -22,6 +22,7 @@ public class ArchipelagoSaver:JSONsaver {
     public ReadOnlyCollection<string> AllValidChecks { get; private set; }
     public ReadOnlyCollection<string> SentChecks { get; private set; }
     public ReadOnlyCollection<string> UnsentChecks { get; private set; }
+    public ReadOnlyCollection<string> StartingWeaponNames { get; private set; }
     public float BonusGillAmount => _cfgBonusGillAmount.Value;
 
     private readonly Dictionary<string, int> _receivedItemCounts = [];
@@ -32,6 +33,7 @@ public class ArchipelagoSaver:JSONsaver {
     private readonly List<string> _sentChecks = [];
     private readonly List<string> _unsentChecks = [];
     private readonly List<string> _allValidChecks = [];
+    private readonly List<string> _startingWeaponNames = [];
     private readonly Queue<ItemInfo> _itemsToProcess = [];
     private readonly Queue<string> _itemNotifsToProcess = [];
     private int _sendNotifsToProcess = 0;
@@ -40,6 +42,7 @@ public class ArchipelagoSaver:JSONsaver {
     private float _tSinceLastSend = 0f;
     private float _tSinceLastReceive = 0f;
     private bool _startCharDirty = false;
+    private bool _startWeaponDirty = false;
     private ConfigEntry<float> _cfgBonusGillAmount;
 
 
@@ -58,6 +61,7 @@ public class ArchipelagoSaver:JSONsaver {
         AllValidChecks = new(_allValidChecks);
         SentChecks = new(_sentChecks);
         UnsentChecks = new(_unsentChecks);
+        StartingWeaponNames = new(_startingWeaponNames);
 
         load(); //load a little earlier to increase margins around item received events
         if(metaProg.TryGetValue("archi_lastIndex", out var indexStr))
@@ -78,6 +82,8 @@ public class ArchipelagoSaver:JSONsaver {
         if(metaProg.TryGetValue("archi_validChecks", out var checksStr3) && checksStr3.Length > 0) {
             _allValidChecks.AddRange(checksStr3.Split("|"));
         }
+        if(metaProg.TryGetValue("archi_startingWeapons", out var startWpnStr) && startWpnStr.Length > 0)
+            _startingWeaponNames.AddRange(startWpnStr.Split("|"));
     }
 
     public new void Start() { }
@@ -112,7 +118,7 @@ public class ArchipelagoSaver:JSONsaver {
                 metaProg["archi_validChecks"] = string.Join('|', _allValidChecks);
             }
 
-            if(_itemsToProcess.Count > 0) {
+            if(_itemsToProcess.Count > 0 && metaProg.ContainsKey("archi_uuid")) {
                 while(_itemsToProcess.Count > 0)
                     ProcessItem(_itemsToProcess.Dequeue());
                 metaProg["archi_savedItems"] = string.Join("|", _receivedItemCounts.ToList().Select(kvp => kvp.Key + ";" + kvp.Value.ToString()));
@@ -144,6 +150,10 @@ public class ArchipelagoSaver:JSONsaver {
                 metaProg["archi_unsentChecks"] = String.Join("|", _unsentChecks);
             }
 
+            if(_startWeaponDirty) {
+                metaProg["archi_startingWeapons"] = string.Join("|", StartingWeaponNames);
+            }
+
             PostSave();
             Plugin.BepinLogger.LogDebug("Custom save complete");
         }
@@ -151,9 +161,29 @@ public class ArchipelagoSaver:JSONsaver {
         if(_startCharDirty) {
             var gr = GameObject.FindFirstObjectByType<gridResetter>();
             if(gr != null) {
-                gr.root = GameObject.Find($"metaGrid/{GameDataAccess.GameData.allCharacters.First(n => n.name == metaProg["archi_startChar"]).internalName}").GetComponent<skigillNode>();
+                AbilityUnlockItemizer.Instance.ResetMetaTreeCharacter(gr);
                 gr.resetMetaProg();
                 _startCharDirty = false;
+            }
+        }
+
+        if(_startWeaponDirty) {
+            var gr = GameObject.FindFirstObjectByType<gridResetter>();
+            if(gr != null) {
+                var wpnIndex = 0;
+                var unlockables = GameDataAccess.GameData.allWeapons.Where(w => !StartingWeaponNames.Contains(w.prefabName)).ToList();
+                foreach(var node in GameObject.Find("metaGrid/ARMES").GetComponentsInChildren<skigillNode>()) {
+                    if(wpnIndex >= unlockables.Count) {
+                        node.icon.sprite = Plugin.Resources.LoadAsset<Sprite>("Assets/Textures/item-unknown.png");
+                        node.name = "UnknownWeapon";
+                    } else {
+                        node.icon.sprite = GameDataAccess.GameData.weaponSprites[unlockables[wpnIndex]];
+                        node.name = unlockables[wpnIndex].prefabName;
+                    }
+                    wpnIndex++;
+                }
+                gr.resetMetaProg();
+                _startWeaponDirty = false;
             }
         }
 
@@ -227,6 +257,8 @@ public class ArchipelagoSaver:JSONsaver {
         _receivedItemCounts.Clear();
         _sentChecks.Clear();
         _unsentChecks.Clear();
+        _startingWeaponNames.Clear();
+        _startWeaponDirty = true;
         _lastReceivedIndex = 0;
         _lastSavedIndex = 0;
     }
@@ -247,6 +279,11 @@ public class ArchipelagoSaver:JSONsaver {
         if(!_receivedItemCounts.ContainsKey(item.ItemName))
             _receivedItemCounts[item.ItemName] = 0;
         _receivedItemCounts[item.ItemName]++;
+
+        if(item.LocationId == -2 && item.ItemName.StartsWith("Weapon: ")) {
+            _startingWeaponNames.Add(item.ItemName.Replace("Weapon: ", ""));
+            _startWeaponDirty = true;
+        }
 
         if(SaveFileRedirect.Instance.ReceiveNotifs
             && (

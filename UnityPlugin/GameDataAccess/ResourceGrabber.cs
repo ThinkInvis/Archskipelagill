@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace Archskipelagill.GameDataAccess;
@@ -11,6 +12,7 @@ public class ResourceGrabber : Module<ResourceGrabber> {
     public Transform worldLayerSparklePrefab { get; private set; } = null;
     public Transform runWorldLayerSparklePrefab { get; private set; } = null;
     public bool GridSceneDuringLoading { get; private set; } = true;
+    public List<Transform> playerSkinsPrefabs = [];
 
     public ResourceGrabber() {
         _prefabSetup = new("Archskipelagill Prefab Setup Dummy");
@@ -19,6 +21,19 @@ public class ResourceGrabber : Module<ResourceGrabber> {
         On.mainMenuCamScript.Start += On_MainMenuCamScript_Start;
         On.introCutsceneScript.loadMenu += On_IntroCutsceneScript_loadMenu;
         On.weaponDictionary.Start += WeaponDictionary_Start;
+        On.CharaStats.Start += CharaStats_Start;
+    }
+
+    private void CharaStats_Start(On.CharaStats.orig_Start orig, CharaStats self) {
+        orig(self);
+
+        if(GridSceneDuringLoading) {
+            foreach(var sk in self.skins) {
+                var nsk = GameObject.Instantiate(sk, _prefabSetup.transform).transform;
+                GameObject.Destroy(nsk.GetChild(0).gameObject);
+                playerSkinsPrefabs.Add(nsk);
+            }
+        }
     }
 
     private void On_IntroCutsceneScript_loadMenu(On.introCutsceneScript.orig_loadMenu orig, introCutsceneScript self) {
@@ -32,7 +47,7 @@ public class ResourceGrabber : Module<ResourceGrabber> {
             return;
         }
 
-        GameData.PopulateWeaponSprites(self);
+        GameData.PopulateWeapons(self);
 
         SceneManager.LoadScene("menu", LoadSceneMode.Single);
     }

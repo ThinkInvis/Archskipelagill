@@ -1,8 +1,10 @@
 ﻿using Archskipelagill.ArchipelagoCompat;
+using Archskipelagill.ItemsAndLocations;
 using BepInEx.Configuration;
 using MonoMod.Cil;
 using MonoMod.Utils;
 using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -102,7 +104,7 @@ public class SaveFileRedirect : Module<SaveFileRedirect> {
         ArchipelagoSaver.Instance.Wipe();
 
         var gr = GameObject.FindFirstObjectByType<gridResetter>();
-        gr.root = GameObject.Find("metaGrid/Mage").GetComponent<skigillNode>();
+        AbilityUnlockItemizer.Instance.ResetMetaTreeCharacter(gr);
         gr.resetMetaProg(); //also saves save file
     }
 }

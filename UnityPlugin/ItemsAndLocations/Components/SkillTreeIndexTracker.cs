@@ -144,6 +144,11 @@ public class SkillTreeIndexTracker:MonoBehaviour {
     }
 
     public void Lock() {
+        if(GetComponent<skigillNode>().metaProg) {
+            Plugin.BepinLogger.LogWarning("SkillTreeIndexTracker.Lock called on meta-tree node");
+            Plugin.BepinLogger.LogWarning(new System.Diagnostics.StackTrace());
+            return;
+        }
         isUnlocked = false;
         GetComponent<SpriteRenderer>().color = new(0.35f, 0.35f, 0.35f, 1f);
         _activateVfx.color = new(0.25f, 0.25f, 0.25f, 1f);

@@ -25,3 +25,5 @@ class SkillNode:
         self.original_index = original_index
         self.chest_index = chest_index
         self.perk_index = perk_index
+        
+DEFAULT_STARTER_WEAPON_BY_CHARACTER = ["025Unlimited", "015Punch", "007grappin", "017Shockwave", "011Sword", "033LanceFlamme"]

@@ -37,6 +37,13 @@ class RandomStartChar(DefaultOnToggle):
     
     display_name = "Random Starting Character"
 
+class RandomStartWeapon(DefaultOnToggle):
+    """
+    If enabled, the starting weapon set (and consequently all weapons in the meta tree) will be randomized. If disabled, the starting weapon set and meta tree weapons will remain unchanged from base game.
+    """
+    
+    display_name = "Random Starting Weapons"
+
 class CheckChests(DefaultOnToggle):
     """
     If enabled, a location will be added for activating each Chest-type Skigill node for the first time; 51 total.
@@ -113,6 +120,7 @@ class SkigillOptions(PerGameCommonOptions):
     itemize_difficulty: ItemizeDifficulty
     itemize_endless_mode: ItemizeEndlessMode
     random_start_char: RandomStartChar
+    random_start_weapon: RandomStartWeapon
     check_chests: CheckChests
     check_perks: CheckPerks
     check_weapon_escapes: CheckWeaponEscapes
@@ -134,7 +142,7 @@ option_groups = [
     ),
     OptionGroup(
         "Logic and Goals",
-        [GoalType, RandomStartChar, RegionChecksNeedCharacter, BossRegionLast],
+        [GoalType, RandomStartChar, RandomStartWeapon, RegionChecksNeedCharacter, BossRegionLast],
     ),
 ]
 
@@ -145,6 +153,7 @@ option_presets = {
         "itemize_difficulty": False,
         "itemize_endless_mode": False,
         "random_start_char": True,
+        "random_start_weapon": True,
         "check_chests": True,
         "check_perks": True,
         "check_weapon_escapes": True,
