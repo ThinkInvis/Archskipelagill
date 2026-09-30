@@ -78,7 +78,17 @@ class SkigillItem(Item):
 
 def get_random_filler_item_name(world: SkigillWorld) -> str:
     if world.random.randint(0, 99) < world.options.trap_chance:
-        return list(ITEM_NAME_TO_ID.keys())[world.random.randrange(18, 24)]
+        return world.random.choices(
+            ["Trap: Damage", "Trap: Pull Enemies", "Trap: Weapon Jam", "Trap: Drain Ski", "Trap: Scramble Stats", "Trap: Flash Mob", "Trap: Stronger Enemies"],
+            [
+                world.options.trap_weight_damage,
+                world.options.trap_weight_pull_enemies,
+                world.options.trap_weight_weapon_jam,
+                world.options.trap_weight_drain_ski,
+                world.options.trap_weight_scramble_stats,
+                world.options.trap_weight_flash_mob,
+                world.options.trap_weight_stronger_enemies
+            ])[0]
     return "Bonus Gill"
 
 def create_item_with_correct_classification(world: SkigillWorld, name: str) -> SkigillItem:

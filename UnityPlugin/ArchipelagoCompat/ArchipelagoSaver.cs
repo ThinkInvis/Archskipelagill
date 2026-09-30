@@ -106,6 +106,7 @@ public class ArchipelagoSaver:JSONsaver {
                     MainMenuInjector.Instance.ReceiveMessage(" !!! WARNING !!!  Your saved world UUID doesn't match with the server's. Please make sure you've RESET YOUR SAVE FILE before proceeding if this is a new run.");
                 }
                 metaProg["archi_uuid"] = (string)_queuedSlotData["world_uuid"];
+                metaProg["archi_trapWeights"] = (string)_queuedSlotData["trap_weights"];
                 _queuedSlotData.Clear();
             }
 

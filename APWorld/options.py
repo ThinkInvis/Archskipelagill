@@ -96,7 +96,85 @@ class TrapChance(Range):
     range_start = 0
     range_end = 100
     default = 0
+    
+class TrapWeightDamage(Range):
+    """
+    Weight for the given trap to be used when any trap is placed.
+    """
 
+    display_name = "Trap Weight: Damage"
+
+    range_start = 0
+    range_end = 100
+    default = 50
+    
+class TrapWeightPullEnemies(Range):
+    """
+    Weight for the given trap to be used when any trap is placed.
+    """
+
+    display_name = "Trap Weight: Pull Enemies"
+
+    range_start = 0
+    range_end = 100
+    default = 50
+    
+class TrapWeightWeaponJam(Range):
+    """
+    Weight for the given trap to be used when any trap is placed.
+    """
+
+    display_name = "Trap Weight: Weapon Jam"
+
+    range_start = 0
+    range_end = 100
+    default = 50
+
+    
+class TrapWeightDrainSki(Range):
+    """
+    Weight for the given trap to be used when any trap is placed.
+    """
+
+    display_name = "Trap Weight: Drain Ski"
+
+    range_start = 0
+    range_end = 100
+    default = 50
+    
+class TrapWeightScrambleStats(Range):
+    """
+    Weight for the given trap to be used when any trap is placed.
+    """
+
+    display_name = "Trap Weight: Scramble Stats"
+
+    range_start = 0
+    range_end = 100
+    default = 50
+    
+class TrapWeightFlashMob(Range):
+    """
+    Weight for the given trap to be used when any trap is placed.
+    """
+
+    display_name = "Trap Weight: Flash Mob"
+
+    range_start = 0
+    range_end = 100
+    default = 50
+    
+class TrapWeightStrongerEnemies(Range):
+    """
+    Weight for the given trap to be used when any trap is placed.
+    """
+
+    display_name = "Trap Weight: Stronger Enemies"
+
+    range_start = 0
+    range_end = 100
+    default = 50
+    
 class GoalType(Choice):
     """
     Which win condition to use.
@@ -128,6 +206,13 @@ class SkigillOptions(PerGameCommonOptions):
     region_checks_need_character: RegionChecksNeedCharacter
     boss_region_last: BossRegionLast
     trap_chance: TrapChance
+    trap_weight_damage: TrapWeightDamage
+    trap_weight_pull_enemies: TrapWeightPullEnemies
+    trap_weight_weapon_jam: TrapWeightWeaponJam
+    trap_weight_drain_ski: TrapWeightDrainSki
+    trap_weight_scramble_stats: TrapWeightScrambleStats
+    trap_weight_flash_mob: TrapWeightFlashMob
+    trap_weight_stronger_enemies: TrapWeightStrongerEnemies
     goal_type: GoalType
 
 
@@ -135,6 +220,10 @@ option_groups = [
     OptionGroup(
         "Item Distribution",
         [ItemizeCharacters, ItemizeWeapons, ItemizeDifficulty, ItemizeEndlessMode, TrapChance],
+    ),
+    OptionGroup(
+        "Trap Weights",
+        [TrapWeightDamage, TrapWeightPullEnemies, TrapWeightWeaponJam, TrapWeightDrainSki, TrapWeightScrambleStats, TrapWeightFlashMob, TrapWeightStrongerEnemies],
     ),
     OptionGroup(
         "Location Distribution",
@@ -161,6 +250,13 @@ option_presets = {
         "region_checks_need_character": False,
         "boss_region_last": True,
         "trap_chance": 0,
+        "trap_weight_damage": 50,
+        "trap_weight_pull_enemies": 50,
+        "trap_weight_weapon_jam": 50,
+        "trap_weight_drain_ski": 50,
+        "trap_weight_scramble_stats": 50,
+        "trap_weight_flash_mob": 50,
+        "trap_weight_stronger_enemies": 50,
         "goal_type": GoalType.option_finalboss
     }
 }

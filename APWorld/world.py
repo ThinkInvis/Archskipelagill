@@ -40,4 +40,5 @@ class SkigillWorld(World):
         retv = self.options.as_dict("goal_type", "boss_region_last")
         retv["start_char"] = self.starting_character_name
         retv["world_uuid"] = str(uuid.uuid4())
+        retv["trap_weights"] = f"{self.options.trap_weight_damage}|{self.options.trap_weight_pull_enemies}|{self.options.trap_weight_weapon_jam}|{self.options.trap_weight_drain_ski}|{self.options.trap_weight_scramble_stats}|{self.options.trap_weight_flash_mob}|{self.options.trap_weight_stronger_enemies}"
         return retv

@@ -3,6 +3,7 @@ using Archskipelagill.ItemsAndLocations;
 using BepInEx;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Archskipelagill.ArchipelagoCompat;
@@ -113,7 +114,16 @@ public class DeathLinkHandler : IDisposable {
                     _responding = false;
                     break;
                 case DeathLinkType.RandomTrap:
-                    TrapHandler.Instance.TriggerTrap(new string[] { "Damage", "Pull Enemies", "Weapon Jam", "Drain Ski", "Scramble Stats", "Flash Mob", "Stronger Enemies" }[UnityEngine.Random.Range(0, 7)]);
+                    var trapOpts = new string[] { "Damage", "Pull Enemies", "Weapon Jam", "Drain Ski", "Scramble Stats", "Flash Mob", "Stronger Enemies" };
+                    var trapWeights = ArchipelagoSaver.Instance.metaProg["archi_trapWeights"].Split("|").Select(n => int.Parse(n)).ToArray();
+                    var totalWeight = trapWeights.Sum();
+                    var targetWeight = UnityEngine.Random.Range(0, totalWeight);
+                    for(var i = 0; i < trapOpts.Length; i++) {
+                        if(targetWeight < trapWeights[i])
+                            TrapHandler.Instance.TriggerTrap(trapOpts[i]);
+                        targetWeight -= trapWeights[i];
+                    }
+                    Plugin.BepinLogger.LogWarning("Could not pick random trap, weights may be misconfigured");
                     _responding = false;
                     break;
                 default:
