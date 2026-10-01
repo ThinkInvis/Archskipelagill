@@ -1,10 +1,10 @@
 ## Changelog
 
-### Upcoming Release
+### 1.0.0-beta2
 
 - Starting character and region are now randomized (can be disabled in yaml)
 - Starting weapon pool and character starting weapons are now randomized (can be disabled in yaml)
-- Added new check categories, all disabled by default:
+- Added new check categories to yaml, all disabled by default:
 	- Time Survived as Character (every 3 minutes up to 30, 60 total checks)
 	- Time Survived on Difficulty (every 3 minutes up to 30, 70 total checks)
 	- Skigillsanity: activate every Stat node of the Skigill (558 total checks)
