@@ -4,6 +4,12 @@
 
 - Starting character and region are now randomized (can be disabled in yaml)
 - Starting weapon pool and character starting weapons are now randomized (can be disabled in yaml)
+- Added new check categories, all disabled by default:
+	- Time Survived as Character (every 3 minutes up to 30, 60 total checks)
+	- Time Survived on Difficulty (every 3 minutes up to 30, 70 total checks)
+	- Skigillsanity: activate every Stat node of the Skigill (558 total checks)
+	- Super Skigillsanity: activate every Chest/Perk node of the Skigill on every character (558 total checks)
+	- Ultra Skigillsanity: activate every Stat node of the Skigill on every character (3444 total checks)
 - Traps now have individually configurable weights in yaml
 - Added an on-by-default client option to disable achievements
 - Added an on-by-default client option to run game in background
