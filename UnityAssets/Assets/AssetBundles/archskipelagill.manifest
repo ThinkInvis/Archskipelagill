@@ -1,16 +1,16 @@
 ManifestFileVersion: 0
 UnityVersion: 6000.2.7f2
-CRC: 3240438540
+CRC: 3056180708
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: 614edddfef1a09264a64ea226efc9e99
+    Hash: 6ec5c9ba8acb2d1d0fb1ca29e41a2163
   TypeTreeHash:
     serializedVersion: 2
     Hash: 3cc4a3a212ae2b1e1249bcc390f260b9
   IncrementalBuildHash:
     serializedVersion: 2
-    Hash: 3eecf094e206ce133a2ed37c5014d6d1
+    Hash: 1d317a4364aaa5c44b3129992d71bac8
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -79,44 +79,46 @@ SerializeReferenceClassIdentifiers:
 - AssemblyName: UnityEngine.UI
   ClassName: UnityEngine.UI.SpriteState
 Assets:
-- Assets/Textures/icon-username.png
-- Assets/Textures/trap-damage.png
 - Assets/Textures/archi-button-conn.png
-- Assets/Sounds/archi_trap_activate.wav
 - Assets/Textures/item-gill.png
-- Assets/Textures/blank.png
+- Assets/Textures/deathlink.png
 - Assets/Sounds/archi_item_fall.wav
 - Assets/Sounds/archi_send.wav
-- Assets/Textures/deathlink.png
 - Assets/Textures/archi-big-single.png
+- Assets/Textures/trapnotif-conn-lost.png
 - Assets/Textures/archi-button-selected.png
 - Assets/Textures/icon-hostname.png
-- Assets/Textures/locked-archi.png
+- Assets/Textures/trap-jam.png
+- Assets/Sounds/archi_conn_lost.wav
 - Assets/Textures/archi-big.png
 - Assets/Sounds/archi_trap_arrive.wav
-- Assets/Textures/trap-jam.png
 - Assets/Textures/settings-backdrop.png
 - Assets/Sounds/archi_item_arrive.wav
-- Assets/Textures/archi-button-dc.png
-- Assets/Textures/settings-backdrop-btn.png
 - Assets/Textures/item-character.png
+- Assets/Textures/settings-backdrop-btn.png
 - Assets/Textures/item-unknown.png
-- Assets/Textures/trap-base.png
-- Assets/Textures/item-weapon.png
-- Assets/Textures/icon-password.png
-- Assets/Textures/settings-backdrop-field.png
 - Assets/Textures/archi-button-conn-selected.png
-- Assets/Textures/trap-deathlink.png
-- Assets/Textures/trap-drainski.png
-- Assets/Textures/trap-enemytime.png
-- Assets/Textures/item-trap.png
-- Assets/Textures/trap-flashmob.png
-- Assets/Prefabs/ArchiMenu.prefab
-- Assets/Textures/archi-button.png
 - Assets/Textures/settings-backdrop-hollow.png
-- Assets/Textures/archi-button-dc-selected.png
-- Assets/Textures/trap-pull.png
-- Assets/Fonts/PerfectDOSVGA437.ttf
 - Assets/Textures/trap-scramble.png
 - Assets/Textures/item-key.png
+- Assets/Textures/icon-username.png
+- Assets/Textures/trap-damage.png
+- Assets/Sounds/archi_trap_activate.wav
+- Assets/Textures/blank.png
+- Assets/Textures/locked-archi.png
+- Assets/Textures/trap-base.png
+- Assets/Textures/archi-button-dc.png
+- Assets/Textures/settings-backdrop-field.png
+- Assets/Textures/trap-enemytime.png
+- Assets/Textures/item-weapon.png
+- Assets/Textures/icon-password.png
+- Assets/Textures/trap-pull.png
+- Assets/Textures/trap-deathlink.png
+- Assets/Textures/trap-drainski.png
+- Assets/Textures/trap-flashmob.png
+- Assets/Textures/item-trap.png
+- Assets/Prefabs/ArchiMenu.prefab
+- Assets/Textures/archi-button.png
+- Assets/Textures/archi-button-dc-selected.png
+- Assets/Fonts/PerfectDOSVGA437.ttf
 Dependencies: []

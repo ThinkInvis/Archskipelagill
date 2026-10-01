@@ -4,11 +4,14 @@ using Archipelago.MultiClient.Net.Enums;
 using Archipelago.MultiClient.Net.Helpers;
 using Archipelago.MultiClient.Net.MessageLog.Messages;
 using Archipelago.MultiClient.Net.Packets;
+using Archskipelagill.ItemsAndLocations;
+using Archskipelagill.ItemsAndLocations.Components;
 using Archskipelagill.UX;
 using BepInEx.Configuration;
 using System;
 using System.Linq;
 using System.Threading;
+using System.Xml.Linq;
 using UnityEngine;
 using static Archskipelagill.ArchipelagoCompat.DeathLinkHandler;
 
@@ -75,6 +78,8 @@ public class ArchipelagoClient : Module<ArchipelagoClient> {
     public void Disconnect() {
         if(_disconnecting || _session == null) return;
         _disconnecting = true;
+        if(!TrapHandler.Instance.CreateTrapNotif("trapnotif-conn-lost", 15f, "archi_conn_lost", false, false))
+            AudioSource.PlayClipAtPoint(Plugin.Resources.LoadAsset<AudioClip>($"Assets/Sounds/archi_conn_lost.wav"), GameObject.FindGameObjectWithTag("MainCamera").transform.position, 1.3f * PlayerPrefs.GetFloat("SFXvol"));
         Plugin.BepinLogger.LogDebug("Disconnecting from server...");
         var task = _session?.Socket.DisconnectAsync();
         _session.Socket.SocketClosed -= OnSessionSocketClosed;

@@ -79,10 +79,12 @@ public class TrapHandler : Module<TrapHandler> {
         _queuedTraps.Enqueue(trapName);
     }
 
-    public void CreateTrapNotif(string trapSpriteName, float lifetime) {
+    public bool CreateTrapNotif(string trapSpriteName, float lifetime, string sfxName = "archi_trap_activate", bool whilePaused = true, bool randomPitch = true) {
+        var cam = GameObject.FindGameObjectWithTag("MainCamera");
+        if(!cam || !cam.TryGetComponent<mainCameraScript>(out var mcs) || (!whilePaused && mcs.paused)) return false;
         var trapNotif = new GameObject("Trap Notification");
         trapNotif.SetActive(false);
-        trapNotif.transform.parent = GameObject.FindGameObjectWithTag("MainCamera").transform.Find("Canvas");
+        trapNotif.transform.parent = cam.transform.Find("Canvas");
         trapNotif.layer = 5;
         trapNotif.transform.localPosition = new(16f, 0f, 0f);
         var trapSprite = trapNotif.AddComponent<SpriteRenderer>();
@@ -90,12 +92,14 @@ public class TrapHandler : Module<TrapHandler> {
         var tnc = trapNotif.AddComponent<TrapNotification>();
         tnc.Lifetime = lifetime;
         var tac = trapNotif.AddComponent<AudioSource>();
-        tac.clip = Plugin.Resources.LoadAsset<AudioClip>("Assets/Sounds/archi_trap_activate.wav");
+        tac.clip = Plugin.Resources.LoadAsset<AudioClip>($"Assets/Sounds/{sfxName}.wav");
         tac.volume = 1.3f * PlayerPrefs.GetFloat("SFXvol");
-        tac.pitch = UnityEngine.Random.Range(0.95f, 1.15f);
+        if(randomPitch)
+            tac.pitch = UnityEngine.Random.Range(0.95f, 1.15f);
         trapNotif.SetActive(true);
         tac.Play();
         trapNotif.transform.localScale = new(1f, 1f, 1f);
+        return true;
     }
 
     public void TriggerTrap(string trapName) {
