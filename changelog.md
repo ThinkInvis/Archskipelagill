@@ -20,6 +20,7 @@
 - Made Scramble Stats trap configurable, slightly weaker, and actually random
 - Made Drain Ski stats relative to node cost instead of current Ski, and markedly stronger
 - Ingame AP console now autoscrolls to bottom if it's already there
+- Fixed goals potentially not being sent while offline
 - Backend:
   - Major refactor to entire codebase to make it less of a huge mess in general
   - Made slot data saving also thread-safe
