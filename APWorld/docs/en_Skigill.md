@@ -17,6 +17,7 @@ Archskipelagill currently exists as a Custom implementation and must be installe
 ### Summary of Effects (on Default Settings)
 
 - Some nodes of the Skigill will be locked; these appear dimmer, and cannot be activated. These must be unlocked in batches by being sent corresponding Archipelago items.
+- The following will all be randomized: the starting character/node in the meta-tree, which weapon each character starts with, and which weapons are in the starter pool vs. which are on the meta-tree.
 - Some items from the meta-tree (characters and weapons) will be locked; these display a custom lock icon, and can't be used even once purchased. These must be unlocked individually by being sent corresponding Archipelago items.
 - The alternate maps are unsupported and will be permanently locked for as long as the mod is installed.
 - A Location will be placed at each Chest and Perk on the Skigill, as well as after escaping with each character and weapon and defeating each boss.
