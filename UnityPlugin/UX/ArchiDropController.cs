@@ -61,7 +61,7 @@ public class ArchiDropController : MonoBehaviour {
         _sfx2.pitch = Time.timeScale;
         if(!_landed) {
             if(_itemTimer <= 0.85f) {
-                _sfx.volume = (_sfx.time / 0.85f) * 1.3f * PlayerPrefs.GetFloat("SFXvol");
+                _sfx.volume = (_sfx.time / 0.85f) * PlayerPrefs.GetFloat("SFXvol");
                 transform.position = _posStart + (_sfx.time / 0.85f) * (_posTarget - _posStart);
                 var phase = _sfx.time * 6f * Mathf.PI;
                 for(var i = 0; i < _spinners.Length; i++) {
@@ -133,7 +133,7 @@ public class ArchiDropController : MonoBehaviour {
 
 		var sfx2 = obj.AddComponent<AudioSource>();
 		sfx2.clip = Plugin.Resources.LoadAsset<AudioClip>($"Assets/Sounds/archi_{(itemName.StartsWith("Trap: ") ? "trap" : "item")}_arrive.wav");
-		sfx2.volume = PlayerPrefs.GetFloat("SFXvol") * 1.3f;
+		sfx2.volume = PlayerPrefs.GetFloat("SFXvol");
 		sfx2.pitch = Time.timeScale;
 
 		var follower = new GameObject("Follower");

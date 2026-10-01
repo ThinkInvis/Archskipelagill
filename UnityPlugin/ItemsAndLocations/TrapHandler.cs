@@ -93,7 +93,7 @@ public class TrapHandler : Module<TrapHandler> {
         tnc.Lifetime = lifetime;
         var tac = trapNotif.AddComponent<AudioSource>();
         tac.clip = Plugin.Resources.LoadAsset<AudioClip>($"Assets/Sounds/{sfxName}.wav");
-        tac.volume = 1.3f * PlayerPrefs.GetFloat("SFXvol");
+        tac.volume = PlayerPrefs.GetFloat("SFXvol");
         if(randomPitch)
             tac.pitch = UnityEngine.Random.Range(0.95f, 1.15f);
         trapNotif.SetActive(true);

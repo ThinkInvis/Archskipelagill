@@ -45,7 +45,7 @@ public class ArchiSendController : MonoBehaviour {
     void Update() {
         if(_sfx.isPlaying) {
             _sfx.pitch = _basePitch * Time.timeScale;
-            _sfx.volume = (1f - _sfx.time / _sfx.clip.length) * 1.3f * PlayerPrefs.GetFloat("SFXvol");
+            _sfx.volume = (1f - _sfx.time / _sfx.clip.length) * PlayerPrefs.GetFloat("SFXvol");
             transform.position += _velocity * Time.deltaTime;
             _velocity += new Vector3(0, (!_chara.metaMenu ? 5f : 1f) * Time.deltaTime, (!_chara.metaMenu ? 5f : 1f) * Time.deltaTime) * (_goal ? 0.2f : 1f);
             var phase = Mathf.Pow(_sfx.time + 1f, 1.2f) * 1f * Mathf.PI;
@@ -84,7 +84,7 @@ public class ArchiSendController : MonoBehaviour {
 
 		var sfx = obj.AddComponent<AudioSource>();
 		sfx.clip = Plugin.Resources.LoadAsset<AudioClip>("Assets/Sounds/archi_send.wav");
-		sfx.volume = PlayerPrefs.GetFloat("SFXvol") * 1.3f;
+		sfx.volume = PlayerPrefs.GetFloat("SFXvol");
 		ctrl._basePitch = UnityEngine.Random.Range(0.9f, 1.1f);
 		sfx.pitch = ctrl._basePitch * Time.timeScale;
 		if(!SaveFileRedirect.Instance.MuteNotifs)
