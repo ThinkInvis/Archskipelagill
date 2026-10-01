@@ -8,6 +8,7 @@ if TYPE_CHECKING:
     from .world import SkigillWorld
 
 from .scraped_game_data import WEAPON_NAMES, STARTER_WEAPON_NAMES, UNLOCK_WEAPON_NAMES
+from .game_data import DEFAULT_STARTER_WEAPON_BY_CHARACTER
 
 # Note: do not use | or ; characters in item names, used as delimiters by client plugin save/load script
 

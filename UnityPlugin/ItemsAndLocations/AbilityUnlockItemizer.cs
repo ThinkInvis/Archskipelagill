@@ -40,7 +40,7 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
     #region MonoMod Hooks
     private void On_EndMenuManager_Start(On.endMenuManager.orig_Start orig, endMenuManager self) {
         orig(self);
-        var checkStr = $"Escaped with {GameData.allCharacters.First(n => n.id == self.st.chara).name}";
+        var checkStr = $"Escaped as {GameData.allCharacters.First(n => n.id == self.st.chara).name}";
         if(self.st.won && ArchipelagoDataUtils.HasLocation(checkStr) == ArchipelagoDataUtils.LocationState.Unchecked) {
             if(AbilityLocationTracker)
                 self.winIcons[self.st.chara].AddComponent<AbilityLocationTrackerDisplay>();
@@ -51,7 +51,7 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
 
     private void On_CharaSelectScript_Start(On.charaSelectScript.orig_Start orig, charaSelectScript self) {
         orig(self);
-        var checkStr = $"Escaped with {GameData.allCharacters.First(n => n.id == self.ID).name}";
+        var checkStr = $"Escaped as {GameData.allCharacters.First(n => n.id == self.ID).name}";
         if(AbilityLocationTracker && ArchipelagoDataUtils.HasLocation(checkStr) == ArchipelagoDataUtils.LocationState.Unchecked) {
             var adci = self.gameObject.AddComponent<AbilityLocationTrackerDisplay>();
             adci.IsLocked = !ArchipelagoSaver.Instance.metaProg.TryGetValue(self.unlockKey, out var ulStr) || ulStr != "unlocked" || !ArchipelagoDataUtils.HasCharacterById(self.ID);
@@ -95,7 +95,7 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
         }
         orig(self);
         if(self.metaProg && self.type == 20) {
-            if(ArchipelagoDataUtils.HasLocation($"Escaped with {GameData.allCharacters.FirstOrDefault(n => n.internalName == self.name).name}") == ArchipelagoDataUtils.LocationState.Unchecked
+            if(ArchipelagoDataUtils.HasLocation($"Escaped as {GameData.allCharacters.FirstOrDefault(n => n.internalName == self.name).name}") == ArchipelagoDataUtils.LocationState.Unchecked
                 || ArchipelagoDataUtils.HasLocation($"Escaped with Weapon {GameData.allWeapons.FirstOrDefault(n => n.prefabName == self.name).prefabName}") == ArchipelagoDataUtils.LocationState.Unchecked) {
                 var tkr = self.gameObject.AddComponent<SkillTreeIndexTracker>();
                 tkr.Unlock(true);
@@ -118,6 +118,9 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
 
     private void On_ModeSelectScript_updateUnlockStatus(On.modeSelectScript.orig_updateUnlockStatus orig, modeSelectScript self) {
         orig(self);
+#if DEBUG
+        if(Plugin.Instance.dbgUnlock) return;
+#endif
         var isArchiLocked = false;
         if(self.mode != "normal") {
             if(self.unlocked) {
@@ -137,6 +140,9 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
 
     private void On_DiffSelectScript_updateUnlockStatus(On.diffSelectScript.orig_updateUnlockStatus orig, diffSelectScript self) {
         orig(self);
+#if DEBUG
+        if(Plugin.Instance.dbgUnlock) return;
+#endif
         var isArchiLocked = false;
         if(ArchipelagoSaver.GetItemCount("Progressive Difficulty") < self.difficulty && self.unlocked) {
             self.unlocked = false;
@@ -152,6 +158,9 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
 
     private void On_CharaSelectScript_updateUnlockStatus(On.charaSelectScript.orig_updateUnlockStatus orig, charaSelectScript self) {
         orig(self);
+#if DEBUG
+        if(Plugin.Instance.dbgUnlock) return;
+#endif
         var isArchiLocked = false;
         if(self.unlocked && !ArchipelagoDataUtils.HasCharacterById(self.ID)) {
             self.unlocked = false;
@@ -170,6 +179,9 @@ public class AbilityUnlockItemizer : Module<AbilityUnlockItemizer> {
 
     private void On_CharaSelectScript_selected(On.charaSelectScript.orig_selected orig, charaSelectScript self) {
         orig(self);
+#if DEBUG
+        if(Plugin.Instance.dbgUnlock) return;
+#endif
         var isArchiLocked = false;
         if(self.unlocked && !ArchipelagoDataUtils.HasCharacterById(self.ID)) {
             self.unlocked = false;

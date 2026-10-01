@@ -22,6 +22,7 @@ public class ResourceGrabber : Module<ResourceGrabber> {
         On.introCutsceneScript.loadMenu += On_IntroCutsceneScript_loadMenu;
         On.weaponDictionary.Start += WeaponDictionary_Start;
         On.CharaStats.Start += CharaStats_Start;
+        On.mainCameraScript.Update += MainCameraScript_Update;
     }
 
     private void CharaStats_Start(On.CharaStats.orig_Start orig, CharaStats self) {
@@ -48,8 +49,17 @@ public class ResourceGrabber : Module<ResourceGrabber> {
         }
 
         GameData.PopulateWeapons(self);
+    }
 
-        SceneManager.LoadScene("menu", LoadSceneMode.Single);
+    private void MainCameraScript_Update(On.mainCameraScript.orig_Update orig, mainCameraScript self) {
+        orig(self);
+        if(GridSceneDuringLoading) {
+#if DEBUG_WITH_SCRAPE
+            GameObject.FindGameObjectWithTag("gridHolder").transform.GetChild(0).gameObject.SetActive(true);
+            GameData.ScrapeSkillTree();
+#endif
+            SceneManager.LoadScene("menu", LoadSceneMode.Single);
+        }
     }
 
 

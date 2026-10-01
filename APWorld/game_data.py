@@ -18,12 +18,11 @@ class SkillNodeRegion(Enum):
     BOSSES = 7
 
 class SkillNode:
-    def __init__(self, type, neighbors, region, original_index, chest_index, perk_index):
+    def __init__(self, type, neighbors, region, original_index, index_of_type):
         self.type = type
         self.neighbors = neighbors
         self.region = region
         self.original_index = original_index
-        self.chest_index = chest_index
-        self.perk_index = perk_index
+        self.index_of_type = index_of_type
         
 DEFAULT_STARTER_WEAPON_BY_CHARACTER = ["025Unlimited", "015Punch", "007grappin", "017Shockwave", "011Sword", "033LanceFlamme"]

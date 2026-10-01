@@ -30,27 +30,39 @@ LOCATION_NAME_TO_ID = {
     "Defeated Rosa on Difficulty 7": 14,
     "Defeated Final Boss on Difficulty 7": 15,
     "I'm The Boss Now on Difficulty 7": 16,
-    "Escaped with Mage": 17,
-    "Escaped with Strongman": 18,
-    "Escaped with Fox": 19,
-    "Escaped with Prototype": 20,
-    "Escaped with Dwarves": 21,
-    "Escaped with Dragon": 22
+    "Escaped as Mage": 17,
+    "Escaped as Strongman": 18,
+    "Escaped as Fox": 19,
+    "Escaped as Prototype": 20,
+    "Escaped as Dwarves": 21,
+    "Escaped as Dragon": 22
 }
 
 locNameInd = len(LOCATION_NAME_TO_ID) + 1
 
-for node in [n for n in SKILL_TREE if n.type == SkillNodeType.CHEST]:
-    LOCATION_NAME_TO_ID[f"Skigill Chest #{node.chest_index + 1} ({node.region.name})"] = locNameInd
+CHARACTER_NAMES = ["Mage", "Strongman", "Fox", "Prototype", "Dwarves", "Dragon"]
+
+for node in [n for n in SKILL_TREE if n.type == SkillNodeType.CHEST or n.type == SkillNodeType.PERK or n.type == SkillNodeType.STAT]:
+    baseStr = f"Skigill {"Chest" if node.type == SkillNodeType.CHEST else "Perk" if node.type == SkillNodeType.PERK else "Stat"} #{node.index_of_type + 1} ({node.region.name})"
+    LOCATION_NAME_TO_ID[baseStr] = locNameInd
     locNameInd += 1
-    
-for node in [n for n in SKILL_TREE if n.type == SkillNodeType.PERK]:
-    LOCATION_NAME_TO_ID[f"Skigill Perk #{node.perk_index + 1} ({node.region.name})"] = locNameInd
-    locNameInd += 1
+    for i in CHARACTER_NAMES:
+        LOCATION_NAME_TO_ID[f"{baseStr} as {i}"] = locNameInd
+        locNameInd += 1
     
 for i in range(len(WEAPON_NAMES)):
     LOCATION_NAME_TO_ID[f"Escaped with Weapon {WEAPON_NAMES[i]}"] = locNameInd
     locNameInd += 1
+    
+for i in CHARACTER_NAMES:
+    for j in range(10):
+        LOCATION_NAME_TO_ID[f"Survived {(j+1)*3} Minutes as {i}"] = locNameInd
+        locNameInd += 1
+    
+for i in range(7):
+    for j in range(10):
+        LOCATION_NAME_TO_ID[f"Survived {(j+1)*3} Minutes on Difficulty {i+1}"] = locNameInd
+        locNameInd += 1
 
 class SkigillLocation(Location):
     game = "Skigill"
@@ -73,25 +85,31 @@ def create_regular_locations(world: SkigillWorld) -> None:
         SkillNodeRegion.BOSSES: world.get_region("Bosses"),
     }
     
-    if world.options.check_chests:
-        for node in [n for n in SKILL_TREE if n.type == SkillNodeType.CHEST]:
-            regions[node.region].add_locations(get_location_names_with_ids([f"Skigill Chest #{node.chest_index + 1} ({node.region.name})"]), SkigillLocation)
-        
-    if world.options.check_perks:
-        for node in [n for n in SKILL_TREE if n.type == SkillNodeType.PERK]:
-            regions[node.region].add_locations(get_location_names_with_ids([f"Skigill Perk #{node.perk_index + 1} ({node.region.name})"]), SkigillLocation)
+    for node in [n for n in SKILL_TREE if n.type == SkillNodeType.CHEST or n.type == SkillNodeType.PERK or n.type == SkillNodeType.STAT]:
+        baseStr = f"Skigill {"Chest" if node.type == SkillNodeType.CHEST else "Perk" if node.type == SkillNodeType.PERK else "Stat"} #{node.index_of_type + 1} ({node.region.name})"
+        if (world.options.check_chests and node.type == SkillNodeType.CHEST) or (world.options.check_perks and node.type == SkillNodeType.PERK) or (world.options.check_skigillsanity and node.type == SkillNodeType.STAT):
+            regions[node.region].add_locations(get_location_names_with_ids([baseStr]), SkigillLocation)
+        if (world.options.check_super_skigillsanity and node.type != SkillNodeType.STAT) or (world.options.check_ultra_skigillsanity and node.type == SkillNodeType.STAT):
+            for i in CHARACTER_NAMES:
+                world.get_region(i).add_locations(get_location_names_with_ids([f"{baseStr} as {i}"]), SkigillLocation)
         
     if world.options.check_weapon_escapes:
         regions[SkillNodeRegion.MAGE].add_locations(get_location_names_with_ids([f"Escaped with Weapon {n}" for n in WEAPON_NAMES]), SkigillLocation)
         
     if world.options.check_hero_escapes:
-        regions[SkillNodeRegion.MAGE].add_locations(get_location_names_with_ids(["Escaped with Mage"]), SkigillLocation)
-        regions[SkillNodeRegion.STRONGMAN].add_locations(get_location_names_with_ids(["Escaped with Strongman"]), SkigillLocation)
-        regions[SkillNodeRegion.FOX].add_locations(get_location_names_with_ids(["Escaped with Fox"]), SkigillLocation)
-        regions[SkillNodeRegion.PROTOTYPE].add_locations(get_location_names_with_ids(["Escaped with Prototype"]), SkigillLocation)
-        regions[SkillNodeRegion.DWARVES].add_locations(get_location_names_with_ids(["Escaped with Dwarves"]), SkigillLocation)
-        regions[SkillNodeRegion.DRAGON].add_locations(get_location_names_with_ids(["Escaped with Dragon"]), SkigillLocation)
-            
+        for i in CHARACTER_NAMES:
+            world.get_region(i).add_locations(get_location_names_with_ids([f"Escaped as {i}"]), SkigillLocation)
+        
+    if world.options.check_hero_survival:
+        for i in CHARACTER_NAMES:
+            for j in range(10):
+                world.get_region(i).add_locations(get_location_names_with_ids([f"Survived {(j+1)*3} Minutes as {i}"]), SkigillLocation)
+        
+    if world.options.check_difficulty_survival:
+        for i in range(7):
+            for j in range(10):
+                regions[SkigillNodeRegion.MAGE].add_locations(get_location_names_with_ids([f"Survived {(j+1)*3} Minutes on Difficulty {i+1}"]), SkigillLocation)
+        
     lnidList = list(LOCATION_NAME_TO_ID.keys())
     regions[SkillNodeRegion.BOSSES].add_locations(get_location_names_with_ids(lnidList[0:6]), SkigillLocation)
 

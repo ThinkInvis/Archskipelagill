@@ -50,8 +50,10 @@ public class SkillTreeItemizer : Module<SkillTreeItemizer> {
         if(!tkr) return;
         var isChest = tkr.DataNode.type == GameData.SkillNodeType.CHEST;
         var isPerk = tkr.DataNode.type == GameData.SkillNodeType.PERK;
-        if(!isChest && !isPerk) return;
-        ArchipelagoClient.Instance.CheckLocationsByName($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? tkr.DataNode.chestIndex : tkr.DataNode.perkIndex) + 1} ({tkr.DataNode.region.name.ToUpper()})");
+        var isStat = tkr.DataNode.type == GameData.SkillNodeType.STAT;
+        if(!isChest && !isPerk && !isStat) return;
+        ArchipelagoClient.Instance.CheckLocationsByName($"Skigill {(isChest ? "Chest" : (isPerk ? "Perk" : "Stat"))} #{tkr.DataNode.indexOfType + 1} ({tkr.DataNode.region.name.ToUpper()})");
+        ArchipelagoClient.Instance.CheckLocationsByName($"Skigill {(isChest ? "Chest" : (isPerk ? "Perk" : "Stat"))} #{tkr.DataNode.indexOfType + 1} ({tkr.DataNode.region.name.ToUpper()}) as {GameData.allCharacters.First(c => c.id == GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>().chara).name}");
         tkr.Unlock(false);
     }
 
@@ -75,7 +77,6 @@ public class SkillTreeItemizer : Module<SkillTreeItemizer> {
         var isChest = tkr.DataNode.type == GameData.SkillNodeType.CHEST;
         var isPerk = tkr.DataNode.type == GameData.SkillNodeType.PERK;
         if(!isChest && !isPerk) return;
-        var idx = isChest ? tkr.DataNode.chestIndex : tkr.DataNode.perkIndex;
         var textObj = new GameObject("Index Label") {
             layer = 9
         };
@@ -86,7 +87,7 @@ public class SkillTreeItemizer : Module<SkillTreeItemizer> {
         var textCpt = textObj.AddComponent<Text>();
         textCpt.font = Plugin.Resources.LoadAsset<Font>("Assets/Fonts/PerfectDOSVGA437.ttf");
         textCpt.fontSize = 16;
-        textCpt.text = $"#{idx+1}";
+        textCpt.text = $"#{tkr.DataNode.indexOfType+1}";
         textCpt.alignment = TextAnchor.MiddleCenter;
         textObj.transform.SetParent(self.instanceDisplayer.transform);
         textObj.transform.localScale = new(0.0625f, 0.0625f, 0.0625f);

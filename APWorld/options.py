@@ -72,6 +72,41 @@ class CheckHeroEscapes(DefaultOnToggle):
     
     display_name = "Checks: Hero Escapes"
     
+class CheckHeroSurvival(Toggle):
+    """
+    If enabled, a location will be added for surviving every 3 minutes up to 30 with each character; 60 total.
+    """
+    
+    display_name = "Checks: Hero Survival"
+    
+class CheckDifficultySurvival(Toggle):
+    """
+    If enabled, a location will be added for surviving every 3 minutes up to 30 on each difficulty; 70 total.
+    """
+    
+    display_name = "Checks: Difficulty Survival"
+    
+class CheckSkigillsanity(Toggle):
+    """
+    If enabled, a location will be added for activating each Stat-type Skigill node for the first time; 574 total.
+    """
+    
+    display_name = "Checks: Skigillsanity"
+    
+class CheckSuperSkigillsanity(Toggle):
+    """
+    If enabled, a location will be added for activating each Chest- and Perk-type Skigill node on each character; 558 total.
+    """
+    
+    display_name = "Checks: Super Skigillsanity"
+    
+class CheckUltraSkigillsanity(Toggle):
+    """
+    If enabled, a location will be added for activating each Stat-type Skigill node on each character; 3444 total! Not for the faint of heart.
+    """
+    
+    display_name = "Checks: Ultra Skigillsanity"
+    
 class RegionChecksNeedCharacter(Toggle):
     """
     If enabled, checks within a given region will be out of logic until you have the character for that region. If disabled, checking locations in distant regions may be much more difficult; but if enabled, it may be easy to get some out-of-logic items.
@@ -203,6 +238,11 @@ class SkigillOptions(PerGameCommonOptions):
     check_perks: CheckPerks
     check_weapon_escapes: CheckWeaponEscapes
     check_hero_escapes: CheckHeroEscapes
+    check_hero_survival: CheckHeroSurvival
+    check_difficulty_survival: CheckDifficultySurvival
+    check_skigillsanity: CheckSkigillsanity
+    check_super_skigillsanity: CheckSuperSkigillsanity
+    check_ultra_skigillsanity: CheckUltraSkigillsanity
     region_checks_need_character: RegionChecksNeedCharacter
     boss_region_last: BossRegionLast
     trap_chance: TrapChance
@@ -227,7 +267,7 @@ option_groups = [
     ),
     OptionGroup(
         "Location Distribution",
-        [CheckChests, CheckPerks, CheckWeaponEscapes, CheckHeroEscapes],
+        [CheckChests, CheckPerks, CheckWeaponEscapes, CheckHeroEscapes, CheckHeroSurvival, CheckDifficultySurvival, CheckSkigillsanity, CheckSuperSkigillsanity, CheckUltraSkigillsanity],
     ),
     OptionGroup(
         "Logic and Goals",
@@ -247,6 +287,11 @@ option_presets = {
         "check_perks": True,
         "check_weapon_escapes": True,
         "check_hero_escapes": True,
+        "check_hero_survival": False,
+        "check_difficulty_survival": False,
+        "check_skigillsanity": False,
+        "check_super_skigillsanity": False,
+        "check_ultra_skigillsanity": False,
         "region_checks_need_character": False,
         "boss_region_last": True,
         "trap_chance": 0,

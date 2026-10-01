@@ -1,6 +1,7 @@
 ﻿using Archskipelagill.ArchipelagoCompat;
 using Archskipelagill.GameDataAccess;
 using System;
+using System.Linq;
 using UnityEngine;
 
 namespace Archskipelagill.ItemsAndLocations.Components;
@@ -94,9 +95,11 @@ public class SkillTreeIndexTracker:MonoBehaviour {
         _hasCheck = false;
         var isChest = DataNode.type == GameData.SkillNodeType.CHEST;
         var isPerk = DataNode.type == GameData.SkillNodeType.PERK;
+        var isStat = DataNode.type == GameData.SkillNodeType.STAT;
         var isBoss = DataNode.type == GameData.SkillNodeType.BOSS;
-        if(isChest || isPerk) {
-            _hasCheck = ArchipelagoDataUtils.HasLocation($"Skigill {(isChest ? "Chest" : "Perk")} #{(isChest ? DataNode.chestIndex : DataNode.perkIndex) + 1} ({DataNode.region.name.ToUpper()})") == ArchipelagoDataUtils.LocationState.Unchecked;
+        if(isChest || isPerk || isStat) {
+            _hasCheck = ArchipelagoDataUtils.HasLocation($"Skigill {(isChest ? "Chest" : (isPerk ? "Perk" : "Stat"))} #{DataNode.indexOfType + 1} ({DataNode.region.name.ToUpper()})") == ArchipelagoDataUtils.LocationState.Unchecked;
+            _hasCheck |= ArchipelagoDataUtils.HasLocation($"Skigill {(isChest ? "Chest" : (isPerk ? "Perk" : "Stat"))} #{DataNode.indexOfType + 1} ({DataNode.region.name.ToUpper()}) as {GameData.allCharacters.First(c => c.id == GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>().chara).name}") == ArchipelagoDataUtils.LocationState.Unchecked;
         } else if(isBoss && _bossCpt != null) {
             var targetBossName = _bossCpt.bossPrefab.GetComponentInChildren<VieScript>().bossName switch {
                 "OVNI" => "Rosa",

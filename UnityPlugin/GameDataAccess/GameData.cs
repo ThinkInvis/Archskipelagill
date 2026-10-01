@@ -12,13 +12,12 @@ public static partial class GameData {
     ////// Nested Data Types //////
     public enum SkillNodeType { UNKNOWN, STAT, CHEST, PERK, BOSS, BOSS_FINAL };
 
-    public struct SkillNode(SkillNodeType _type, int[] _neighbors, Region _region, int _originalIndex, int _chestIndex, int _perkIndex) {
+    public struct SkillNode(SkillNodeType _type, int[] _neighbors, Region _region, int _originalIndex, int _indexOfType) {
         public SkillNodeType type = _type;
         public int[] neighbors = _neighbors;
         public Region region = _region;
         public int originalIndex = _originalIndex;
-        public int chestIndex = _chestIndex;
-        public int perkIndex = _perkIndex;
+        public int indexOfType = _indexOfType;
     }
 
     public struct Weapon(string _saveName, string _prefabName, int _id, bool _starter) {
@@ -122,6 +121,7 @@ public static partial class GameData {
         new("Bosses", "Final", null, [0, 1, 2, 3, 4, 5])
         ];
 
+    public static readonly List<Weapon> allWeapons = [];
     public static readonly Dictionary<Weapon, Sprite> weaponSprites = [];
     public static readonly Dictionary<Weapon, GameObject> weaponPrefabs = [];
 
@@ -129,12 +129,21 @@ public static partial class GameData {
     ////// Public API //////
 
     public static void PopulateWeapons(weaponDictionary wd) {
-        var wpnUnlockable = wd.unlockablePrefabs;
-        var wpnStarter = wd.WeaponList.Except(wd.unlockablePrefabs).Where(w => w != null);
-        foreach(var wpn in wpnUnlockable.Union(wpnStarter)) {
-            var targetWeapon = allWeapons.First(n => n.prefabName == wpn.name.Replace("(Clone)", ""));
-            weaponSprites[targetWeapon] = wpn.GetComponent<weaponStats>().icon;
-            weaponPrefabs[targetWeapon] = wpn.gameObject;
+        for(var i = 0; i < wd.unlocksableSaveNames.Length; i++) {
+            var wpn = wd.unlockablePrefabs[i];
+            var wc = wpn.GetComponent<weaponStats>();
+            var newWpn = new Weapon(wd.unlocksableSaveNames[i], wpn.name.Replace("(Clone)", ""), wc.ID, false);
+            weaponSprites[newWpn] = wpn.GetComponent<weaponStats>().icon;
+            weaponPrefabs[newWpn] = wpn.gameObject;
+            allWeapons.Add(newWpn);
+        }
+        foreach(var wpn in wd.WeaponList.Except(wd.unlockablePrefabs)) {
+            if(wpn == null) continue;
+            var wc = wpn.GetComponent<weaponStats>();
+            var newWpn = new Weapon(null, wpn.name.Replace("(Clone)", ""), wc.ID, true);
+            weaponSprites[newWpn] = wpn.GetComponent<weaponStats>().icon;
+            weaponPrefabs[newWpn] = wpn.gameObject;
+            allWeapons.Add(newWpn);
         }
     }
 
@@ -154,6 +163,8 @@ public static partial class GameData {
 
         int chestCount = 0;
         int perkCount = 0;
+        int statCount = 0;
+        int bossCount = 0;
 
         //Build node list
         var finalBossNode = allValidNodes.Find(n => n.adjacent.Count == 0 && n.type == 22);
@@ -166,15 +177,22 @@ public static partial class GameData {
                 22 => "BOSS",
                 _ => "STAT"
             };
-            int chestIndex = -1;
+            int iot = -1;
             if(skillNodeType == "CHEST") {
-                chestIndex = chestCount;
+                iot = chestCount;
                 chestCount++;
             }
-            int perkIndex = -1;
             if(skillNodeType == "PERK") {
-                perkIndex = perkCount;
+                iot = perkCount;
                 perkCount++;
+            }
+            if(skillNodeType == "STAT") {
+                iot = statCount;
+                statCount++;
+            }
+            if(skillNodeType == "BOSS") {
+                iot = bossCount;
+                bossCount++;
             }
             var connexList = node.adjacent.Select(n => allValidNodes.IndexOf(n.GetComponent<skigillNode>())).ToList();
             if(node == finalBossNode) {
@@ -186,7 +204,7 @@ public static partial class GameData {
             var spawnDistances = new List<int>();
             var grid = GameObject.FindGameObjectWithTag("gridHolder");
             for(var j = 0; j < allRegions.Count; j++) {
-                var targetNode = grid.transform.Find(allRegions[j].nodeName).GetComponent<skigillNode>();
+                var targetNode = allValidNodes.First(n => n.name == allRegions[j].nodeName);
                 spawnDistances.Add(FindNodeDistance(allValidNodes, targetNode, node));
             }
             var closestDist = spawnDistances.Where(n => n >= 0).Min();
@@ -200,26 +218,9 @@ public static partial class GameData {
             node.transform.Find("IconColor").GetComponent<SpriteRenderer>().color = regionColor;
             node.transform.Find("nodeOcto").GetComponent<SpriteRenderer>().color = regionColor;
 
-            outputPy.Add($"\tSkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{allRegions[highestRegion].name.ToUpper()}, {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
-            outputCs.Add($"\t\tnew SkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], allRegions[{highestRegion}], {avnUnsorted.IndexOf(node)}, {chestIndex}, {perkIndex})");
+            outputPy.Add($"\tSkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], SkillNodeRegion.{allRegions[highestRegion].name.ToUpper()}, {avnUnsorted.IndexOf(node)}, {iot})");
+            outputCs.Add($"\t\tnew SkillNode(SkillNodeType.{skillNodeType}, [{string.Join(", ", connexList)}], allRegions[{highestRegion}], {avnUnsorted.IndexOf(node)}, {iot})");
         }
-
-        //Build weapon list
-        var wd = GameObject.Find("WeaponDict").GetComponent<weaponDictionary>();
-        List<string> outputWpnCs = [];
-        for(var i = 0; i < wd.unlocksableSaveNames.Length; i++) {
-            var wpn = wd.unlockablePrefabs[i];
-            var wc = wpn.GetComponent<weaponStats>();
-            outputWpnCs.Add($"\t\tnew(\"{wd.unlocksableSaveNames[i]}\", \"{wpn.name.Replace("(Clone)", "")}\", {wc.ID}, false)");
-        }
-        foreach(var wpn in wd.WeaponList.Except(wd.unlockablePrefabs)) {
-            if(wpn == null) continue;
-            var wc = wpn.GetComponent<weaponStats>();
-            outputWpnCs.Add($"\t\tnew(null, \"{wpn.name.Replace("(Clone)", "")}\", {wc.ID}, true)");
-        }
-        var wpnUnlockable = wd.unlockablePrefabs.Select(p => '"' + p.name.Replace("(Clone)", "") + '"');
-        var wpnStarter = wd.WeaponList.Except(wd.unlockablePrefabs).Where(w => w != null).Select(p => '"' + p.name.Replace("(Clone)", "") + '"');
-
 
         //Write final output to game directory
         var dir = Directory.GetCurrentDirectory();
@@ -230,8 +231,8 @@ public static partial class GameData {
 
             import re
 
-            STARTER_WEAPON_NAMES = [{{string.Join(", ", wpnStarter)}}]
-            UNLOCK_WEAPON_NAMES = [{{string.Join(", ", wpnUnlockable)}}]
+            STARTER_WEAPON_NAMES = [{{string.Join(", ", allWeapons.Where(w => w.starter).Select(w => '"' + w.prefabName + '"'))}}]
+            UNLOCK_WEAPON_NAMES = [{{string.Join(", ", allWeapons.Where(w => !w.starter).Select(w => '"' + w.prefabName + '"'))}}]
             WEAPON_NAMES = sorted(STARTER_WEAPON_NAMES + UNLOCK_WEAPON_NAMES, key = lambda n : int(re.findall(r'\d+', n)[0]))
 
             SKILL_TREE = {
@@ -245,9 +246,6 @@ public static partial class GameData {
             namespace Archskipelagill.GameDataAccess;
 
             public static partial class GameData {
-                public static List<Weapon> allWeapons = [
-            {{string.Join("," + System.Environment.NewLine, outputWpnCs)}}
-                ];
                 public static List<SkillNode> skillTree = [
             {{string.Join("," + System.Environment.NewLine, outputCs)}}
                 ];

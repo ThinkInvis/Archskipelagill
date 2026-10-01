@@ -79,6 +79,7 @@ public class Plugin:BaseUnityPlugin {
 
 #if DEBUG
     string _dbgUri, _dbgSlotName, _dbgPassword = "";
+    public bool dbgUnlock = false;
     private void OnGUI() {
         GUI.BeginGroup(new Rect(Screen.width - 332, 200, 332, Screen.height - 200));
         // show the mod is currently loaded in the corner
@@ -146,6 +147,9 @@ public class Plugin:BaseUnityPlugin {
         if(GUI.Button(new Rect(16, 420, 200, 20), "DEBUG: Test receive notif (key item)")) {
             var q = typeof(ArchipelagoSaver).GetField("_itemNotifsToProcess", BindingFlags.Instance | BindingFlags.NonPublic).GetValue(ArchipelagoSaver.Instance) as Queue<string>;
             q.Enqueue("Skigill Region: Mage");
+        }
+        if(GUI.Button(new Rect(16, 450, 200, 20), "DEBUG: Toggle unlock characters")) {
+            dbgUnlock = !dbgUnlock;
         }
         GUI.EndGroup();
     }
