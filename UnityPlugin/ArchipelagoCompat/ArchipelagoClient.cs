@@ -102,7 +102,6 @@ public class ArchipelagoClient : Module<ArchipelagoClient> {
             return;
         }
         RunLocationCheck([.. unsentNames.Where(n => _session.Locations.AllMissingLocations.Contains(_session.Locations.GetLocationIdFromName("Skigill", n)))]);
-        RunGoalCheck([.. unsentNames]);
     }
 
     public void OnQuit() {
@@ -230,6 +229,7 @@ public class ArchipelagoClient : Module<ArchipelagoClient> {
     private async void RunLocationCheck(params string[] unsentNames) {
         try {
             await _session.Locations.CompleteLocationChecksAsync([.. unsentNames.Select(n => _session.Locations.GetLocationIdFromName("Skigill", n))]);
+            RunGoalCheck(unsentNames);
         } catch(Exception ex) {
             Plugin.BepinLogger.LogError("Failed to send checks:");
             Plugin.BepinLogger.LogError(ex);
