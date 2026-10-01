@@ -1,22 +1,24 @@
 ﻿using Archskipelagill.ArchipelagoCompat;
+using System.Linq;
 using UnityEngine;
 
 namespace Archskipelagill.ItemsAndLocations;
 
-public class RoundEndItemizer : Module<RoundEndItemizer> {
+public class WinConditionItemizer : Module<WinConditionItemizer> {
 
 	////// Initializer/Fields/Properties //////
     
-	public RoundEndItemizer() {
+	public WinConditionItemizer() {
         On.mainCameraScript.playerWin += On_MainCameraScript_playerWin;
         On.VieScript.dies += On_VieScript_dies;
         On.mainCameraScript.cancelWinVortex += On_MainCameraScript_cancelWinVortex;
+        On.timerScript.Update += TimerScript_Update;
     }
 
 
-	////// MonoMod Hooks //////
-	#region MonoMod Hooks
-	private void On_MainCameraScript_cancelWinVortex(On.mainCameraScript.orig_cancelWinVortex orig, mainCameraScript self) {
+    ////// MonoMod Hooks //////
+    #region MonoMod Hooks
+    private void On_MainCameraScript_cancelWinVortex(On.mainCameraScript.orig_cancelWinVortex orig, mainCameraScript self) {
         if(ArchipelagoSaver.GetItemCount("Endless Mode") < 1) return;
         orig(self);
     }
@@ -60,6 +62,19 @@ public class RoundEndItemizer : Module<RoundEndItemizer> {
             var chn = ch.name.Replace("(Clone)", "");
             if(int.TryParse(chn[..3], out var n) && n >= 1 && n <= 60)
                 ArchipelagoClient.Instance.CheckLocationsByName($"Escaped with Weapon {chn}");
+        }
+    }
+
+    private void TimerScript_Update(On.timerScript.orig_Update orig, timerScript self) {
+        var tPrev = self.t;
+        orig(self);
+        var stats = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
+        if(stats.dead || stats.won) return;
+        for(var i = 1; i <= 10; i++) {
+            if(self.t > i * 60 * 3 && tPrev <= i * 60 * 3) {
+                ArchipelagoClient.Instance.CheckLocationsByName($"Survived {i * 3} Minutes as {GameDataAccess.GameData.allCharacters.First(c => c.id == stats.chara).name}");
+                ArchipelagoClient.Instance.CheckLocationsByName($"Survived {i * 3} Minutes on Difficulty {stats.difficulty}");
+            }
         }
     }
     #endregion
