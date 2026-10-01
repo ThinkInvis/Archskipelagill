@@ -108,7 +108,7 @@ def create_regular_locations(world: SkigillWorld) -> None:
     if world.options.check_difficulty_survival:
         for i in range(7):
             for j in range(10):
-                regions[SkigillNodeRegion.MAGE].add_locations(get_location_names_with_ids([f"Survived {(j+1)*3} Minutes on Difficulty {i+1}"]), SkigillLocation)
+                regions[SkillNodeRegion.MAGE].add_locations(get_location_names_with_ids([f"Survived {(j+1)*3} Minutes on Difficulty {i+1}"]), SkigillLocation)
         
     lnidList = list(LOCATION_NAME_TO_ID.keys())
     regions[SkillNodeRegion.BOSSES].add_locations(get_location_names_with_ids(lnidList[0:6]), SkigillLocation)
