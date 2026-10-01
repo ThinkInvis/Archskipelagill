@@ -232,8 +232,9 @@ public class ArchipelagoClient : Module<ArchipelagoClient> {
     }
     
     private async void RunLocationCheck(params string[] unsentNames) {
+        var unsentValidNames = unsentNames.Select(n => (name: n, id: _session.Locations.GetLocationIdFromName("Skigill", n))).Where(n => _session.Locations.AllMissingLocations.Contains(n.id));
         try {
-            await _session.Locations.CompleteLocationChecksAsync([.. unsentNames.Select(n => _session.Locations.GetLocationIdFromName("Skigill", n)).Intersect(_session.Locations.AllMissingLocations)]);
+            await _session.Locations.CompleteLocationChecksAsync([.. unsentValidNames.Select(n => n.id)]);
             RunGoalCheck(unsentNames);
         } catch(Exception ex) {
             Plugin.BepinLogger.LogError("Failed to send checks:");
@@ -241,7 +242,7 @@ public class ArchipelagoClient : Module<ArchipelagoClient> {
             ArchipelagoSaver.Instance.ReceiveUnsentChecks([.. unsentNames]);
             return;
         }
-        ArchipelagoSaver.Instance.ReceiveSentChecks([.. unsentNames]);
+        ArchipelagoSaver.Instance.ReceiveSentChecks([.. unsentValidNames.Select(n => n.name)]);
     }
 
     private async void RunGoalCheck(params string[] unsentNames) {
