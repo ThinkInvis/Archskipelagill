@@ -74,9 +74,7 @@ public class SkillTreeItemizer : Module<SkillTreeItemizer> {
         if(self.instanceDisplayer == null) return;
         var tkr = self.source.GetComponent<SkillTreeIndexTracker>();
         if(tkr == null) return;
-        var isChest = tkr.DataNode.type == GameData.SkillNodeType.CHEST;
-        var isPerk = tkr.DataNode.type == GameData.SkillNodeType.PERK;
-        if(!isChest && !isPerk) return;
+        if(tkr.DataNode.indexOfType == -1) return;
         var textObj = new GameObject("Index Label") {
             layer = 9
         };
