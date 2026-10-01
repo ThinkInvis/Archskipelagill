@@ -112,12 +112,17 @@ public class TrapHandler : Module<TrapHandler> {
 
         switch(trapName) {
             case "Damage":
-                cs.HP *= DamageTrapStrength;
+                var damage = cs.HP * DamageTrapStrength;
+                cs.HP -= damage;
+                if(cs.HP < 1f) {
+                    damage = 1f - cs.HP;
+                    cs.HP = 1f;
+                }
                 hb.hurtSFX.PlayHurtSFX();
                 var hurtNotif = UnityEngine.Object.Instantiate<GameObject>(hb.damageTakenNotif, hb.transform.position, Quaternion.identity);
                 hurtNotif.GetComponent<Rigidbody2D>().AddForce(Vector2.up * 300f);
                 var dsp = hurtNotif.GetComponent<displayDamage>();
-                dsp.damage = (int)(cs.HP / 10f);
+                dsp.damage = (int)(damage / 10f);
                 dsp.fond.enabled = false;
                 dsp.virgule.enabled = true;
                 dsp.color = new Color(0.57254905f, 0.07450981f, 0.10980392f);

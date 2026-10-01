@@ -11,6 +11,9 @@
 	- Super Skigillsanity: activate every Chest/Perk node of the Skigill on every character (558 total checks)
 	- Ultra Skigillsanity: activate every Stat node of the Skigill on every character (3444 total checks)
 - Traps now have individually configurable weights in yaml
+- Fixed Damage trap being able to kill
+- Fixed Damage trap strength config having the inverse of the expected effect
+- Fixed Damage trap popup number being incorrect with non-default settings
 - Added an on-by-default client option to disable achievements
 - Added an on-by-default client option to run game in background
 - Skigill node tooltips on the mid-run pause menu now display location number for chests, perks, stats, and bosses (bosses don't use this number yet but it's displayed anyways)
@@ -21,6 +24,7 @@
 - Made Drain Ski stats relative to node cost instead of current Ski, and markedly stronger
 - Ingame AP console now autoscrolls to bottom if it's already there
 - Fixed goals potentially not being sent while offline
+- Fixed client SFX being unintentionally quiet compared to game SFX
 - Backend:
   - Major refactor to entire codebase to make it less of a huge mess in general
   - Made slot data saving also thread-safe
