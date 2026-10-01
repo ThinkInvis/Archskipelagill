@@ -25,6 +25,7 @@
 - Ingame AP console now autoscrolls to bottom if it's already there
 - Fixed goals potentially not being sent while offline
 - Fixed client SFX being unintentionally quiet compared to game SFX
+- Added an ingame notification for client connection loss
 - Backend:
   - Major refactor to entire codebase to make it less of a huge mess in general
   - Made slot data saving also thread-safe
