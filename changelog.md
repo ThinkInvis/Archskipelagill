@@ -29,6 +29,7 @@
 - Backend:
   - Major refactor to entire codebase to make it less of a huge mess in general
   - Made slot data saving also thread-safe
+  - Added a new build config which automatically scrapes game data during launch
 
 ### 1.0.0-beta1
 
