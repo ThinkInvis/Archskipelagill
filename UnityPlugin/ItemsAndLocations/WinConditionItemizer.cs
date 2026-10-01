@@ -69,7 +69,7 @@ public class WinConditionItemizer : Module<WinConditionItemizer> {
         var tPrev = self.t;
         orig(self);
         var stats = GameObject.FindGameObjectWithTag("Player").GetComponent<CharaStats>();
-        if(stats.dead || stats.won) return;
+        if(stats.dead) return;
         for(var i = 1; i <= 10; i++) {
             if(self.t > i * 60 * 3 && tPrev <= i * 60 * 3) {
                 ArchipelagoClient.Instance.CheckLocationsByName($"Survived {i * 3} Minutes as {GameDataAccess.GameData.allCharacters.First(c => c.id == stats.chara).name}");
