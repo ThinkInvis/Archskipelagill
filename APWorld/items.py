@@ -95,7 +95,10 @@ def get_random_filler_item_name(world: SkigillWorld) -> str:
 def create_item_with_correct_classification(world: SkigillWorld, name: str) -> SkigillItem:
     classification = DEFAULT_ITEM_CLASSIFICATIONS[name]
 
-    if world.options.goal_type > 3 and name == "Progressive Difficulty":
+    if (world.options.goal_type > 3 or world.options.check_difficulty_survival) and name == "Progressive Difficulty":
+        classification = ItemClassification.progression | ItemClassification.useful
+        
+    if (world.options.check_hero_survival or world.options.check_difficulty_survival) and name == "Endless Mode":
         classification = ItemClassification.progression | ItemClassification.useful
 
     return SkigillItem(name, classification, ITEM_NAME_TO_ID[name], world.player)
