@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 from rule_builder.options import OptionFilter
 from rule_builder.rules import Has, HasAll, HasAny, Rule, False_
 
-from .game_data import SkillNodeType, SkillNodeRegion, SkillNode
+from .game_data import SkillNodeType, SkillNodeRegion, SkillNode, CHARACTER_NAMES
 from .scraped_game_data import SKILL_TREE, WEAPON_NAMES
 
 if TYPE_CHECKING:

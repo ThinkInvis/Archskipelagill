@@ -7,7 +7,7 @@ from BaseClasses import ItemClassification, Location, Region
 from itertools import islice
 
 from . import items
-from .game_data import SkillNodeType, SkillNodeRegion, SkillNode
+from .game_data import SkillNodeType, SkillNodeRegion, SkillNode, CHARACTER_NAMES
 from .scraped_game_data import WEAPON_NAMES, SKILL_TREE
 
 if TYPE_CHECKING:
@@ -39,8 +39,6 @@ LOCATION_NAME_TO_ID = {
 }
 
 locNameInd = len(LOCATION_NAME_TO_ID) + 1
-
-CHARACTER_NAMES = ["Mage", "Strongman", "Fox", "Prototype", "Dwarves", "Dragon"]
 
 for node in [n for n in SKILL_TREE if n.type == SkillNodeType.CHEST or n.type == SkillNodeType.PERK or n.type == SkillNodeType.STAT]:
     baseStr = f"Skigill {"Chest" if node.type == SkillNodeType.CHEST else "Perk" if node.type == SkillNodeType.PERK else "Stat"} #{node.index_of_type + 1} ({node.region.name})"

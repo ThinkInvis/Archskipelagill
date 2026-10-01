@@ -26,3 +26,4 @@ class SkillNode:
         self.index_of_type = index_of_type
         
 DEFAULT_STARTER_WEAPON_BY_CHARACTER = ["025Unlimited", "015Punch", "007grappin", "017Shockwave", "011Sword", "033LanceFlamme"]
+CHARACTER_NAMES = ["Mage", "Strongman", "Fox", "Prototype", "Dwarves", "Dragon"]
