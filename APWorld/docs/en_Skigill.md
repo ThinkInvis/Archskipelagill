@@ -26,6 +26,7 @@ Archskipelagill currently exists as a Custom implementation and must be installe
 - Built-in Location Tracker effects will highlight unchecked locations with spinning orbs and blinking minimap dots, and cause comets to fall/rise whenever you receive or send items.
 - A new button and submenu will be added to the main and pause menus, containing a connection panel and console for the Archipelago client.
 - A separate save file will be used by the mod, leaving the base game save file untouched. The mod's save file can be wiped from a button on the Archipelago submenu while disconnected.
+- 50 Gill will be granted each time a new run is started (by wiping the save file) to prevent some unplayable starts that weapon randomization can otherwise cause.
 
 ### Goals
 

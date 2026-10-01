@@ -1,5 +1,10 @@
 ## Changelog
 
+### 1.0.0-beta3
+
+- Fixed notifications being sent for disabled checks
+- Added a client option to have some Gill on start to prevent unplayable starts, default 50
+
 ### 1.0.0-beta2
 
 - Starting character and region are now randomized (can be disabled in yaml)
