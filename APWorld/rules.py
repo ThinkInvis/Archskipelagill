@@ -130,5 +130,19 @@ def set_all_location_rules(world: SkigillWorld) -> None:
         world.set_rule(world.get_location("Escaped as Dwarves"), Has("Character: Dwarves"))
         world.set_rule(world.get_location("Escaped as Dragon"), Has("Character: Dragon"))
 
+    if world.options.check_hero_survival:
+        for i in CHARACTER_NAMES:
+            for j in range(10):
+                if j >= 5:
+                    world.set_rule(world.get_location(f"Survived {(j+1)*3} Minutes as {i}"), Has("Endless Mode"))
+        
+    if world.options.check_difficulty_survival:
+        for i in range(7):
+            for j in range(10):
+                if i > 0:
+                    world.set_rule(world.get_location(f"Survived {(j+1)*3} Minutes on Difficulty {i+1}"), Has("Progressive Difficulty", i))
+                if j >= 5:
+                    world.set_rule(world.get_location(f"Survived {(j+1)*3} Minutes on Difficulty {i+1}"), Has("Endless Mode"))
+                
 def set_completion_condition(world: SkigillWorld) -> None:
     world.set_completion_rule(Has("Victory"))
